@@ -1,0 +1,33 @@
+,respectively
+iff.... if and only if
+We will also omit the subscript m in the notation
+, i.e.,
+e.g.
+Hence, we abuse the notation to let c →∗ tnˆ denote that the compound task c in some task network is
+with respect to
+Particularly
+holds in a state
+is substituted with its counterpart in TOHTN planning problems
+M and t1, t2 (or t) are (is) nullable
+By the induction hypothesis
+
+In this paper, we shall present such a transformation and show how
+the two models differ in regards to empty methods.
+
+A world state is modelled
+as a set of atomic propositions that are true in that state and
+every other proposition is false (closed world assumption)
+
+There might be multiple ways
+to decompose a task, each of these is described through a
+decomposition method
+
+Let us be given a plan........mejme plan
+
+In order to easier refer to states in each model we
+will re-index the states in the
+
+let us assume
+
+For a regular action ai, it 
+holds 
