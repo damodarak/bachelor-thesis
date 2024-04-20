@@ -1,0 +1,9 @@
+totaly ordered -> WITHOUt between, after...only before........before(mnozina) je stejne jako before(prvni z te mnoziny)...nesmi byt prazdne metody, dat si pozor kde provest test
+zkusim se neceho zbavit, ale za nejakych podminek
+
+jadro transformace
+
+TO chomsky
+grabybachova normalni akce.......prvni je terminal pak mix
+
+shop2 hddl...syntax modelu
