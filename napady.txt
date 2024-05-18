@@ -1,0 +1,7 @@
+nejednoznacne a jednoznacne HTN domeny
+stoupajici plany...htn domeny, kde operatory nemaji negativni efekty
+slozene tasky, ktere budou mit podukol dosahnout nejakeho proposition symbolu
+2nf
+odstaneni empty method
+operator with special semantics
+compound task with special semantics
