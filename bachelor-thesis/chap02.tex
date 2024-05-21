@@ -63,20 +63,20 @@ This rewriting rule symbolizing a \emph{method} is saying as follows: A method w
 Definition~\ref{def02:10} works well for \emph{planning domains} without \emph{empty methods} (a method that decomposes compound task into the empty set of subtasks). Using \emph{an empty method} creates undefined behavior because the decomposed compound task is removed from all constraints and thus it is unclear when the specified constraint should be checked. For this reason, we will later redefine method decomposition. 
 
 \begin{defn}\label{def02:11}
-    A \emph{(HTN) planning domain} is a quadruple $\mathcal{D} = (\mathcal{L} \ / \ P, O, C, M$), where $\mathcal{L} \ / \ P$ and $O$ are first-order language (\emph{set of propositional symbols}) and a set of operators, respectively, as described in the section \nameref{class_repre}, $C$ is a set of \emph{compound tasks} and $M$ represents a set of all methods.
+    A \emph{(HTN) planning domain} is a quadruple $\mathcal{D} = (\mathcal{L} \ / \ P, O, C, M$), where $\mathcal{L} \ / \ P$ and $O$ are first-order language (\emph{set of propositional symbols}) and a set of \emph{operators}, respectively, as described in the section \nameref{class_repre}, $C$ is a set of \emph{compound tasks} and $M$ represents a set of all methods.
     
-    \emph{Planning domain} will be referred to as \emph{totally-ordered} if all of the methods in $M$ and the initial \emph{task network} are \emph{totally-ordered} (there is a total strict ordering of sub-tasks). \emph{Planning domains} that are not \emph{totally-ordered} will be referred to as \emph{partially-ordered}.
+    \emph{Planning domain} will be referred to as \emph{totally-ordered} if all of the methods in $M$ and the \emph{initial task network} are \emph{totally-ordered} (there is a total strict ordering of sub-tasks). \emph{Planning domains} that are not \emph{totally-ordered} will be referred to as \emph{partially-ordered}.
 \end{defn}
 
 \medskip\noindent
 A first-order language $\mathcal{L}$ can be easily interchanged for a set of \emph{propositional symbols} $P$ due to the equivalent expressive power of \emph{set-theoretic representation} and \emph{classical representation}~\cite{nau}.
 
 \begin{defn}\label{def02:12}
-    A \emph{(hierarchical) planning problem} is a triple $\mathcal{P} = (s_0,\omega,\mathcal{D})$ that consists of initial state of the world $s_0$, initial \emph{task network} $\omega$ and a \emph{planning domain} $\mathcal{D}$.
+    A \emph{(hierarchical) planning problem} is a triple $\mathcal{P} = (s_0,\omega,\mathcal{D})$ that consists of \emph{initial state} of the world $s_0$, \emph{initial task network} $\omega$ and a \emph{planning domain} $\mathcal{D}$.
 \end{defn}
 
 \begin{defn}\label{def02:13}%solution........decompo tree
-    A \emph{solution} to the \emph{planning problem} $\mathcal{P}$ is a \emph{plan} $\pi=(a_1,\dots,a_k)$. This sequence of \emph{actions} is assembled from a \emph{primitive task network} $\omega'=(U',C')$ after the application of a sequence of methods from $M$ to the initial \emph{task network} $\omega$. A \emph{solution} $\pi$ needs to be valid, i.e., $\gamma(s_0,\pi)$ is not undefined and also needs to satisfy all of the constraints in $C'$. That is:
+    A \emph{solution} to the \emph{planning problem} $\mathcal{P}$ is a \emph{plan} $\pi=(a_1,\dots,a_k)$. This sequence of \emph{actions} is assembled from a \emph{primitive task network} $\omega'=(U',C')$ after the application of a sequence of methods from $M$ to the \emph{initialtask network} $\omega$. A \emph{solution} $\pi$ needs to be valid, i.e., $\gamma(s_0,\pi)$ is not undefined and also needs to satisfy all of the constraints in $C'$. That is:
     
     \begin{itemize}
         \item $t_i \prec t_j \implies i < j$,
@@ -98,7 +98,7 @@ A first-order language $\mathcal{L}$ can be easily interchanged for a set of \em
 With the knowledge acquired in the previous sections, we can try to map planning definitions and structures to the definitions and structures of the theory of Automata and Grammars. By doing so, we would be able to utilize already discovered knowledge and algorithms. Furthermore, it will allow us to prove different language classifications~\cite{langclassification}.
 
 \medskip\noindent
-The simplest example is to map \emph{classical planning problem} to the equivalent DFA, and vice versa. The mapped DFA generates all of the \emph{solutions}, i.e., \emph{plans} that are valid, \emph{applicable} to the initial state $s_0$ and satisfy the goal $g$.
+The simplest example is to map \emph{classical planning problem} to the equivalent DFA, and vice versa. The mapped DFA generates all of the \emph{solutions}, i.e., \emph{plans} that are valid, \emph{applicable} to the \emph{initial state} $s_0$ and satisfy the goal $g$.
 
 \begin{thm}\label{thm02:1}
     For every \emph{classical planning problem $\mathcal{P} = (S, A, \gamma, s_0, g)$}, where $(S, A, \gamma)$ is a \emph{planning domain}, there exists a DFA~\cite{chytil} $D = (Q, \Sigma, \delta, q_0, F)$ such that $D$ generates all the \emph{solutions} for $\mathcal{P}$.
@@ -111,7 +111,7 @@ The simplest example is to map \emph{classical planning problem} to the equivale
     For every DFA $D = (Q, \Sigma, \delta, q_0, F)$ there exists a correspondent \emph{classical planning problem $\mathcal{P} = (S, A, \gamma, s_0, g)$} where the set of \emph{solutions} of $\mathcal{P}$ is equal to $L(D)$.
 \end{thm}
 \begin{proof}
-    Having DFA $D = (Q, \Sigma, \delta, q_0, F)$, we will construct \emph{planning problem} $\mathcal{P}$ with individual components defined as follows. Without loss of generality, we will rename states of $Q$. Each state $q \in Q$ will have a unique index $i$: $0 \leq i < |Q|$. $q_0$ is the initial state of $D$. Now we define $\mathcal{P} = (S, A, \gamma, s_0, g)$ with:
+    Having DFA $D = (Q, \Sigma, \delta, q_0, F)$, we will construct \emph{planning problem} $\mathcal{P}$ with individual components defined as follows. Without loss of generality, we will rename states of $Q$. Each state $q \in Q$ will have a unique index $i$: $0 \leq i < |Q|$. $q_0$ is the \emph{initial state} of $D$. Now we define $\mathcal{P} = (S, A, \gamma, s_0, g)$ with:
 
     \begin{gather*}
         S = \{{\{i\} | q_i \in Q - F}\} \cup \{{\{i, goal\} | q_i \in F}\}, \\
@@ -139,28 +139,33 @@ Now we will prove that \emph{totally-ordered} HTN planning can be represented as
     For every CF grammar $G = (V_G, T_G, P_G, S_G)$~\cite{chytil} there exists a correspondent \emph{totally ordered planning problem} $\mathcal{P} = (s_0,\omega,\mathcal{D})$ with $\mathcal{D}=(P, O, C, M)$ such that the set of \emph{solutions} of $\mathcal{P}$ is equal to $L(G)$.
 \end{thm}
 \begin{proof}
-    Constructing \emph{planning problem $\mathcal{P}$} is uncomplicated and intuitive because the structures are similar. All we need is to handle \emph{operators $o \in O$} so that the generated \emph{plans} are \emph{applicable} to the initial state $s_0$. Having $G = (V_G,T_G,P_G,S_G)$ we construct $\mathcal{P} = (\{\}, (\{S_G\}, \{\}), \mathcal{D})$ with $\mathcal{D} = (\{\},T_G,V_G,M)$. Methods are defined as follows:
+    Constructing \emph{planning problem $\mathcal{P}$} is uncomplicated and intuitive because the structures are similar. All we need is to handle \emph{operators $o \in O$} so that the generated \emph{plans} are \emph{applicable} to the \emph{initial state} $s_0$. Having $G = (V_G,T_G,P_G,S_G)$ we construct $\mathcal{P} = (\{\}, (\{S_G\}, \{\}), \mathcal{D})$ with $\mathcal{D} = (\{\},T_G,V_G,M)$. Methods are defined as follows:
     
     \[
     M = \{T \rightarrow T_1,\dots,T_k \; [ \; \{T_i \prec T_j \; | \; 1 \leq i < j \leq k\} \; ] \; | \; (T,T_1 \dots T_k) \in P_G\}.
     \]
     
-    Using this construction, the \emph{planning problem $\mathcal{P}$} can now generate the set of \emph{plans} that equals $L(G)$. One problem is that the generated \emph{plans} might not be valid \emph{solutions}. This can be handled conveniently if we use empty sets for the preconditions of all operators. Each $o \in O$ will be defined as $o = (\{\}, \{\}, \{\})$. The result of this modification is that every possible \emph{plan} is now a valid \emph{solution} if it can be decomposed from the \emph{initial task network}.
+    Using this construction, the \emph{planning problem $\mathcal{P}$} can now generate the set of \emph{plans} that equals $L(G)$. One problem is that the generated \emph{plans} might not be valid \emph{solutions}. This can be handled conveniently if we use empty sets for the preconditions of all \emph{operators}. Each $o \in O$ will be defined as $o = (\{\}, \{\}, \{\})$. The result of this modification is that every possible \emph{plan} is now a valid \emph{solution} if it can be decomposed from the \emph{initial task network}.
 \end{proof}
 
 \begin{thm}\label{thm02:4}
     For every \emph{totally ordered planning problem} $\mathcal{P} = (s_0,\omega,\mathcal{D})$ with $\mathcal{D}=(P, O, C, M)$ without \emph{before-, after-, between-constraints} there exists a CF language $L$ that is equal to the set of \emph{solutions} of $\mathcal{P}$.
 \end{thm}
 \begin{proof}
-    Let $\mathcal{P} = (s_0,\omega = (U, C), \mathcal{D} = (P, O, C, M))$ be a \emph{totally ordered planning problem} in which constraints of each method consist only of \emph{ordering constraints}. We will construct CF grammar $G = (V_G, T_G, P_G, S_G)$ where $V_G = C, T_G = O$ and $S_G \in U$. We assume that the initial \emph{task network} $\omega$ consists of one task, $|U| = 1$. If there are more tasks (that are totally ordered by constraints $C$), we will add one extra production rule to the $P_G$ that rewrites the new starting symbol $S'_G$ to the given state of $\omega = (U, C)$. The set of production rules is defined as follows:
+    Let $\mathcal{P} = (s_0,\omega = (U, C), \mathcal{D} = (P, O, C, M))$ be a \emph{totally ordered planning problem} in which constraints of each method consist only of \emph{ordering constraints}. We will construct CF grammar $G = (V_G, T_G, P_G, S_G)$ where $V_G = C, T_G = O$ and $S_G \in U$. We assume that the \emph{initial task network} $\omega$ consists of one task, $|U| = 1$. If there are more tasks (that are totally ordered by constraints $C$), we will add one extra production rule to the $P_G$ that rewrites the new starting symbol $S'_G$ to the given state of $\omega = (U, C)$. The set of production rules is defined as follows:
     
     \[
     P_G = \{(T, T_1\dots T_k) \; | \; (T, \{T_1, \dots, T_k\}, \{T_i \prec T_j \; | \; 1 \leq i < j \leq k\}) \in M\}.
     \]
 
-    Grammar $G$ generates all \emph{plans} that can be generated with $\mathcal{P}$. Some of these \emph{plans} might be valid \emph{solutions} and some of them might not be \emph{applicable} to the \emph{initial state} $s_0$. 
+    Grammar $G$ generates all \emph{plans} that can be generated with $\mathcal{P}$. Some of these \emph{plans} might be valid \emph{solutions} and some of them might not be \emph{applicable} to the \emph{initial state} $s_0$. In other words, $L(G)$ is a superset of all possible \emph{solutions} of $\mathcal{P}$. To solve this issue it is sufficient to use the fact that the intersection of a context-free language and a regular language is resulting into context-free language~\cite{chytil}. We can use Theorem~\ref{thm02:1} to build a DFA $D$ that will generate all \emph{plans} that are \emph{applicable} to $s_0$. The empty set of goal symbols $g = \emptyset$ will ensure that the language of $D$ equals to all possible \emph{plans} that are allowed by the planning \emph{operators} $O$. Having everything prepared, we can construct a CF language $L = L(G) \cap L(D)$ which is equal to the set of \emph{solutions} of $\mathcal{P}$.
 \end{proof}
 
 \begin{cor}\label{cor2:2}
 Totally-ordered HTN planning is classified into the class of context-free languages.
 \end{cor}
+
+\section{HTN Plan Verification}
+
+\medskip\noindent
+Hierarchical plan verification can be seen as a reversal process to the decomposition of a \emph{initial task network} into a \emph{plan} that is \emph{applicable} to the \emph{initial state} $s_0$ and satisfies all constraints. Given a \emph{hierarchical planning domain} $\mathcal{D} = (P, O, C, M)$, \emph{initial task network} $\omega$, an \emph{initial state} $s_0$, and a \emph{plan} $\pi$, we ask if it is possible to decompose the $\omega$ into $\pi$ using $\mathcal{D}$. Depending on a hierarchical model or semantics specification, there might be some additional information to the input of a plan verification problem. An approach for totally-ordered plan verification with method preconditions is discussed here~\cite{cmyk}.       
