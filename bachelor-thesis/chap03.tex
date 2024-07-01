@@ -1,7 +1,35 @@
 \chapter{{HTN} Semantics}
 
 \medskip\noindent
+So far we have only discussed the definitions of classical and hierarchical planning. In this chapter, we will consider various semantics for hierarchical planning. A large part of this chapter will compare and describe semantics concerning \emph{empty methods} which are not defined properly within Definition~\ref{def02:10}. The main issue regarding \emph{empty methods} is caused by the unclear and ambiguous modification of \emph{task network's} constraints. It is uncertain how and when the modified constraints need to be checked. In the first part of this chapter, we will analyze existing approaches and propose new ways of handling \emph{empty methods} concerning the HTN plan verification process. In the second part, we will propose a new idea for modeling hierarchical planning problems without the negative effects of \emph{primitive tasks}.
 
-\section{Title of the first subchapter of the third chapter}
+\section{HTN Semantics \& Empty Methods}
 
-\section{Title of the second subchapter of the third chapter}
+\medskip\noindent
+This section will describe different solutions of how to handle \emph{empty methods}. Suppose we have a basic \emph{task network} $\omega = (\{t1, t2\}, \{t1 \prec t2, \; before(p, t2)\})$. In natural language, we would say that task (\emph{primitive} or \emph{compound}) $t1$ must precede task $t2$, and at the same time, before executing the first task to which task $t2$ decomposes (in case of a \emph{primitive task}, we mean the state before the \emph{application} of the task $t2$) the \emph{propositional symbol} $p$ must hold in a state. Having an \emph{empty method} $m$ such that:
+
+\[
+    t2 \rightarrow \varepsilon \quad [C], \; where \; C = \emptyset \; and \; \varepsilon \; denotes \; no \; subtasks,
+\]
+
+\noindent
+we can decompose the $t2$ in \emph{task network} $\omega$. After the $application$ of the \emph{empty method} $m$, we are not able to tell with certainty the result \emph{task network}. By \emph{applying} $m$, we erase the task $t2$ from the set of tasks in $\omega$ and we modify all of the constraints in $C$. The unclear result might look like this: $\omega' = (\{t1\}, \\ \{t1 \prec \; ?, \; before(p, ?)\})$ with $?$ symbolizing undefined behaviour. Thus, the following section will study different ways of representing HTN planning with the goal of resolving undefined behavior of \emph{empty methods}. Usually, we will need some additional information about \emph{task network's} decomposition process which will deal with unclear situations.
+
+\subsection{No Empty Methods Model}
+
+\medskip\noindent
+The most effortless way to handle \emph{empty methods} is to forbid them (every dictator would approve). This way, each \emph{method} $m \in M$ must have nonempty set of $subtasks(m)$, i.e.:
+
+\[
+    T \rightarrow T_1,\dots,T_k \quad [C], \; where \; k \geq 1.
+\]
+
+\noindent
+The main benefit of this semantics is regarding the \emph{method} decomposition Definition~\ref{def02:10}. By forbidding the usage of \emph{empty methods} we are not able to create fuzzy situations with unclear constraints. This way we do not need to adjust any definition and everything works as it should.
+
+\medskip\noindent
+As it happens in life, forbidding something might help in some cases but, on the other hand, it closes doors for the flexibility and advantages of \emph{empty methods}. Now, it is not possible to fulfill the task by doing nothing which might be very convenient in states that already hold all desired \emph{propositional symbols}. In such states, the decomposition of certain \emph{compound tasks} is meaningless and creates \emph{plans} that are longer than \emph{plans} which would allow \emph{empty methods}.
+
+\subsection{NO-OP Model}
+
+\section{compound task with special semantics + CS that need to achieve some propos symbol + operators without negative effects}

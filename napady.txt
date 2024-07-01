@@ -5,3 +5,5 @@ slozene tasky, ktere budou mit podukol dosahnout nejakeho proposition symbolu
 odstaneni empty method
 operator with special semantics
 compound task with special semantics
+
+dosazitelnost, uzitecne neuzitecne symboly
