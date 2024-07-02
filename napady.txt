@@ -7,3 +7,7 @@ operator with special semantics
 compound task with special semantics
 
 dosazitelnost, uzitecne neuzitecne symboly
+
+TO
+nova semantika, ktera dovoluje empty methods...kdyz odstranime task tak vsechny constrainty poupravime, z after se muze stat before nasledujici akce atd.. odstranit orderingy
+ 
