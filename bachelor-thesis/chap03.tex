@@ -8,21 +8,21 @@ So far we have only discussed the definitions of classical and hierarchical plan
 \medskip\noindent
 The following section will describe different solutions of how to handle \emph{empty methods}.
 
-\begin{example}\label{ex03:5}
-    Suppose we have a basic \emph{task network} $\omega = (\{t1, t2\}, \{t1 \prec t2, \\ before(p, t2)\})$. In natural language, we would say that task (\emph{primitive} or \emph{compound}) $t1$ must precede task $t2$, and at the same time, before executing the first task to which task $t2$ decomposes (in case of a \emph{primitive task}, we mean the state before the \emph{application} of the task $t2$) the \emph{propositional symbol} $p$ must hold in a state. Having an \emph{empty method} $m$ such that:
+\begin{example}\label{ex03:6}
+    Suppose we have a simple \emph{task network} $\omega = (\{t1, t2\}, \{t1 \prec t2, \\ before(p, t2)\})$. In natural language, we would say that task (\emph{primitive} or \emph{compound}) $t1$ must precede task $t2$, and at the same time, before executing the first task to which task $t2$ decomposes (in case of a \emph{primitive task}, we mean the state before the \emph{application} of the task $t2$) the \emph{propositional symbol} $p$ must hold in a state. Having an \emph{empty method} $m$ such that:
     
     \[
         t2 \rightarrow \varepsilon \quad [C], \; where \; C = \emptyset \; and \; \varepsilon \; denotes \; no \; subtasks,
     \]
     
     \noindent
-    we can decompose the $t2$ in \emph{task network} $\omega$. After the $application$ of the \emph{empty method} $m$, we are not able to tell with certainty the result \emph{task network}. By \emph{applying} $m$, we erase the task $t2$ from the set of tasks in $\omega$ and we modify all of the constraints in $C$. The unclear result might look like this: $\omega' = (\{t1\}, \{t1 \prec \; ?, \\ before(p, ?)\})$ with $?$ symbolizing undefined behaviour. Thus, the following section will study different ways of representing HTN planning with the goal of resolving undefined behavior of \emph{empty methods}. Usually, we will need some additional information about \emph{task network's} decomposition process which will deal with unclear situations. Sometimes we will need to modify existing definitions from previous chapters.
+    we can decompose the $t2$ in \emph{task network} $\omega$. After the $application$ of the \emph{empty method} $m$, we are not able to tell with certainty the result \emph{task network}. By \emph{applying} $m$, we erase the task $t2$ from the set of tasks in $\omega$ and we modify all of the constraints in $C$. The unclear result might look like this: $\omega' = (\{t1\}, \{t1 \prec \; ?, \\ before(p, ?)\})$ with $?$ symbolizing undefined behaviour. Thus, the following section will study different ways of representing HTN planning with the goal of resolving undefined behavior of \emph{empty methods}. Usually, we will need some additional information about \emph{task network's} decomposition process which will deal with unclear situations. Sometimes we will need to modify existing definitions from the previous chapters.
 \end{example}
 
 \subsection{No Empty Methods Model}\label{sub03:311}
 
 \medskip\noindent
-The most effortless way to handle \emph{empty methods} is to forbid them (every dictator would approve). This way, each \emph{method} $m \in M$ must have nonempty set of $subtasks(m)$, i.e.:
+The most effortless way to handle \emph{empty methods} is to forbid them (every totalitarian dictator would approve). This way, each \emph{method} $m \in M$ must have nonempty set of $subtasks(m)$, i.e.:
 
 \[
     T \rightarrow T_1,\dots,T_k \quad [C], \; where \; k \geq 1.
@@ -40,13 +40,13 @@ Succeeding models will allow different kinds of \emph{empty methods}, usually by
 \subsection{No-op Based Model (version 1)}
 
 \medskip\noindent
-Another possible way to resolve the issue with \emph{empty methods} is the No-op model~\cite{ondrckova2023semantics}. The no-op model introduces a new symbol $no\text{-}op()$ which is not presented in the \emph{hierarchical planning domain}. Formally, the $no\text{-}op()$ symbol is just another \emph{primitive task} with no preconditions and effects, i.e. $no\text{-}op() = \{\{\}, \{\}, \{\}\}$. The semantics behind this symbol is hidden right in the name, "no operation", meaning that this action has no impact on the world that we model. It serves as a regular symbol during the planning phase concerning all of the \emph{ordering constraints} and \emph{before-, after-, between-constraint}. After the checking of all available constraints, the $no\text{-}op()$ symbol is deleted from the final \emph{plan} as it was not part of the former \emph{planning problem}.
+Another possible way to resolve the issue with \emph{empty methods} is the No-op model~\cite{ondrckova2023semantics}. The no-op model introduces a new symbol $no\text{-}op()$ which is not presented in the \emph{hierarchical planning domain}. Formally, the $no\text{-}op()$ symbol is just another \emph{primitive task} with no preconditions and effects, i.e. $no\text{-}op() = (\{\}, \{\}, \{\})$. The semantics behind this symbol is hidden right in the name, "no operation", meaning that this action has no impact on the world that we model. It serves as a regular symbol during the planning phase concerning all of the \emph{ordering constraints} and \emph{before-, after-, between-constraint}. After the checking of all available constraints, the $no\text{-}op()$ symbol is deleted from the final \emph{plan} as it was not part of the former \emph{planning problem}.
 
 \medskip\noindent
 Pros of the no-op model are easily seen. We have solved the issue of \emph{empty methods} by introducing a new symbol $no\text{-}op()$ and at the same time we did not need to allow regular \emph{empty methods} which decompose a task into an empty set. The no-op model extends the previous model Section~\ref{sub03:311}.
 
 \medskip\noindent
-Cons of this model appear in the HTN plan verification, reverse process to the \emph{hierarchical planning}. The main problem is due to the fact that the $no\text{-}op()$ symbols are not part of the input to the plan verification because they are removed after the check of all constraints in a \emph{primitive task network} (consists only of \emph{primitive tasks}). For this reason, the no-op model is inefficient for plan verification because it would be need to guess the locations and number of no-op() symbols in the input \emph{plan}, e.g.:
+Cons of this model lies in the HTN plan verification, reverse process to the \emph{hierarchical planning}. The main problem is due to the fact that the $no\text{-}op()$ symbols are not part of the input to the plan verification because they are removed after the check of all constraints in a \emph{primitive task network} (consists only of \emph{primitive tasks}). For this reason, the no-op model is inefficient for plan verification because it would be needed to guess the locations and number of no-op() symbols in the input \emph{plan}, e.g.:
 
 \begin{gather*}
     input: \pi = (task1, task2, task3) \\
@@ -59,12 +59,46 @@ Cons of this model appear in the HTN plan verification, reverse process to the \
 \subsection{No-op Based Model (version 2)}
 
 \medskip\noindent
-The main problem with the no-op model is the inability to verify \emph{plan} efficiently. In the preceding no-op model, we erase $no\text{-}op()$ symbols after the checking of all constraints. It is possible to avoid this problem by forcing the planner of \emph{planning problem} to include the $no\text{-}op()$ symbol into his \emph{planning domain} and treat it as an \emph{empty method} (in some sense). With this practice, the planner will not need to erase $no\text{-}op()$ symbols in the resulting \emph{plan} which will make HTN plan verification much more efficient.
+The main problem with the no-op model is the inability to verify \emph{plan} efficiently. In the preceding no-op model, we erase $no\text{-}op()$ symbols after the checking of all constraints. It is possible to avoid this problem by forcing the planner of \emph{planning problem} to include the $no\text{-}op()$ symbol into his \emph{planning domain} and treat it as an \emph{empty method} (in some sense). With this practice, the planner will not need to erase $no\text{-}op()$ symbols in the resulting \emph{plan} which will make HTN plan verification much more efficient. The second version of the no-op model also extends Section~\ref{sub03:311} (No Empty Methods Model) as it does not allow real \emph{empty methods} in \emph{planning problems}.
+
+\medskip\noindent
+Even though we have solved the \emph{empty methods} problem and HTN verification problem, we still have not used \emph{empty methods}, but rather some illusion of them. In the coming models, we will try to integrate actual \emph{empty methods}, however, more planning information will be required.
 
 \subsection{Constraint Graph Model}
 
-\subsection{Index Based Model}
+\medskip\noindent
+A similar yet not equivalent ideas can be viewed in the book \emph{Automated Planning: theory and practice (Chapter 11, STN Planning)}~\cite{nau}.
+
+\medskip\noindent
+The constraint graph model will be the first in the series of models that will allow actual usage of \emph{empty methods}. For this purpose, we will redefine \emph{task network} and \emph{method decomposition}. \emph{Task network} will be represented with a directed acyclic graph (DAG) displaying the evolution of the \emph{initial task network} into the \emph{primitive task network}. \emph{Method decomposition} will append new directed edges to the \emph{task network} (graph). Each directed edge $(u,v)$ determines the \emph{compound task $u$} and task (\emph{primitive or compound}) $v$ to which the \emph{compound task $u$} decomposes. Vertices will hold additional information about constraints. Now, let's put it all more formally.
+
+\medskip\noindent
+\emph{Task network} is a DAG $G = (V, E)$ in which the set of vertices $V$ portray \emph{primitive or compound tasks} and edges depict task decomposition done by \emph{methods}. As we know, only \emph{compound tasks} can be decomposed, which is why edges can emerge only from vertices with \emph{compound tasks}. In this model, only the graph's leaves can be decomposed, otherwise, it would be possible to decompose a task multiple times which is unwanted. Having a \emph{method} $m = (compound(m), subtasks(m), constr(m))$ and a \emph{task network} $G$ with a vertex symbolizing a \emph{compound task} $compound(m)$, we can apply the \emph{method} $m$ on \emph{task network} $G$. As a result, we get $G' = (V \cup subtasks(m), E \cup \{(compound(m), sub) | sub \in subtasks(m)\})$. The definition of \emph{task decomposition} has one special case: unsurprisingly, \emph{an empty method}. In this model, we do not want to follow practices of no-op models by forcing the planner to use a special symbol $no\text{-}op()$. The desirable outcome is to support real \emph{empty methods}, \\ i.e. $T \rightarrow \varepsilon \; [C]$ meanwhile allowing the planner to check all types of constraints completely. To fulfill this requirement an \emph{empty method} will also create a new special vertex denoted by $\square$. This vertex serves for the sake of constraints in the \emph{primitive task network}. E.g. having a \emph{compound task} $comp$ and a \emph{method} $comp \rightarrow \square \; [C]$, applying the \emph{method} to the \emph{task} $comp$ would create a new vertex $\square$ and a new directed edge $(comp, \square)$. The difference between this approach and $no\text{-}op()$ model approach is that here the empty vertex does not have any impact on actual \emph{plan} (sequence of \emph{primitive tasks}). Thus, the planner does not need to integrate or use any new symbols in the solving phase of a \emph{planning problem}. 
+
+\medskip\noindent
+The last thing to mention is the constraints and their semantics in this model. Constraints, as we know them from previous models, have their meaning in the planning phase. Instead of having one single set with all constraints in the \emph{task network}, each vertex in the graph will have its own set of constraints. Every \emph{task decomposition} provided by a \emph{method} creates new vertices in the graph with an empty set of constraints. If a \emph{method} has a non-empty set of constraints then (when the application of a \emph{method} takes place) they are passed to the vertex constraints set which is being decomposed. For this purpose, each vertex in the graph is a pair of a vertex and the set of constraints linked to that \emph{compound task}.
+
+\medskip\noindent
+On contrary to previous models and definitions, in this model the tasks and constraints are not erased nor modified from the \emph{task network}, they are only appended. This practice does not create any inconsistent state, because, in the end, all of the constraints in all vertices must be satisfied for a \emph{plan} to be valid. 
+
+\medskip\noindent
+\emph{A solution} to the \emph{planning problem} is a \emph{plan} $\pi = (t_1, \dots, t_k$) that is \emph{applicable} to the \emph{initial state}. Moreover, all constraints must be satisfied for each vertex in the constraint graph. The scope of constraints located in a vertex has constraints only for the sub-tree of the given vertex. This feature is possible since the constraint graph is directed and acyclic.
+
+\medskip\noindent
+The constraint graph model allows planners to create and verify plans without the demand of new symbols for the representation of \emph{empty methods}. Since the constraints are appended to the model, rather than adjusted, it is possible to spot constraint collisions much earlier. The downside of this model is the graph itself which will need additional information stored somewhere.
+
+\begin{example}\label{ex03:7}
+\xxx{from init task network to primitve, usage of empty methods, ordering constraints, before constr}
+\end{example}
+
+\subsection{Index-Based Model}
+
+\medskip\noindent
+In this subsection, we will inspect a model that will combine ideas of a \emph{task network} defined in Definition~\ref{def02:9} and constraint satisfaction problem. The index-based model was first proposed here~\cite{ondrckova2023semantics}. The core idea lies in two functions: $start(t)$ and $end(t)$ with $t$ being a task (\emph{primitive or compound}). These two functions indicate the beginning and the end of the task, or, in other words, the first and the last \emph{primitive task} in \emph{plan} to which the task decomposes. If the task is already \emph{primitive} then $start(t) = end(t)$ holds. The image of functions $start$ and $end$ is $\mathbb{N} \cup \{n + 0.5 \; | \; n \in \mathbb{N}\}$. The image of these functions is differentiated between natural numbers which express actions that actually do something (\emph{primitive tasks}) and so-called half-indexes which represent \emph{empty methods}. The meaning behind half-indexes is that the task that expresses no action or an \emph{empty method} points to a specific place between tasks. This helps the planner to identify the location of \emph{empty methods} and to check all constraints properly.
 
 \subsection{Increment Based Model}
+only TO
+
+\subsection{Comparisons}
 
 \section{compound task with special semantics + CS that need to achieve some propos symbol + operators without negative effects}
