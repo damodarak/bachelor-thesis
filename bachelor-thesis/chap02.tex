@@ -75,7 +75,7 @@ A first-order language $\mathcal{L}$ can be easily interchanged for a set of \em
     A \emph{(hierarchical) planning problem} is a triple $\mathcal{P} = (s_0,\omega,\mathcal{D})$ that consists of \emph{initial state} of the world $s_0$, \emph{initial task network} $\omega$ and a \emph{planning domain} $\mathcal{D}$.
 \end{defn}
 
-\begin{defn}\label{def02:13}%solution........decompo tree
+\begin{defn}\label{def02:13}
     A \emph{solution} to the \emph{planning problem} $\mathcal{P}$ is a \emph{plan} $\pi=(a_1,\dots,a_k)$. This sequence of \emph{actions} is assembled from a \emph{primitive task network} $\omega'=(U',C')$ after the application of a sequence of \emph{methods} from $M$ to the \emph{initialtask network} $\omega$. A \emph{solution} $\pi$ needs to be valid, i.e., $\gamma(s_0,\pi)$ is not undefined and also needs to satisfy all of the constraints in $C'$. That is:
     
     \begin{itemize}
