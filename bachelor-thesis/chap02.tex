@@ -30,7 +30,7 @@ All of the following definitions are correspondent and equivalent to the definit
 \end{defn}
 
 \medskip\noindent
-In accordance with the Definition~\ref{def01:5}, the more formal definition~\cite{complexity}~\cite{langclassification} of the \emph{task network} would contain some function $\alpha: U \rightarrow N$, which would map instances of \emph{primitive} and \emph{compound tasks} to the set of names of all \emph{tasks}. This function would allow us to have multiple instances of the same \emph{task} in the set of tasks $U$, each with a unique identifier. We will omit a function $\alpha$ because its context will be always clear.
+In accordance with the Definition~\ref{def01:5}, the more formal definition~\cite{complexity}~\cite{langclassification}~\cite{nau} of the \emph{task network} would contain some function $\alpha: U \rightarrow N$, which would map instances of \emph{primitive} and \emph{compound tasks} to the set of names of all \emph{tasks}. This function would allow us to have multiple instances of the same \emph{task} in the set of tasks $U$, each with a unique identifier. We will omit a function $\alpha$ because its context will be always clear.
 
 \begin{defn}\label{def02:10}
     A \emph{method} is a triple $m = (compound(m),subtasks(m), \\ constraints(m))$, where $compound(m)$ is a \emph{compound  task} and $(subtasks(m), \\ constraints(m))$ is a \emph{task network}. Having a \emph{task network} $\omega=(U,C)$, \emph{compound task} $c \in U$, and an instance of \emph{method} $m$ from $M$. Then $m$ decomposes $c$ into $subtasks(m)$, creating a new \emph{task network} $\omega'=(U',C')$ of a form:
@@ -60,7 +60,7 @@ T \rightarrow T_1,\dots,T_k \quad [C].
 This rewriting rule symbolizing a \emph{method} is saying as follows: A \emph{method} which decomposes the \emph{compound task} $T$ into sub-tasks $T_1,\dots,T_k$ under the constraints $C$.
 
 \medbreak\noindent
-Definition~\ref{def02:10} works well for \emph{planning domains} without \emph{empty methods} (a \emph{method} that decomposes compound task into the empty set of subtasks). Using \emph{an empty method} creates undefined behavior because the decomposed compound task is removed from all constraints and thus it is unclear when the specified constraint should be checked. For this reason, we will later redefine \emph{method} decomposition. 
+Definition~\ref{def02:10} works well for \emph{planning domains} without \emph{empty methods} (a \emph{method} that decomposes compound task into the empty set of subtasks). Using \emph{an empty method} creates undefined behavior because the decomposed compound task is removed from all constraints and thus it is unclear where the specified constraint should be checked. For this reason, we will later redefine \emph{method} decomposition. 
 
 \begin{defn}\label{def02:11}
     A \emph{(HTN) planning domain} is a quadruple $\mathcal{D} = (\mathcal{L} \ / \ P, O, C, M$), where $\mathcal{L} \ / \ P$ and $O$ are first-order language (\emph{set of propositional symbols}) and a set of \emph{operators}, respectively, as described in the section \nameref{class_repre}, $C$ is a set of \emph{compound tasks} and $M$ represents a set of all \emph{methods}.
@@ -76,21 +76,20 @@ A first-order language $\mathcal{L}$ can be easily interchanged for a set of \em
 \end{defn}
 
 \begin{defn}\label{def02:13}
-    A \emph{solution} to the \emph{planning problem} $\mathcal{P}$ is a \emph{plan} $\pi=(a_1,\dots,a_k)$. This sequence of \emph{actions} is assembled from a \emph{primitive task network} $\omega'=(U',C')$ after the application of a sequence of \emph{methods} from $M$ to the \emph{initialtask network} $\omega$. A \emph{solution} $\pi$ needs to be valid, i.e., $\gamma(s_0,\pi)$ is not undefined and also needs to satisfy all of the constraints in $C'$. That is:
+    A \emph{solution} to the \emph{planning problem} $\mathcal{P}$ is a \emph{plan} $\pi=(a_1,\dots,a_k)$. This sequence of \emph{actions} is assembled from a \emph{primitive task network} $\omega'=(U', C')$ after the application of a sequence of \emph{methods} from $M$ to the \emph{initial task network} $\omega$. A \emph{solution} $\pi$ needs to be valid, i.e., $\gamma(s_0,\pi)$ is not undefined and also needs to satisfy all of the constraints in $C'$. That is:
     
     \begin{itemize}
         \item $t_i \prec t_j \implies i < j$,
-        \item $before(l,V) \implies l \in s_{min\{i \; | \; a_i \; \in \; U\} \; - \; 1}$,
-        \item $after(V,l) \implies l \in s_{max\{i \; | \; a_i \; \in \; U\}}$,
+        
+        \item $before(l, V) \implies l \in s_{min\{i \; | \; a_i \; \in \; V\} \; - \; 1}$ (if the literal $l$ is negative then it must not be in a state, same applies for other constraints),
+        
+        \item $after(V,l) \implies l \in s_{max\{i \; | \; a_i \; \in \; V\}}$,
+        
         \item $between(V',l,V'') \implies (\forall j, \; max\{i \; | \; a_i \; \in \; V'\} \; \leq \; j \; < \; min\{i \; | \; a_i \; \in \; V''\}: l \; \in \; s_j)$.
     \end{itemize}
     
     By $l$ we mean a ground instance of a literal $l$ (in the case of \emph{set-theoretic} representation it would be $p \in P$).
 \end{defn}
-
-\begin{example}\label{ex02:5}
-    \xxx{some example of complete planning problem and possibly a picture}
-\end{example}
 
 \section{HTN and Context-free Grammars}
 

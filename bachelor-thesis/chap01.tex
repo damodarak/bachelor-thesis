@@ -33,9 +33,9 @@ All of the following definitions are correspondent and equivalent to the definit
   \begin{itemize}
     \item $\Sigma = (S, A, \gamma)$ is a \emph{planning domain} on $P$.
     
-    \item $s_o \in S$ is an \emph{initial state}.
+    \item $s_0 \in S$ is an \emph{initial state}.
     
-    \item $g \subseteq P$ is a set of \emph{goal proposition symbol}, which must be true in the state after the final action of a plan (will be defined in Definition~\ref{def01:3}). $S_g=\{s \in S | g \subseteq s\}$ is a set of goal states, i.e., states that satisfy the \emph{planning problem}~$\mathcal{P}.$
+    \item $g \subseteq P$ is a set of \emph{goal proposition symbol}, which must be true in the state after the final action of a plan. $S_g=\{s \in S | g \subseteq s\}$ is a set of goal states, i.e., states that satisfy the \emph{planning problem}~$\mathcal{P}.$
   \end{itemize}
 \end{defn}
 
@@ -81,7 +81,7 @@ It is easy to see that for each \emph{planning problem} $\mathcal{P}$ with nonem
         \label{fig01:1}
     \end{figure}
     
-    Imagine a simple planning domain (Figure~\ref{fig01:1}) that can represent states in an uncomplicated maze-like game. We have 4 game locations, a player character, a key, and a locked door (illustrated by a \emph{loc4}). The character can move freely between locations but if he wants to enter \emph{loc4}, then he needs a key that can be picked at the \emph{loc3} (but cannot be discarded later on). Now we will define a planning problem $\mathcal{P}=(\Sigma,s_0,g)$ for this domain $\Sigma=(S,A,\gamma)$ more formally:
+    Imagine a simple planning domain (Figure~\ref{fig01:1}) that can represent states in an uncomplicated maze-like game. We have four game locations, a player character, a key, and a locked door (illustrated by a \emph{loc4}). The character can move freely between locations but if he wants to enter \emph{loc4}, then he needs a key that can be picked at the \emph{loc3} (but cannot be discarded later on). Now we will define a planning problem $\mathcal{P}=(\Sigma,s_0,g)$ for this domain $\Sigma=(S,A,\gamma)$ more formally:
     
 \end{example}
 
@@ -199,8 +199,11 @@ Having a first-order language $\mathcal{L}$ with a finite amount of constant and
 
     \begin{itemize}
         \item $S \subseteq 2^{\displaystyle \{all~ground~atoms~of~\mathcal{L}\}}$,
+        
         \item $A =~$\{all ground instances of operators in $O$\},
+        
         \item $\gamma$ is analogous Definition~\ref{def01:1},
+        
         \item $S$ is closed under $\gamma$ in the same manner as in Definition~\ref{def01:1}.
     \end{itemize}
 \end{defn}
@@ -210,11 +213,9 @@ A \emph{classical planning problem} is corresponding to \emph{set-theoretic plan
 
     \begin{itemize}
         \item $\Sigma = (S,A,\gamma)$ is a \emph{classical planning domain},
-        \item $s_0 \in S$ is an initial state,
+        
+        \item $s_0 \in S$ is an initial state
+        
         \item $g$ is a set of literals.
     \end{itemize}
 \end{defn}
-
-% \begin{example}\label{ex01:5}
-% \xxx{maybe later figure 2 example}
-% \end{example}
