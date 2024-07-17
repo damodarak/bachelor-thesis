@@ -17,7 +17,7 @@ All of the following definitions are correspondent and equivalent to the definit
     For a \emph{solution} (\emph{plan}) to be valid we need to satisfy all of the constraints listed in $C$. We identify four types of constraints:
 
     \begin{itemize}
-        \item $t_i \prec t_j$ where $t_i,t_j \in U$: an ordering constraint meaning that in every valid \emph{solution} the last \emph{primitive task} (\emph{action}) in the \emph{solution} to which $t_i$ decomposes must precede the first \emph{primitive task} (\emph{action}) in the \emph{solution} to which $t_j$ decomposes,
+        \item $t_i \prec t_j$ where $t_i,t_j \in U$: an \emph{ordering-constraint} meaning that in every valid \emph{solution} the last \emph{primitive task} (\emph{action}) in the \emph{solution} to which $t_i$ decomposes must precede the first \emph{primitive task} (\emph{action}) in the \emph{solution} to which $t_j$ decomposes,
         
         \item $before(l,U')$: \emph{before-constraint} symbolizing that in every valid \emph{solution} the literal $l$ must hold in a state right before the \emph{application} of a first \emph{action} to which $U' \subseteq U$ decomposes,
     
@@ -43,7 +43,7 @@ In accordance with the Definition~\ref{def01:5}, the more formal definition~\cit
     where $C'$ is a modification of $C$:
 
     \begin{itemize}
-        \item replace each \emph{ordering-constrain} containing $c$ with new ones containing $subtasks(m)$, i.e., $\forall c' \in subtasks(m): c \prec x$ is replaced with $c' \prec x$ and $x \prec c$ is replaced with $x \prec c'$,
+        \item replace each \emph{ordering-constraint} containing $c$ with new ones containing $subtasks(m)$, i.e., $\forall c' \in subtasks(m): c \prec x$ is replaced with $c' \prec x$ and $x \prec c$ is replaced with $x \prec c'$,
         
         \item replace each \emph{before-, after-, between-constraint} containing $c$ with new ones containing $subtasks(m)$. For example, we would replace \emph{before-constraint} $before(l,V)$ with $before(l,(V - \{c\}) \cup subtasks(m))$.
     \end{itemize}
@@ -151,7 +151,7 @@ Now we will prove that \emph{totally-ordered} HTN planning can be represented as
     For every \emph{totally ordered planning problem} $\mathcal{P} = (s_0,\omega,\mathcal{D})$ with $\mathcal{D}=(P, O, C, M)$ without \emph{before-, after-, between-constraints} there exists a CF language $L$ that is equal to the set of \emph{solutions} of $\mathcal{P}$.
 \end{thm}
 \begin{proof}
-    Let $\mathcal{P} = (s_0,\omega = (U, C), \mathcal{D} = (P, O, C, M))$ be a \emph{totally ordered planning problem} in which constraints of each \emph{method} consist only of \emph{ordering constraints}. We will construct CF grammar $G = (V_G, T_G, P_G, S_G)$ where $V_G = C, T_G = O$ and $S_G \in U$. We assume that the \emph{initial task network} $\omega$ consists of one task, $|U| = 1$. If there are more tasks (that are totally ordered by constraints $C$), we will add one extra production rule to the $P_G$ that rewrites the new starting symbol $S'_G$ to the given state of $\omega = (U, C)$. The set of production rules is defined as follows:
+    Let $\mathcal{P} = (s_0,\omega = (U, C), \mathcal{D} = (P, O, C, M))$ be a \emph{totally ordered planning problem} in which constraints of each \emph{method} consist only of \emph{ordering-constraints}. We will construct CF grammar $G = (V_G, T_G, P_G, S_G)$ where $V_G = C, T_G = O$ and $S_G \in U$. We assume that the \emph{initial task network} $\omega$ consists of one task, $|U| = 1$. If there are more tasks (that are totally ordered by constraints $C$), we will add one extra production rule to the $P_G$ that rewrites the new starting symbol $S'_G$ to the given state of $\omega = (U, C)$. The set of production rules is defined as follows:
     
     \[
     P_G = \{(T, T_1\dots T_k) \; | \; (T, \{T_1, \dots, T_k\}, \{T_i \prec T_j \; | \; 1 \leq i < j \leq k\}) \in M\}.

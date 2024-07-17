@@ -44,7 +44,7 @@ Succeeding models will allow different kinds of \emph{empty methods}, usually by
 \subsection{No-op Based Model (version 1)}
 
 \medskip\noindent
-Another possible way to resolve the issue with \emph{empty methods} is the No-op model~\cite{ondrckova2023semantics}. The no-op model introduces a new symbol $no\text{-}op()$ which is not presented in the \emph{hierarchical planning domain}. Formally, the $no\text{-}op()$ symbol is just another \emph{primitive task} with no preconditions and effects, i.e. $no\text{-}op() = (\{\}, \{\}, \{\})$. The semantics behind this symbol is hidden right in the name, "no operation", meaning that this action has no impact on the world that we model. It serves as a regular symbol during the planning phase concerning all of the \emph{ordering constraints} and \emph{before-, after-, between-constraint}. After the checking of all available constraints, the $no\text{-}op()$ symbol is deleted from the final \emph{plan} as it was not part of the former \emph{planning problem}.
+Another possible way to resolve the issue with \emph{empty methods} is the No-op model~\cite{ondrckova2023semantics}. The no-op model introduces a new symbol $no\text{-}op()$ which is not presented in the \emph{hierarchical planning domain}. Formally, the $no\text{-}op()$ symbol is just another \emph{primitive task} with no preconditions and effects, i.e. $no\text{-}op() = (\{\}, \{\}, \{\})$. The semantics behind this symbol is hidden right in the name, "no operation", meaning that this action has no impact on the world that we model. It serves as a regular symbol during the planning phase concerning all of the \emph{ordering-constraints} and \emph{before-, after-, between-constraint}. After the checking of all available constraints, the $no\text{-}op()$ symbol is deleted from the final \emph{plan} as it was not part of the former \emph{planning problem}.
 
 \medskip\noindent
 Pros of the no-op model are easily seen. We have solved the issue of \emph{empty methods} by introducing a new symbol $no\text{-}op()$ and at the same time we did not need to allow regular \emph{empty methods} which decompose a task into an empty set. The no-op model extends the previous model Section~\ref{sub03:311}.
@@ -171,9 +171,9 @@ Moreover, every \emph{solution plan} $\pi = (a_1, \dots, a_k)$ regarding the con
 
     \item for each task $t$: $start(t) \leq end(t)$,
 
-    \item the minimum possible value of a function $start$ is $0.5$ (empty task before the first \emph{primitive task}),
+    \item the minimum possible value of a function $start$ is $0.5$ (\emph{empty task} before the first \emph{primitive task}),
 
-    \item the maximum possible value of a function $end$ is $k + 0.5$ (empty task after the last \emph{primitive task}),    
+    \item the maximum possible value of a function $end$ is $k + 0.5$ (\emph{empty task} after the last \emph{primitive task}),    
 
     \item multiple \emph{compound tasks} $t1$ and $t2$ ($t1$ is not decomposed from $t2$ and vice versa) can have identical values of both functions $start$ and $end$ if, and only if, all of them are pointing to the same half-index,
 
@@ -181,19 +181,19 @@ Moreover, every \emph{solution plan} $\pi = (a_1, \dots, a_k)$ regarding the con
 
     \item if a \emph{compound task} $t1$ has only one subtask $t2$ then $start(t1) = start(t2)$ and $end(t1) = end(t2)$ holds,
 
-    \item a half-index $start/end(t) = k + 0.5$, $k \in \mathbb{N}_0$ indicates that exactly $k$ actions (\emph{primitive tasks}) precede this empty task.
+    \item a half-index $start/end(t) = k + 0.5$, $k \in \mathbb{N}_0$ indicates that exactly $k$ actions (\emph{primitive tasks}) precede this \emph{empty task}.
 \end{itemize}
 
 \medskip\noindent
-As we can see, all empty tasks are mapped to correct half-indices. At the same time the constraints semantics work properly. Multiple empty tasks can have the same values of $start$ and $end$. Suppose a task $t1$ with function values $start(t1) = end(t1) = 3.5$ and a task $t2$ with identical function values. Due to ceiling ($\lceil \; \rceil$) and floor ($\lfloor \; \rfloor$) functions there is no collision in ordering constraints: $t1 \prec t2$: $\lfloor 3.5 \rfloor < \lceil 3.5 \rceil$. 
+As we can see, all empty tasks are mapped to correct half-indices. At the same time the constraints semantics work properly. Multiple empty tasks can have the same values of $start$ and $end$. Suppose a task $t1$ with function values $start(t1) = end(t1) = 3.5$ and a task $t2$ with identical function values. Due to ceiling ($\lceil \; \rceil$) and floor ($\lfloor \; \rfloor$) functions there is no collision in \emph{ordering-constraints}: $t1 \prec t2$: $\lfloor 3.5 \rfloor < \lceil 3.5 \rceil$. 
 
 \noindent
-State conditions are also checked correctly with the empty tasks. A task $t1$ with function values $start(t1) = end(t1) = 3.5$ is placed correctly between the third and fourth action. In this example, both $before(p, \{ t1 \})$ and $after(\{ t1 \}, p)$ are checked in the same state $s_3$ because $before(p, \lceil 3.5 \rceil)$: $s_{\lceil 3.5 \rceil - 1}$ and $after(\lfloor 3.5 \rfloor, p)$: $s_{\lfloor 3.5 \rfloor}$. This behavior makes perfect sense by cause of the fact that empty tasks do not change the state in any sense. Indeed, the state to be checked is after the last applied action in a plan before the empty task.
+State conditions are also checked correctly with the \emph{empty tasks}. A task $t1$ with function values $start(t1) = end(t1) = 3.5$ is placed correctly between the third and fourth action. In this example, both $before(p, \{ t1 \})$ and $after(\{ t1 \}, p)$ are checked in the same state $s_3$ because $before(p, \lceil 3.5 \rceil)$: $s_{\lceil 3.5 \rceil - 1}$ and $after(\lfloor 3.5 \rfloor, p)$: $s_{\lfloor 3.5 \rfloor}$. This behavior makes perfect sense by cause of the fact that \emph{empty tasks} do not change the state in any sense. Indeed, the state to be checked is after the last applied action in a plan before the \emph{empty task}.
 
 \subsection{Increment-Based Model}
 
 \medskip\noindent
-For our last example of HTN semantics handling \emph{empty methods}, we will look at a model with a special context. This time, we will only concern totally-ordered (TO) \emph{planning domains}. Totally-ordered domains have all \emph{methods} totally-ordered, that is: for every \emph{method} $(m = T \rightarrow T_1,\dots,T_k \; [C]) \in M$: for every $T_i, T_j \in \{ T_1, \dots, T_k\}, i \neq j$: $T_i \prec T_j$ or $T_j \prec T_i$. This special subclass of \emph{planning domains} is more strict about ordering than partially-ordered (PO) \emph{planning domains}, nonetheless, it allows us to operate with \emph{methods} and state constraints beneficially. 
+For our last example of HTN semantics handling \emph{empty methods}, we will look at a model with a special context. This time, we will only concern totally-ordered (TO) \emph{planning domains}. Moreover, for simplicity, we will omit the \emph{between-constraint} as it can be simulated with the series of $before$'s or $after$'s. Totally-ordered domains have all \emph{methods} totally-ordered, that is: for every \emph{method} $(T \rightarrow T_1,\dots, T_k \; [C]) \in M$: for every $T_i, T_j \in \{ T_1, \dots, T_k\}, i \neq j$: $T_i \prec T_j$ or $T_j \prec T_i$. This special subclass of \emph{planning domains} is more strict about ordering than partially-ordered (PO) \emph{planning domains}, nonetheless, it allows us to operate with \emph{methods} and \emph{state-constraints} beneficially. 
 
 \medskip\noindent
 Furthermore, in this model, we will introduce the first model transformation techniques but only in the sense of \emph{task decomposition}. More to this topic will be presented in the following chapter.
@@ -202,7 +202,39 @@ Furthermore, in this model, we will introduce the first model transformation tec
 The increment-based model tries to solve issues of \emph{empty methods} caused by Definition~\ref{def02:10} directly. This model does not bring any new semantics to the table, rather it resolves undefined behavior of \emph{empty methods}.
 
 \medskip\noindent
-The main problem with the Definition~\ref{def02:10} is the \emph{task decomposition} using an \emph{empty method}. In this case, all constraints containing a decomposed task are removed, and new modified constraints should added but because we do not have any subtasks, we cannot say with certainty the final result of the \emph{task network}. To solve this problem, we need to deal with ordering constraints and state constraints ($before$, $after$, $between$). 
+The main problem with the Definition~\ref{def02:10} is the \emph{task decomposition} using an \emph{empty method}. In this case, all constraints containing a decomposed task are removed, and new modified constraints should added but because we do not have any subtasks, we cannot say with certainty the final result of the \emph{task network}. To solve this problem, we need to deal with \emph{ordering-constraints} and \emph{state-constraints} ($before$, $after$). 
+
+\medskip\noindent
+Now we will redefine \emph{task decomposition} that will allow us usage of \emph{empty methods}. As was said earlier, we are only concerned about totally-ordered \emph{planning domains}. Having a \emph{method} $m = T \rightarrow T_1, \dots, T_k \; [Constr]$, $k \geq 0$, \emph{a task network} $\omega = (U, C)$ with a \emph{compound task} $T \in U$, the decomposition $\delta$ is defined followingly:
+
+\[
+    \delta(\omega, T, m) = ((U - \{ T \}) \cup \{T_1, \dots, T_k\}, C' \cup Constr),
+\]
+
+\noindent
+where $C'$ is a modification of C:
+
+\begin{itemize}
+    \item replace each \emph{ordering-constraint} containing $T$ with new ones containing $\{ T_1, \dots, T_k \}$, i.e., $\forall i \in \{ 1, \dots, k \}: T \prec x$ is replaced with $T_i \prec x$ and $x \prec T$ is replaced with $x \prec T_i$. If $k = 0$, then we just remove all \emph{ordering-constraints} containing $T$,
+        
+    \item replace each \emph{before-, after-constraint} containing $T$ with new ones containing $\{ T_1, \dots, T_k \}$. For example, we would replace \emph{before-constraint} $before(p,V)$ with $before(p, (V - \{T\}) \cup \{ T_1, \dots, T_k \})$. If $k = 0$, then we have two distinct situations. Either we remove one of the tasks or the last task in the set. Now, let's break down different outcomes:
+
+        \begin{itemize}
+            \item $before(p, V), T \in V, |V| > 1$: we only remove the task $T$ and replace $before(p, V)$ with $before(p, V - \{ T \})$,
+
+            \item $before(p, V), T \in V, |V| = 1$: we find strict total order on the set $U$ (tasks of the \emph{task network} $\omega$) $T_i \prec T_j \prec \dots \prec T_k$, and locate the index $d$ of the decomposed task $T$. After that, we include a new constraint $before(p, \{ T_{d+1} \})$ into the set of constraints and remove the former constraint $before(p, V)$. If $T_{d+1}$ does not exist then we create a new constraint $after(\{ T_{d-1} \}, p)$. If $T_{d-1}$ also does not exist then $T$ is the last task in $\omega$, we can remove the task from the \emph{task network} but the planner needs to check if the \emph{initial state} $s_0$ contains required \emph{propositional symbols},
+
+            \item $after(V, p), T \in V, |V| > 1$: we only remove the task $T$ and replace $after(V, p)$ with $after(V - \{ T \}, p)$,
+
+            \item $after(V, p), T \in V, |V| = 1$: we find strict total order on the set $U$ $T_i \prec T_j \prec \dots \prec T_k$, and locate the index $d$ of the decomposed task $T$. After that, we include a new constraint $after(\{ T_{d-1} \}, p)$ and remove the former $after(V, p)$ constraint. If $T_{d-1}$ does not exist, we include $before(p, \{ T_{d+1} \})$. If $T_{d+1}$ also does not exist then $T$ is the last task in $\omega$, we can remove the task from the \emph{task network} but the planner needs to check if the \emph{initial state} $s_0$ contains required \emph{propositional symbols}.
+        \end{itemize}
+\end{itemize}
+
+\medskip\noindent
+It is crucial to understand the meaning behind the constraint modification of the new \emph{method decomposition} definition, and to see why it works. First of all, we will look at the \emph{ordering-constraint}. A \emph{compound task} that is decomposed with an \emph{empty method} is not relevant from the perspective of ordering as this task does not do anything. Hypothetically, between each two actions there is an infinite amount of virtual \emph{empty tasks}, none of them is relevant to the \emph{task network}, especially to the constraint set $C$. For this reason, all \emph{ordering-constraints} containing the decomposed task can be removed. On the other hand, \emph{state-constraints} cannot be removed from the \emph{task network} because they are telling the planner that as some point in the planning phase they need to be checked.
+
+\medskip\noindent
+With the increment-based model, we have finished our list of HTN semantics that solve the problem of \emph{empty methods}. The first three semantics do not allow usage of real \emph{empty methods} meanwhile the second three allow them. Different semantics might be beneficial in different situations, depending on the \emph{planning domain}. Some future software for hierarchical planning might even combine various features from the semantics presented, but that is left for the future work.
  
 \section{compound task with special semantics + CS that need to achieve some propos symbol + operators without negative effects}
 precist si prvni publikaci + v 4. pub je zminka ze v hddl je povoleno goal task ale neni after
