@@ -1,6 +1,19 @@
 \chapter{Transformations of {HTN} {M}odels}
 
+\medskip\noindent
+After an exhaustive enumeration of various definitions and semantics, we will finally start discussing the transformation of different HTN models. This chapter will exhibit varying transformations along divergent contexts and preconditions. For example, HTN models might be partially-ordered, totally-ordered, with or without \emph{goal tasks}, having a different set of allowed \emph{state-constraints}. Moreover, we will look at differing formalisms and try to compile away unsupported features.
+
 \section{Normal Forms}
+% def nor form
+% prevod do nor form bez before,after,between,pouze ordering, PO
+
+\medskip\noindent
+The first section of this chapter is inspired by the \emph{Chomsky normal form} (CNF)~\cite{chytil}. A context-free grammar is in CNF if all of its production rules are of the form: $A \rightarrow BC$, $A \rightarrow a$, $S \rightarrow \varepsilon$ where $A, B, C$ are nonterminal symbols, $a$ is a terminal symbol, $S$ is a starting nonterminal symbol, and $\varepsilon$ denotes an empty symbol. This "nice" form of CF grammar allows us to prove important theorems about CF languages more easily. Similarly, we want to have "nice" forms of \emph{planning domains} which might speed up algorithms for planning, or plan verification. Also, these forms are useful for proving important HTN theorems~\cite{langclassification}~\cite{cmyk}.
+
+\begin{defn}\label{def04:14}
+norm form
+\end{defn}
+
 
 \section{State-Constraints Modification}
 
