@@ -1,19 +1,40 @@
 \chapter{Transformations of {HTN} {M}odels}
 
 \medskip\noindent
-After an exhaustive enumeration of various definitions and semantics, we will finally start discussing the transformation of different HTN models. This chapter will exhibit varying transformations along divergent contexts and preconditions. For example, HTN models might be partially-ordered, totally-ordered, with or without \emph{goal tasks}, having a different set of allowed \emph{state-constraints}. Moreover, we will look at differing formalisms and try to compile away unsupported features.
+After an exhaustive enumeration of various definitions and semantics, we will finally start discussing the transformation of different HTN models. This chapter will exhibit varying transformations along divergent contexts and preconditions. For example, HTN models might be partially-ordered, totally-ordered, with or without \emph{goal tasks}, having a different set of allowed \emph{state-constraints}. Moreover, we will look at differing formalisms and try to compile away unsupported features. Our scope of interest is transformations that do not change the set of \emph{solutions} to the \emph{planning problem}.
 
 \section{Normal Forms}
-% def nor form
-% prevod do nor form bez before,after,between,pouze ordering, PO
 
 \medskip\noindent
-The first section of this chapter is inspired by the \emph{Chomsky normal form} (CNF)~\cite{chytil}. A context-free grammar is in CNF if all of its production rules are of the form: $A \rightarrow BC$, $A \rightarrow a$, $S \rightarrow \varepsilon$ where $A, B, C$ are nonterminal symbols, $a$ is a terminal symbol, $S$ is a starting nonterminal symbol, and $\varepsilon$ denotes an empty symbol. This "nice" form of CF grammar allows us to prove important theorems about CF languages more easily. Similarly, we want to have "nice" forms of \emph{planning domains} which might speed up algorithms for planning, or plan verification. Also, these forms are useful for proving important HTN theorems~\cite{langclassification}~\cite{cmyk}.
+The first section of this chapter is inspired by the \emph{Chomsky normal form} (CNF)~\cite{chytil}. A context-free grammar (CFG) is in CNF if all of its production rules are of the form: $A \rightarrow BC$, $A \rightarrow a$, $S \rightarrow \varepsilon$ (in this case $S$ cannot be on the right side of a production rule) where $A, B, C$ are nonterminal symbols, $a$ is a terminal symbol, $S$ is a starting nonterminal symbol, and $\varepsilon$ denotes an empty symbol. This "nice" form of CF grammar allows us to prove important theorems about CF languages more easily. Similarly, we want to have "nice" forms of \emph{planning domains} without \emph{empty methods} which might speed up algorithms for planning, or plan verification. Also, these forms are useful for proving HTN theorems~\cite{langclassification}~\cite{cmyk}.
 
 \begin{defn}\label{def04:14}
-norm form
+    A \emph{hierarchical planning problem} $\mathcal{P} = (s_0,\omega,\mathcal{D})$ is said to be in \emph{HTN-CNF} if all of its methods are of the form: $T \rightarrow T_1, T_2 \; [C]$; $T \rightarrow a \; [C]$ where $T, T_1, T_2$ are \emph{compound tasks}, and $a$ is a \emph{primitive task (action)}. 
 \end{defn}
 
+\medskip\noindent
+In Definition~\ref{def04:14} we exclude the possibility of having empty \emph{plans} but this decision can be interchanged at any time. Moreover, this definition does not allow \emph{empty methods}.
+
+\begin{defn}\label{def04:15}
+    We say that two \emph{planning problems} $\mathcal{P'}$, $\mathcal{P''}$ are equivalent if the set of solutions of $\mathcal{P'}$ is equal to the set of solutions of $\mathcal{P''}$.
+\end{defn}
+
+\begin{thm}\label{thm04:5}
+    Every \emph{planning problem} $\mathcal{P}$ (partially-, totally-ordered) that does not generate an empty \emph{plan} as a \emph{solution}, without \emph{state-constraints} (before, after, between) can be transformed into \emph{an equivalent planning problem} in \emph{HTN-CNF}.
+\end{thm}
+\begin{proof}
+    The proof follows the ideas of the transformation of CFG into CNF~\cite{chytil}. First of all, we need to get rid of \emph{empty methods}. For that, we need to find all \emph{nullable compound tasks}. \emph{A compound task} $T$ is \emph{nullable} if \emph{a method} $T \rightarrow \varepsilon \; [C]$ exists, or if there is a sequence of \emph{decomposition} such that $T \rightarrow \dots \rightarrow \varepsilon \; [C]$. \emph{Nullable compound tasks} can be found followingly: for each \emph{method} $T \rightarrow \varepsilon \; [C]$, $T$ is \emph{nullable}, and for each \emph{method} $T \rightarrow T_1, \dots, T_k \; [C], \; k \geq 1$ where $T_1, \dots, T_k$ are \emph{nullable}, $T$ is also \emph{nullable} (\emph{actions} are never \emph{nullable}). Having all \emph{nullable tasks}, we can remove \emph{empty methods} from the domain. After that, for each \emph{method} $T \rightarrow T_1, \dots, T_k \; [C]$ holding $i \geq 1$ \emph{nullable tasks} as subtasks, we create $2^i$ new methods with/without \emph{nullable tasks}, one special case is if $i = k$ then we do not create a new \emph{empty method} $T \rightarrow \varepsilon \; [C]$. 
+    
+    The next step is to remove \emph{methods} of a form $T \rightarrow T_1 \; [C]$ where $T, T_1$ are \emph{compound tasks}. These \emph{methods} will be called - \emph{unit methods}. For that, we need to find all \emph{unit pairs}. \emph{A unit pair} $(T_1, T_2)$ is a pair of \emph{compound tasks} such that $T_2$ can be decomposed from $T_1$ only with the usage of \emph{unit methods}, i.e., $T_1 \rightarrow \dots \rightarrow T_2 \; [C]$. After that, for each \emph{unit pair} $(T_1, T_2)$ and for each non-\emph{unit-method} $T_2 \rightarrow T_i, \dots, T_j \; [C_2], i < j$, we create a new method: $T_1 \rightarrow T_i, \dots, T_j \; [C_2], i < j$ (\emph{ordering-constraints} are inherited from the second \emph{method}). Doing so, we can delete all \emph{unit-methods} from the \emph{planning problem} without the modification of \emph{solutions}.
+
+    For each \emph{action} $a$ we produce a new \emph{compound task} $T_a$, a new \emph{method} $T_a \rightarrow a \; [\{\}]$, and for each \emph{method} $T \rightarrow T_1, \dots, T_k \; [C]$ having $a$ as a $subtask$ we delete $a$ from the $subtasks$ and include $T_a$ instead. All \emph{ordering-constraints} having $a$ are interchanged with ones containing $T_a$. 
+
+    In the proof's first three parts, we deleted all \emph{empty methods}, \emph{unit methods}, and modified \emph{methods} so they have single \emph{action} or \emph{compound tasks} as $subtasks$. Thus, all \emph{methods} left have a form: $T \rightarrow T_1, \dots, T_k \; [C], k \geq 2$; $T \rightarrow a \; [\{\}]$ where $T, T_1, \dots, T_k$ are \emph{compound tasks}, and $a$ is \emph{action}. To finish the proof we need to divide the remaining \emph{methods}.
+
+    %without ordering cycles, anebo pouze souvisle ordering casti a nezavisle ulohy volne
+    %total order za sebou bez ocasku se da brat jako MACRO TASK, protoze to musi byt striktne za sebou
+    %udelat graf orderingu
+\end{proof}
 
 \section{State-Constraints Modification}
 
