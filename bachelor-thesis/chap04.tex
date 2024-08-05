@@ -34,45 +34,116 @@ In Definitions~\ref{def04:14},~\ref{def04:15} we exclude the possibility of havi
     For each \emph{action} $a$ we produce a new \emph{compound task} $T_a$, a new \emph{method} $T_a \rightarrow a \; [\{\}]$, and for each \emph{method} $T \rightarrow T_1, \dots, T_k \; [C]$ having $a$ as a $subtask$ we delete $a$ from the $subtasks$ and include $T_a$ instead. All \emph{ordering-constraints} having $a$ are interchanged with ones containing $T_a$. 
 
     In this proof, we deleted all \emph{empty methods}, \emph{unit methods}, and modified \emph{methods} so they have single \emph{action} or \emph{compound tasks} as $subtasks$. Thus, all \emph{methods} left have a form: $T \rightarrow T_1, \dots, T_k \; [C], k \geq 2$; $T \rightarrow a \; [\{\}]$ where $T, T_1, \dots, T_k$ are \emph{compound tasks}, and $a$ is \emph{action}. In every step, we did not create nor remove any potential \emph{solution}.
-
-    %without ordering cycles, anebo pouze souvisle ordering casti a nezavisle ulohy volne
-    %total order za sebou bez ocasku se da brat jako MACRO TASK, protoze to musi byt striktne za sebou
-    %udelat graf orderingu
 \end{proof}
 
 \begin{defn}\label{def04:17}
-    \emph{A method} $T \rightarrow T_1, \dots, T_k \; [C]$ has \emph{linear ordering-constraints} $C$ if $subtasks$ can be split into disjunctive sets (set partition) $S_1, \dots, S_k, k \geq 1$ such that all \emph{ordering-constraints} between tasks are within the same set, and all tasks within one set $S_i$ are linearly ordered (directly or transitively). Tasks not contained in any of \emph{ordering-constraints} are in sets of one element.
+    \emph{A method} $T \rightarrow T_1, \dots, T_k \; [C]$ has \emph{linear ordering-constraints} $C$ if $subtasks$ can be split into disjunctive sets (set partition) $S_1, \dots, S_k, k \geq 1$ such that all \emph{ordering-constraints} between tasks are within the same set, and all tasks within one set $S_i$ are linearly ordered (if any two tasks aren't comparable within a set directly then we apply a transitive closure). Tasks not contained in any of \emph{ordering-constraints} are in sets of one element.
 \end{defn}
 
 \begin{thm}\label{thm04:6}
     Every \emph{planning problem} $\mathcal{P}$ in $\text{NF}_{\geq 2}$, with all \emph{methods} containing only \emph{linear ordering-constraints}, without \emph{state-constraints} (before, after, between) can be transformed into \emph{an equivalent planning problem} in \emph{HTN-CNF}.
 \end{thm}
 \begin{proof}
-     In this proof, we will need to divide the large \emph{methods} into smaller ones. Because all tasks are linearly ordered within the divided sets we know that there cannot be "ordering cycles", also we know that at every time in every task set, there is the smallest task, with respect to \emph{ordering-constraints}. A key feature of such constraints is that the tasks in sets are mutually independent because, from the definition, between tasks from different sets no \emph{ordering-constraints} exist. 
+     In this proof, we will need to divide the large \emph{methods} into smaller ones. Because all tasks are linearly ordered within the divided sets we know that there cannot be "ordering cycles", also we know that at every time in every task set, there is the smallest task, with respect to \emph{ordering-constraints}. A key feature of such constraints is that the tasks in sets are mutually independent because, from the definition, no \emph{ordering-constraints} exist between tasks from different sets. 
 
-     Let us have \emph{a method} $T \rightarrow T_1, \dots, T_k \; [C], k \geq 2$, and a set partition of tasks $S_1, \dots, S_k, k \geq 1$ by the Definition~\ref{def04:17}. Now, we will transform the input \emph{planning problem} $\mathcal{P}$ into the result \emph{HTN-CNF} \emph{planning problem} in two steps. First, we will add new \emph{compound tasks} $S_1, \dots, S_k$ (same names as set partitions) and $k - 2$ $C_i$ \emph{compound tasks} to the \emph{planning problem}. After that, we will add new \emph{methods}: $T \rightarrow S_1, C_1 \; [\{\}]; \; C_1 \rightarrow S_2, C_2 \; [\{\}]; \; C_{k - 2} \rightarrow S_{k - 1}, S_k \; [\{\}]$. Newly created methods have an empty set of constraints because, as was mentioned, tasks from different partitions do not have any ordering relations between them. Therefore, their subtasks can interleave without any restrictions. One special case that might occur is if the set of $subtasks$ is fully linearly ordered then there will be only one partition $S_1$. This situation can be handled by creating only one \emph{method} $T \rightarrow S_1, no\text{-}op() \; [\{\}]$ where $no\text{-}op()$ is a new \emph{action}, "fake empty method" introduced in the previous chapter.
-\end{proof}%check ze nemame jen S_1, nebo ze nemame jen 2 CT a takoveto srandy
+     Let us have \emph{a method} $T \rightarrow T_1, \dots, T_k \; [C], k \geq 3$, and a set partition of tasks $S_1, \dots, S_k, k \geq 1$ by the Definition~\ref{def04:17}. Now, we will transform the input \emph{planning problem} $\mathcal{P}$ into the result \emph{HTN-CNF} \emph{planning problem} in two steps. First, we will add new \emph{compound tasks} $S_1, \dots, S_k$ (same names as set partitions) and $k - 2$ $C_i$ \emph{compound tasks} to the \emph{planning problem}. After that, we will add new \emph{methods}: $T \rightarrow S_1, C_1 \; [\{\}]; \; C_1 \rightarrow S_2, C_2 \; [\{\}]; \; \dots; \; C_{k - 2} \rightarrow S_{k - 1}, S_k \; [\{\}]$. Newly created methods have an empty set of constraints because, as was mentioned, tasks from different partitions do not have any ordering relations between them. Therefore, their subtasks can interleave without any restrictions. 
+     
+     One special case that might occur is if the set of $subtasks$ is fully linearly ordered then there will be only one partition $S_1$. This situation can be handled easily. We will start the process of binarization right away. Similarly to the previous process, we will create $k - 2$ $X_i$ \emph{compound tasks}. After that, we will append new \emph{methods}: $T \rightarrow T_1, X_1 \; [\{T_1 \prec X_1\}]; \; X_1 \rightarrow T_2, X_2 \; [\{T_2 \prec X_2\}]; \; \dots; \; X_{k - 2} \rightarrow T_{k - 1}, T_k \; [\{T_{k - 1} \prec T_k\}]$ where $T_1$ is the smallest element with respect to \emph{ordering-constraints}, $T_2$ is the second smallest and so on.
 
-\medskip\noindent
-\xxx{proc ty podminky musi byt takhle, ukazat obrazky grafu kdy a jak to jde a grafu kdy to nelze rozdelit, problem je v tom ze se PO podulohy muzou prolinat a nektere ordering grafy nejde binarizovat}
+     In the case of multiple sets $S_1, S_2, \dots$, we repeat the process above for each \emph{compound task} $S_i$ and for each partition $S_i$ independently. Doing so, we can delete the former \emph{method}. We iterate this process for all \emph{methods} with at least 3 tasks as subtasks.
+\end{proof}
+
+\begin{example}\label{ex04:7}
+    \xxx{proc ty podminky musi byt takhle, ukazat obrazky grafu kdy a jak to jde a grafu kdy to nelze rozdelit, problem je v tom ze se PO podulohy muzou prolinat a nektere ordering grafy nejde binarizovat, ktere obecne planning problemy muzou byt prevedeny do htn-cnf= nejmensi/nejvetsi prvek nebo obecne prvek ktery v kazdem topolo. uspor. ma stejne cislo}
+\end{example}
 
 \begin{thm}\label{thm04:7}
-    every TO -> without empty method
+    Theorem~\ref{thm04:5} transforms \emph{a planning problem} $\mathcal{P}$ with all \emph{methods} having \emph{linear ordering-constraints} into \emph{a planning problem} in $\text{NF}_{\geq 2}$ with all \emph{methods} having \emph{linear ordering-constraints}.
 \end{thm}
 \begin{proof}
-    p
+    Theorem~\ref{thm04:5} includes two main parts: removing all \emph{empty methods} and \emph{unit-methods}. The elimination of \emph{unit-methods} does not have any effect on ordering because we need at least two tasks for \emph{an ordering-constraint}. We create new \emph{methods} without \emph{nullable} tasks which also deletes constraints containing these tasks. But because the ordering is linear even after the deletion of some elements (transitive closure from the definition) we do not create \emph{methods} with non-\emph{linear ordering-constraints}.
 \end{proof}
+
+\medskip\noindent
+Before we start with the transformation of \emph{totally-ordered planning problems} we need to tidy up \emph{state-constraints}. So far, \emph{state-constraints} are defined on sets of subtasks, i.e., $before(p, U)$, $after(U, p)$, $between(U, p, V)$ with $U, V$ denoting subsets of subtasks, and $p$ denotes \emph{a propositional symbol}. \emph{TO planning problems} allow us to remove unnecessary tasks from sets $U, V$ leaving us with only one subtask. Hence, we abuse the notation to let $before(p, T)$ denote $before(p, \{ T \})$ with $T$ being \emph{a method's} subtask. Similarly, we will use this notation for $after$ and $between$ constraints. 
 
 \begin{thm}\label{thm04:8}
-    every TO without between -> htn-cnf
+    For each \emph{TO planning problem} there is \emph{an equivalent planning problem} with all \emph{state-constraints} having only one subtask.
+\end{thm}
+\begin{proof}
+    Let us have \emph{a method} $T \rightarrow T_1, \dots, T_k \; [C], k \geq 1$, and a $before(p, U) \in C$. This constraint can be transformed to $before(p, T)$ such that $T \in U$ and $(\forall F \in (U - \{ T \})): T \prec F$. This can be done analogously for each $after(U, p)$ and $between(U, p, V)$ constraint. If the result $between(U, p, V)$ constraint is of a form $between(T, p, F)$ and $F \prec T$ holds then this whole constraint can be removed from the set of constraints as there are never states to test this constraint. 
+\end{proof}
+
+\medskip\noindent
+Now, all \emph{TO} domains will implicitly have only \emph{state-constraints} described in Theorem~\ref{thm04:8}.
+
+\medskip\noindent
+In the following parts, we will try to convert general \emph{TO planning problems} into ones of a \emph{HTN-CNF}. Initially, we will compile away $between$ constraints because this type of \emph{state-constraint} spans throughout states. This behavior complicates the conversion because the \emph{HTN-CNF} has at most two tasks as subtasks. In this case, the $between(T_1, p, T_2)$ constraint cannot be used at all as it needs at least three TO subtasks $T_1 \prec T_2 \prec T_3$ (a check is then made before the application of the first \emph{action} to which $T_2$ decomposes, after the last \emph{action} to which $T_2$ decomposes, and also all states in between are checked). In~\cite{ondrckova2024empty} it is described how to get rid of $between$ constraints from \emph{TO planning problems} by adding a series of $before$ constraints. This conversion is false as it does not concern all states between subtasks but only states before the first \emph{action} to which potential \emph{compound tasks} decompose. Compiling away $between$ constraints is more complicated but not impossible. The algorithm below shows how to do it properly.
+
+\begin{algorithm}
+    \caption{TO into TO without between-constraints}\label{alg04:1}
+    \begin{algorithmic}[1]
+        \Procedure {Main}{\emph{TO planning problem}: $\mathcal{P} = (s_0,\omega,\mathcal{D})$}
+            \While{$\mathcal{D}$ contains \emph{a method} $m$ with \emph{a between-constraint} $between(T, p, F)$}
+                \State $Searched\_CT \gets \{\}$
+                \State $Need\_Search \gets$ all tasks between $T$ and $F$ with respect to \emph{TO} 
+                \For {each task $t$ in $Need\_Search$}
+                    \If{$t$ is in $Searched\_CT$}
+                        \State swap $t$ with $t_{searched}$ in a set of subtasks and in all occurrences of $t$ in constraints
+                    \Else
+                        \State add $t$ to $Searched\_CT$
+                    \EndIf
+                \EndFor
+            % \If{$N$ is even}
+            %     \State $X \gets X \times X$
+            %     \State $N \gets \frac{N}{2}$  \Comment{This is a comment}
+            % \ElsIf{$N$ is odd}
+            %     \State $y \gets y \times X$
+            %     \State $N \gets N - 1$
+            % \EndIf
+            \EndWhile
+        \EndProcedure
+        \\
+        \Procedure {Search \emph{compound task}}{\emph{Compound task}: $CT$}
+            \State $y \gets 1$
+        \EndProcedure
+    \end{algorithmic}
+\end{algorithm}
+
+\begin{thm}\label{thm04:9}
+    For each \emph{TO planning problem} there is \emph{an equivalent planning problem} without any \emph{between-constraint}.
+\end{thm}
+\begin{proof}
+    alg1
+\end{proof}
+
+\begin{thm}\label{thm04:10}
+    every TO without between -> without empty method
 \end{thm}
 \begin{proof}
     p
 \end{proof}
 
-\section{State-Constraints Modification}
+\begin{thm}\label{thm04:11}
+    every TO without empty method -> htn-cnf
+\end{thm}
+\begin{proof}
+    p
+\end{proof}
+
+\begin{thm}\label{thm04:12}
+    htn-GNF
+\end{thm}
+\begin{proof}
+    p
+\end{proof}
+
+\begin{thm}\label{thm04:13}
+    next
+\end{thm}
+\begin{proof}
+    p
+\end{proof}
 
 \section{many different formalisms and languages...look for features that can be transformed or deleted}
-\cite{hddl}
-
-\section{Next}
+\cite{hddl}=list of formalisms with publication
