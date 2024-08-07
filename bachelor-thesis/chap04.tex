@@ -78,18 +78,18 @@ Before we start with the transformation of \emph{totally-ordered planning proble
 Now, all \emph{TO} domains will implicitly have only \emph{state-constraints} described in Theorem~\ref{thm04:8}.
 
 \medskip\noindent
-In the following parts, we will try to convert general \emph{TO planning problems} into ones of a \emph{HTN-CNF}. Initially, we will compile away $between$ constraints because this type of \emph{state-constraint} spans throughout states. This behavior complicates the conversion because the \emph{HTN-CNF} has at most two tasks as subtasks. In this case, the $between(T_1, p, T_2)$ constraint cannot be used at all as it needs at least three TO subtasks $T_1 \prec T_2 \prec T_3$ (a check is then made before the application of the first \emph{action} to which $T_2$ decomposes, after the last \emph{action} to which $T_2$ decomposes, and also all states in between are checked). In~\cite{ondrckova2024empty} it is described how to get rid of $between$ constraints from \emph{TO planning problems} by adding a series of $before$ constraints. This conversion is false as it does not concern all states between subtasks but only states before the first \emph{action} to which potential \emph{compound tasks} decompose. Compiling away $between$ constraints is more complicated but not impossible. The algorithm below shows how to do it properly.
+In the following parts, we will try to convert general \emph{TO planning problems} into ones of a \emph{HTN-CNF}. Initially, we will compile away $between$ constraints because this type of \emph{state-constraint} spans throughout states. This behavior complicates the conversion because the \emph{HTN-CNF} has at most two tasks as subtasks. In this case, the $between(T_1, p, T_2)$ constraint cannot be used at all as it needs at least three TO subtasks $T_1 \prec T_2 \prec T_3$ (a check is then made before the application of the first \emph{action} to which $T_2$ decomposes, after the last \emph{action} to which $T_2$ decomposes, and also all states in between are checked). In~\cite{ondrckova2024empty} it is described how to get rid of $between$ constraints from \emph{TO planning problems} by adding a series of $before$ constraints. This conversion is false as it does not concern all states between subtasks but only states before the first \emph{action} to which potential \emph{compound tasks} decompose. Compiling away $between$ constraints is more complicated but not impossible. The Algorithm~\ref{alg04:1} below shows how to do it properly.
 
 \medskip\noindent
-In the following algorithm, we will create new \emph{compound tasks} that are derived from the existing ones. Let us have \emph{a compound task} $T$. A new \emph{compound task} $T_{\{p, q\}}$ (same name but with a suffix) denotes that in every possible decomposition tree starting from $T_{\{p, q\}}$ all \emph{methods} do not contain any $between$ constraints, and every \emph{primitive task network} derived from the $T_{\{p, q\}}$ holds \emph{propositional symbols} $\{p, q\}$ in every state. These new \emph{compound task} will be replaced in \emph{methods} containing $between$ constraints which will allow us to remove these constraints. Also, we will use the notation $before(Q, T)$ with $T$ being a task and $Q \subseteq P$ being a subset of \emph{propositional symbols}. $before(Q, T)$ is just an abbreviation for a $before(q_1, T), before(q_2, T), \dots$ where $q_i \in Q$.
+In the following Algorithm~\ref{alg04:1}, we will create new \emph{compound tasks} that are derived from the existing ones. Let us have \emph{a compound task} $T$. A new \emph{compound task} $T_{\{p, q\}}$ (same name but with a suffix) denotes that in every possible decomposition tree starting from $T_{\{p, q\}}$ all \emph{methods} do not contain any $between$ constraints, and every \emph{primitive task network} derived from the $T_{\{p, q\}}$ holds \emph{propositional symbols} $\{p, q\}$ in every state. These new \emph{compound task} will be replaced in \emph{methods} containing $between$ constraints, and as a result, it will allow us to remove these constraints. Also, we will use the notation $before(Q, T)$ with $T$ being a task and $Q \subseteq P$ being a subset of \emph{propositional symbols}. $before(Q, T)$ is just an abbreviation for a $before(q_1, T), before(q_2, T), \dots$ where $q_i \in Q$.
 
 \begin{algorithm}
     \caption{TO into TO without between-constraints}\label{alg04:1}
     \begin{algorithmic}[1]
         \Procedure {Main}{\emph{TO planning problem}: $\mathcal{P} = (s_0,\omega,\mathcal{D})$}
-            \State $NewCT \gets \{\}$
+            \State $NewCT \gets \{\}$ \Comment{New \emph{Compound Tasks}}
             \While {$\mathcal{D}$ contains \emph{a method} $m$ with \emph{a between-constraint}}            
-                \For {each \emph{compound task} $T$ in $subtasks(m)$ that is part of $\geq 1$ $between$ constraints}
+                \For {each \emph{compound task} $T$ in $subtasks(m)$ that is part of $\geq 1$ \emph{between-constraints}}
                     \State $PropSymbols \gets \{p: between(T, p, F) \; and \; T \prec t \prec F \}$
                     \If {$T_{PropSymbols}$ not in $NewCT$}
                         \State find \emph{methods} $m$ with $T = compound(m)$ and create new $m'=(T_{PropSymbols}, subtasks(m), constraints(m))$
@@ -100,11 +100,10 @@ In the following algorithm, we will create new \emph{compound tasks} that are de
                 \For {each task $t$ in $subtasks(m)$}
                     \State $PropSymbols \gets \{p: between(T, p, F) \; and \; T \prec t \prec F \}$
                     \State \Comment{if $PropSymbols = \emptyset$ then constraints are always satisfied}
-                    \State add $before(PropSymbols, t)$ to $m$
-                    \State add $after(PropSymbols, t)$ to $m$
+                    \State add $before(PropSymbols, t)$, $after(PropSymbols, t)$ to $m$
                 \EndFor
                 
-                \State remove all $between$ constraints from $constraints(m)$
+                \State remove all \emph{between-constraints} from $constraints(m)$
 
                 \For {each $T_{symbols}$ in $subtasks(m)$ ($T_{symbols}$ not in $NewCT$)}
                     \State $NewCT \gets NewCT \cup T_{symbols}$
@@ -112,7 +111,6 @@ In the following algorithm, we will create new \emph{compound tasks} that are de
                 \EndFor
             \EndWhile
         \EndProcedure
-        \\
         \Procedure {SearchCompoundTask}{\emph{Compound task}: $T_{InputSymbols}$}
             \For {each \emph{method} $m$ with $T_{InputSymbols} = compound(m)$}
                 \For {each task $t$ in $subtasks(m)$}
@@ -126,10 +124,10 @@ In the following algorithm, we will create new \emph{compound tasks} that are de
                     \If {$T_{PropSymbols \cup InputSymbols}$ not in $NewCT$}
                         \State find \emph{methods} $m$ with $T = compound(m)$ and create new $m'=(T_{PropSymbols \cup InputSymbols}, subtasks(m), constraints(m))$
                     \EndIf
-                    \State swap all occurrences of $T$ with $T_{PropSymbols \cup InputSymbols}$ in \emph{a method} $m$
+                    \State swap all occurrences of $T$ with $T_{PropSymbols \cup InputSymbols}$ in $m$
                 \EndFor
 
-                \State remove all $between$ constraints from $constraints(m)$
+                \State remove all \emph{between-constraints} from $constraints(m)$
 
                 \For {each $T_{symbols}$ in $subtasks(m)$ ($T_{symbols}$ not in $NewCT$)}
                     \State $NewCT \gets NewCT \cup T_{symbols}$
@@ -146,7 +144,16 @@ In the following algorithm, we will create new \emph{compound tasks} that are de
     For each \emph{TO planning problem} there is \emph{an equivalent planning problem} without any \emph{between-constraint}.
 \end{thm}
 \begin{proof}
-    alg1 + explanation
+    The idea of the Algorithm~\ref{alg04:1} is to remove \emph{between-constraints} \emph{method} by \emph{method} with a procedure that might remind us of Depth-first search (DFS). Suppose a method \( M \) includes at least one \emph{between-constraint}. In every valid \emph{solution} of the \emph{planning problem} \(\mathcal{P}\) that employs \( M \) during the planning phase, there must exist a consecutive \emph{sub-plan} that is decomposed from the \( \text{compound}(M) \) and contains the \emph{propositional symbol} specified in the constraint.
+
+    If we want to remove $between(T, p, F)$ constraint then we must ensure that all decompositions (even those with cycles) of all \emph{compound tasks} between $T$ and $F$ (with respect to \emph{TO}) hold \emph{propositional symbol} $p$.
+    
+    An algorithm is split into two distinct parts: the while-loop (3) in the \texttt{Main} function and a recursive function \texttt{SearchCompoundTask} (23). The main cycle removes all \emph{between-constraints} from a single \emph{method} per iteration meanwhile not creating any new \emph{between-constraints}. All \emph{compound tasks} that are mentioned in \emph{between-constraints} are substituted with new \emph{compound tasks} that are stored in an auxiliary set \texttt{NewCT} (2). If a substituted \emph{compound task} is already stored in \texttt{NewCT} then we do not have to recursively search this task with \texttt{SearchCompoundTask} function (17, 38). On the contrary, if the task is not searched then we need to create new \emph{methods} so that tasks from other \emph{methods} cannot be decomposed via \emph{methods} designed for the substituted tasks (7, 33).
+
+    The recursive procedure \texttt{SearchCompoundTask} looks for all \emph{methods} that decompose the input \emph{compound tasks} and append constraints so that the \emph{propositional symbols} are checked in all states concerning the subtasks (27, 28). Also, the recursive procedure removes all \emph{between-constraints} during the search (35), so they are not found in the main while-loop.
+
+
+    There is a finite number of \emph{propositional symbols}, \emph{methods}, \emph{compound tasks}, and new \emph{compound tasks} in \texttt{NewCT}. Therefore, the algorithm will not fall into an infinite cycle, and gradually all \emph{between-constraints} will be removed.
 \end{proof}
 
 \begin{thm}\label{thm04:10}
@@ -177,5 +184,6 @@ In the following algorithm, we will create new \emph{compound tasks} that are de
     p
 \end{proof}
 
-\section{many different formalisms and languages...look for features that can be transformed or deleted}
+\section{many different formalisms and languages}
+look for features that can be transformed or deleted \\
 \cite{hddl}=list of formalisms with publication
