@@ -100,7 +100,7 @@ In the following Algorithm~\ref{alg04:1}, we will create new \emph{compound task
                 \For {each task $t$ in $subtasks(m)$}
                     \State $PropSymbols \gets \{p: between(T, p, F) \; and \; T \prec t \prec F \}$
                     \State \Comment{if $PropSymbols = \emptyset$ then constraints are always satisfied}
-                    \State add $before(PropSymbols, t)$, $after(PropSymbols, t)$ to $m$
+                    \State add $before(PropSymbols, t)$, $after(t, PropSymbols)$ to $m$
                 \EndFor
                 
                 \State remove all \emph{between-constraints} from $constraints(m)$
@@ -116,7 +116,7 @@ In the following Algorithm~\ref{alg04:1}, we will create new \emph{compound task
                 \For {each task $t$ in $subtasks(m)$}
                     \State $PropSymbols \gets \{p: between(T, p, F) \; and \; T \prec t \prec F \}$
                     \State add $before(PropSymbols \cup InputSymbols, t)$ to $m$
-                    \State add $after(PropSymbols \cup InputSymbols, t)$ to $m$
+                    \State add $after(t, PropSymbols \cup InputSymbols)$ to $m$
                 \EndFor
 
                 \For {each \emph{compound task} $T$ in $subtasks(m)$}
@@ -157,27 +157,51 @@ In the following Algorithm~\ref{alg04:1}, we will create new \emph{compound task
 \end{proof}
 
 \begin{thm}\label{thm04:10}
-    every TO without between -> without empty method
+    For each \emph{TO planning problem} that does not generate empty \emph{plan} as a \emph{solution}, there is \emph{an equivalent planning problem} without \emph{empty methods}.
 \end{thm}
 \begin{proof}
-    p
+    First, we will remove all \emph{between-constraints} with the Theorem~\ref{thm04:9}.
+
+    Similarly to Theorem~\ref{thm04:5}, we will need to find all \emph{nullable tasks} in \emph{a planning problem} and create new \emph{methods} without these tasks. The difficult part is handling the \emph{before-, after-constraints} which need to be checked eventually. \emph{A nullable task} may have many different series of decompositions that lead to an empty set of tasks. Each of these decompositions may have different constraints that need to be checked. For this purpose, we will use a function $Nullifies(T)$ that accepts a \emph{nullable compound task} and returns a set of sets of \emph{propositional symbols}. Each element of the function's output represents one possible way of how we can decompose this \emph{compound task} and which \emph{propositional symbols} need to be checked.
+
+    We will find all values of the function $Nullifies$ in the following inductive manner. \textbf{Base:} for each $T \rightarrow \varepsilon \; [\{\}]: Nullifies(T) = \{\{\}\}$. \textbf{Induction:} having $T \rightarrow T_1, \dots, T_k \; [C], \; k \geq 1$ with subtasks containing only \emph{nullable compound tasks} we extend $Nullifies(T) = Nullifies(T) \; \cup \; \{\{\text{propositional symbols mentioned in} \; C\} \\ \cup propSym_1 \cup \dots \cup propSym_k\}$ where $propSym_i \in Nullifies(T_i)$. The induction part is repeated until there is a new unique combination of \emph{propositional symbols} that is not mentioned in $Nullifies(T)$ with some \emph{nullable compound task} $T$ and some \emph{method} $T \rightarrow T_1, \dots, T_k \; [C], \; i \geq 1$.
+
+    It can be easily seen that $T$ is \emph{nullable} if and only if $Nullifies(T) \neq \emptyset$ (after we have found all values). \emph{The compound task} in \emph{the initial task network} is never \emph{nullable} as stated in the theorem. This feature will be used in the second part of the \emph{empty method} elimination.
+
+    At this point, all \emph{empty methods} can be removed from the \emph{planning domain}.
+
+    Now, for the final part, we will append new \emph{methods} with/without \emph{nullable tasks} to the \emph{planning problem}, similarly to Theorem~\ref{thm04:5}. Suppose \emph{a method} contains $i$ \emph{nullable tasks} in $subtasks$. Without loss of generality, \emph{nullable tasks} will be $T_1, \dots, T_i$. There will be $(|Nullifies(T_1)| + 1) \times \dots \times (|Nullifies(T_i)| + 1)$ new \emph{methods}, some of them might be identical. For each such combination, we will create a new \emph{method} without (some) \emph{nullable tasks}. Constraints mentioning deleted tasks are removed from the set of constraints. If we want to remove \emph{a nullable task} $T_j$ then we need to find the closest task that is not removed from the \emph{method} and append new \emph{state-constraints} to \emph{the method}. If the non-removed task $T_k$ holds $k < j$ then we create new constraints: $after(T_k, p_1), after(T_k, p_2), \dots$, where $p_i \in PropSymbols \in Nullifies(T_j)$. On the other hand, if $k > j$ then we append $before(T_k, p_1), before(T_k, p_2), \dots$ to the set of \emph{method's} constraints. It might happen that all $subtasks(M)$ of \emph{a method} $M$ are \emph{nullable}, in this case, we do not create new \emph{empty method} because $compound(M)$ will be removed from \emph{methods} that contain $compound(M)$ as a subtask. As was stated before, \emph{initial task network} is never \emph{nullable}, thus we do not need to handle this awkward situation.
+    %following proof does not create new betweens constr, C is copied and modified for deleted tasks
 \end{proof}
 
 \begin{thm}\label{thm04:11}
-    every TO without empty method and between -> htn-cnf
+    For each \emph{TO planning problem} there is \emph{an equivalent planning problem} without any \emph{after-constraints}.
 \end{thm}
 \begin{proof}
-    p
+    \emph{TO planning problems} allow us to shift any \emph{after-constraint} to the succeeding task. So, \emph{an after-constraint} is changed to \emph{before-constraint}. This transformation is valid with only one exception. If \emph{the after-constraint} targets the last task with respect to \emph{TO} then \emph{an after-constraint} cannot be shifted to the following task because such task does not exist in a set of \emph{method's} $subtasks$. One might think that we can compile this feature away using the cooperation with other \emph{methods}. Still, it can happen that the targeted task will be the last \emph{action} in \emph{the solution} which means that the check will be evaluated in a state after the execution of all \emph{actions} in \emph{the plan}. Therefore, in this case, we cannot shift \emph{an after-constraint} so easily. What we can do is to create a new \emph{compound task} $T_{empty}$ with one \emph{empty method}. Then, this task can be inserted at the end of \emph{a method} and problematic \emph{after-constraints} can be shifted to the $T_{empty}$.
+
+    Symmetrically, we can transform all \emph{before-constraints} to the equivalent \emph{after-constraints}.
 \end{proof}
 
 \begin{thm}\label{thm04:12}
+    For each \emph{TO planning problem} that does not generate empty \emph{plan} as a \emph{solution}, there is \emph{an equivalent planning problem} in \emph{HTN-CNF}.
+\end{thm}
+\begin{proof}
+    The proof is akin to proofs of Theorems~\ref{thm04:5}~\ref{thm04:6} with some extra steps to handle \emph{state-constraints}. At the beginning, we will use Theorem~\ref{thm04:9} to remove all \emph{between-constraints}. Afterwards, we will use Theorem~\ref{thm04:10} to remove all \emph{empty methods} which does not create any new \emph{between-constraints}. Now we need to handle \emph{unit methods}. We will find all \emph{unit pairs} which is identical to the proof to the Theorem~\ref{thm04:5}. Analogous to the process of discarding \emph{empty methods} \emph{unit pairs} might have different decompositions which lead to different sets of constraints. As for \emph{empty methods}, we will find all such combinations of \emph{unit pairs} with sets of constraints with the help of an auxiliary function $Nulifies(T, F)$ with $(T, F)$ being an \emph{unit pair}. \textbf{Base:} for each \emph{unit method} $T \rightarrow F \; [C]$: $Nullifies(T, F) = \{C\}$ (if there are multiple \emph{unit methods} with identical \emph{compound tasks} but with different constraints then each set of constraints is added separately). \textbf{Induction:} having \emph{a unit pair} $(T, F)$ and \emph{a unit method} $F \rightarrow H \; [C]$: $Nullifies(T, H) = Nullifies(T, H) \; \cup \; \{constr_t \cup constr_h \; | \; (\forall constr_t \in Nullifies(T, F)) \; and \; (\forall constr_h \in Nullifies(F, H))\}$. Hence, for each \emph{unit pair} $(T, F)$ and for each \emph{non-unit method} $F \rightarrow F_1, \dots, F_k \; [C]$ we create new \emph{methods} for each set of constraints in $Nullifies(T, F)$. New \emph{method} is of a form $T \rightarrow F_1, \dots, F_k \; [C \cup newC]$ where $newC$ are newly produced constraints from $newConstr \in Nullifies(T, F)$. $newC = \{before(p, F_1) \; | \; before(p, X) \in newConstr\} \cup \{after(F_k, p) \; | \; after(X, p) \in newConstr\}$. After that, we can remove all \emph{unit methods}.
+
+    For each \emph{method} with multiple subtasks with at least one \emph{primitive task} as a subtask, we substitute \emph{a primitive task} $a$ with \emph{a compound task} $T_a$. All constraints targeting $a$ are interchanged with constraints targeting $T_a$. We also create a new \emph{method} $T_a \rightarrow a \; [\{\}]$. Now, our \emph{planning problem} is in $\text{NF}_{\geq 2}$. To finish the proof we need to divide long \emph{methods}.
+
+    For each \emph{method} $T \rightarrow T_1, \dots, T_k \; [C], \; k \geq 3$ we produce $k - 2$ $C_i$ \emph{compound tasks}, and construct new \emph{methods} $T \rightarrow T_1, C_1 \; [\{T_1 \prec C_1\} \; \cup \; \{\text{all \emph{state-constraints}} \\ \text{targeting} \; T_1\}]$, $C_1 \rightarrow T_2, C_2 \; [\{T_2 \prec C_2\} \; \cup \; \{\text{all \emph{state-constraints} targeting $T_2$}\}]$, $\dots$, $C_{k-2} \rightarrow T_{k-1}, T_k \; [\{T_{k-1} \prec T_k\} \; \cup \; \{\text{all \emph{state-constraints} targeting $T_{k-1}, T_k$}\}]$.
+\end{proof}
+
+\begin{thm}\label{thm04:13}
     htn-GNF
 \end{thm}
 \begin{proof}
     p
 \end{proof}
 
-\begin{thm}\label{thm04:13}
+\begin{thm}\label{thm04:14}
     next
 \end{thm}
 \begin{proof}

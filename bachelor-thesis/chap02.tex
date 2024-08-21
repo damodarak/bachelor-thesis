@@ -30,10 +30,10 @@ All of the following definitions are correspondent and equivalent to the definit
 \end{defn}
 
 \medskip\noindent
-In accordance with the Definition~\ref{def01:5}, the more formal definition~\cite{complexity}~\cite{langclassification}~\cite{nau} of the \emph{task network} would contain some function $\alpha: U \rightarrow N$, which would map instances of \emph{primitive} and \emph{compound tasks} to the set of names of all \emph{tasks}. This function would allow us to have multiple instances of the same \emph{task} in the set of tasks $U$, each with a unique identifier. We will omit a function $\alpha$ because its context will be always clear.
+In accordance with the Definition~\ref{def01:5}, the more formal definition~\cite{complexity}~\cite{langclassification}~\cite{nau} of the \emph{task network} would contain some function $\alpha: U \rightarrow N$, which would map instances of \emph{primitive} and \emph{compound tasks} to the set of names of all \emph{tasks}. This function would allow us to have multiple instances of the same \emph{task} in the set of tasks $U$, each with a unique identifier. We will omit a function $\alpha$ because its context will always be clear.
 
 \begin{defn}\label{def02:10}
-    A \emph{method} is a triple $m = (compound(m),subtasks(m), \\ constraints(m))$, where $compound(m)$ is a \emph{compound  task} and $(subtasks(m), \\ constraints(m))$ is a \emph{task network}. Having a \emph{task network} $\omega=(U,C)$, \emph{compound task} $c \in U$, and an instance of \emph{method} $m$ from $M$. Then $m$ decomposes $c$ into $subtasks(m)$, creating a new \emph{task network} $\omega'=(U',C')$ of a form:
+    A \emph{method} is a triple $m = (compound(m),subtasks(m), \\ constraints(m))$, where $compound(m)$ is a \emph{compound  task} and $(subtasks(m), \\ constraints(m))$ is a \emph{task network}. $constraints(m)$ operate only with the tasks in $subtasks(m)$. Having a \emph{task network} $\omega=(U,C)$, \emph{compound task} $c \in U$, and an instance of \emph{method} $m$ from $M$. Then $m$ decomposes $c$ into $subtasks(m)$, creating a new \emph{task network} $\omega'=(U',C')$ of a form:
 
     \[
     \delta(\omega,c,m) = ((U-\{c\}) \cup subtasks(m), C' \cup constraints(m)),
