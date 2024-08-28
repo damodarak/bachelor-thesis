@@ -1,12 +1,12 @@
 \chapter{Transformations of {HTN} {M}odels}
 
 \medskip\noindent
-After an exhaustive enumeration of various definitions and semantics, we will finally start discussing the transformation of different HTN models. This chapter will exhibit varying transformations along divergent contexts and preconditions. For example, HTN models might be partially-ordered, totally-ordered, with or without \emph{goal tasks}, having a different set of allowed \emph{state-constraints}. Moreover, we will look at differing formalisms and try to compile away unsupported features. Our scope of interest is transformations that do not change the set of \emph{solutions} to the \emph{planning problem}.
+After an exhaustive enumeration of various definitions and semantics, we will finally start discussing the transformation of different HTN models. This chapter will exhibit varying transformations along divergent contexts and preconditions. For example, HTN models might be partially-ordered, totally-ordered, with or without \emph{goal tasks}, having a different set of allowed \emph{state-constraints}. \xxx{HIDDEN TEXT} %Moreover, we will look at differing formalisms and try to compile away unsupported features. Our scope of interest is transformations that do not change the set of \emph{solutions} to the \emph{planning problem}.
 
 \section{Normal Forms}
 
 \medskip\noindent
-The first section of this chapter is inspired by the \emph{Chomsky normal form} (CNF)~\cite{chytil}. A context-free grammar (CFG) is in CNF if all of its production rules are of the form: $A \rightarrow BC$, $A \rightarrow a$, $S \rightarrow \varepsilon$ (in this case $S$ cannot be on the right side of a production rule) where $A, B, C$ are nonterminal symbols, $a$ is a terminal symbol, $S$ is a starting nonterminal symbol, and $\varepsilon$ denotes an empty symbol. This "nice" form of CF grammar allows us to prove important theorems about CF languages more easily. Similarly, we want to have "nice" forms of \emph{planning domains} without \emph{empty methods} which might speed up algorithms for planning, or plan verification. Also, these forms are useful for proving HTN theorems~\cite{langclassification}~\cite{cmyk}.
+The first section of this chapter is inspired by the \emph{Chomsky normal form} (CNF)~\cite{chytil}. A context-free grammar (\emph{CFG}) is in CNF if all of its production rules are of the form: $A \rightarrow BC$, $A \rightarrow a$, $S \rightarrow \varepsilon$ (in this case $S$ cannot be on the right side of a production rule) where $A, B, C$ are nonterminal symbols, $a$ is a terminal symbol, $S$ is a starting nonterminal symbol, and $\varepsilon$ denotes an empty symbol. This "nice" form of CF grammar allows us to prove important theorems about CF languages more easily. Similarly, we want to have "nice" forms of \emph{planning domains} without \emph{empty methods} which might speed up algorithms for planning, or plan verification. Also, these forms are useful for proving HTN theorems~\cite{langclassification}~\cite{cmyk}.
 
 \begin{defn}\label{def04:14}
     A \emph{hierarchical planning problem} $\mathcal{P} = (s_0,\omega,\mathcal{D})$ is said to be in $\text{NF}_{\geq 2}$~\cite{langclassification} if all methods are of the form: $T \rightarrow T_1, \dots, T_k \; [C], k \geq 2$; $T \rightarrow a \; [C]$ where $T, T_1, \dots, T_k$ are \emph{compound tasks}, and $a$ is a \emph{primitive task (action)}.
@@ -78,7 +78,10 @@ Before we start with the transformation of \emph{totally-ordered planning proble
 Now, all \emph{TO} domains will implicitly have only \emph{state-constraints} described in Theorem~\ref{thm04:8}.
 
 \medskip\noindent
-In the following parts, we will try to convert general \emph{TO planning problems} into ones of a \emph{HTN-CNF}. Initially, we will compile away $between$ constraints because this type of \emph{state-constraint} spans throughout states. This behavior complicates the conversion because the \emph{HTN-CNF} has at most two tasks as subtasks. In this case, the $between(T_1, p, T_2)$ constraint cannot be used at all as it needs at least three TO subtasks $T_1 \prec T_2 \prec T_3$ (a check is then made before the application of the first \emph{action} to which $T_2$ decomposes, after the last \emph{action} to which $T_2$ decomposes, and also all states in between are checked). In~\cite{ondrckova2024empty} it is described how to get rid of $between$ constraints from \emph{TO planning problems} by adding a series of $before$ constraints. This conversion is false as it does not concern all states between subtasks but only states before the first \emph{action} to which potential \emph{compound tasks} decompose. Compiling away $between$ constraints is more complicated but not impossible. The Algorithm~\ref{alg04:1} below shows how to do it properly.
+In the following parts, we will try to convert general \emph{TO planning problems} into ones of a \emph{HTN-CNF}. Initially, we will compile away $between$ constraints because this type of \emph{state-constraint} spans throughout states which is undesirable. This behavior complicates the conversion because the \emph{HTN-CNF} has at most two tasks as subtasks. In this case, the $between(T_1, p, T_2)$ constraint is saying that the check is made before the application of the first \emph{action} to which $T_2$ decomposes, after the last \emph{action} to which $T_1$ decomposes, and also all states in between are checked. This means that the test is made in a single state after the last \emph{action} of $T_1$. This can be easily transformed to a single \emph{before-, after-constraint}. Complications with \emph{between-constraints} begin if we have at least three \emph{TO} subtasks $T_1 \prec T_2 \prec T_3$ and a $between(T_1, p, T_3)$ constraint. Having this, the check has to be made in (potentially) multiple states depending on a decomposition tree of \emph{a compound task} $T_2$. Transformation of this feature becomes difficult if we do not want to lose any information about \emph{a planning domain}.
+
+\medskip\noindent
+In~\cite{ondrckova2024empty} it is described how to get rid of $between$ constraints from \emph{TO planning problems} by adding a series of $before$ constraints. This conversion is false as it does not concern all states between subtasks but only states before the first \emph{action} to which potential \emph{compound tasks} decompose. Compiling away $between$ constraints is more complicated but not impossible. The Algorithm~\ref{alg04:1} below shows how to do it properly.
 
 \medskip\noindent
 In the following Algorithm~\ref{alg04:1}, we will create new \emph{compound tasks} that are derived from the existing ones. Let us have \emph{a compound task} $T$. A new \emph{compound task} $T_{\{p, q\}}$ (same name but with a suffix) denotes that in every possible decomposition tree starting from $T_{\{p, q\}}$ all \emph{methods} do not contain any $between$ constraints, and every \emph{primitive task network} derived from the $T_{\{p, q\}}$ holds \emph{propositional symbols} $\{p, q\}$ in every state. These new \emph{compound task} will be replaced in \emph{methods} containing $between$ constraints, and as a result, it will allow us to remove these constraints. Also, we will use the notation $before(Q, T)$ with $T$ being a task and $Q \subseteq P$ being a subset of \emph{propositional symbols}. $before(Q, T)$ is just an abbreviation for a $before(q_1, T), before(q_2, T), \dots$ where $q_i \in Q$.
@@ -137,13 +140,15 @@ In the following Algorithm~\ref{alg04:1}, we will create new \emph{compound task
         \EndProcedure
     \end{algorithmic}
 \end{algorithm}
-
+\xxx{hidden text}
 %\alpha unique task names, swap only unique stuff
 
 \begin{thm}\label{thm04:9}
     For each \emph{TO planning problem} there is \emph{an equivalent planning problem} without any \emph{between-constraint}.
 \end{thm}
 \begin{proof}
+    First of all, we will compile away \emph{between-constraints} of the neighboring tasks, i.e., tasks $T_1 \prec T_2$ such that no task $T_i$ exist with $T_1 \prec T_i$ and $T_i \prec T_2$. As was said before, these constraints can be interchanged to a single \emph{before-constraint}. \emph{Between-constraints} of a form $between(T_i, p, T_i)$ or $between(T_j, p, T_i)$ with $T_i \prec T_j$ are pointless and can be removed without any loss of information.
+    
     The idea of the Algorithm~\ref{alg04:1} is to remove \emph{between-constraints} \emph{method} by \emph{method} with a procedure that might remind us of Depth-first search (DFS). Suppose a method \( M \) includes at least one \emph{between-constraint}. In every valid \emph{solution} of the \emph{planning problem} \(\mathcal{P}\) that employs \( M \) during the planning phase, there must exist a consecutive \emph{sub-plan} that is decomposed from the \( \text{compound}(M) \) and contains the \emph{propositional symbol} specified in the constraint.
 
     If we want to remove $between(T, p, F)$ constraint then we must ensure that all decompositions (even those with cycles) of all \emph{compound tasks} between $T$ and $F$ (with respect to \emph{TO}) hold \emph{propositional symbol} $p$.
@@ -171,7 +176,6 @@ In the following Algorithm~\ref{alg04:1}, we will create new \emph{compound task
     At this point, all \emph{empty methods} can be removed from the \emph{planning domain}.
 
     Now, for the final part, we will append new \emph{methods} with/without \emph{nullable tasks} to the \emph{planning problem}, similarly to Theorem~\ref{thm04:5}. Suppose \emph{a method} contains $i$ \emph{nullable tasks} in $subtasks$. Without loss of generality, \emph{nullable tasks} will be $T_1, \dots, T_i$. There will be $(|Nullifies(T_1)| + 1) \times \dots \times (|Nullifies(T_i)| + 1)$ new \emph{methods}, some of them might be identical. For each such combination, we will create a new \emph{method} without (some) \emph{nullable tasks}. Constraints mentioning deleted tasks are removed from the set of constraints. If we want to remove \emph{a nullable task} $T_j$ then we need to find the closest task that is not removed from the \emph{method} and append new \emph{state-constraints} to \emph{the method}. If the non-removed task $T_k$ holds $k < j$ then we create new constraints: $after(T_k, p_1), after(T_k, p_2), \dots$, where $p_i \in PropSymbols \in Nullifies(T_j)$. On the other hand, if $k > j$ then we append $before(T_k, p_1), before(T_k, p_2), \dots$ to the set of \emph{method's} constraints. It might happen that all $subtasks(M)$ of \emph{a method} $M$ are \emph{nullable}, in this case, we do not create new \emph{empty method} because $compound(M)$ will be removed from \emph{methods} that contain $compound(M)$ as a subtask. As was stated before, \emph{initial task network} is never \emph{nullable}, thus we do not need to handle this awkward situation.
-    %following proof does not create new betweens constr, C is copied and modified for deleted tasks
 \end{proof}
 
 \begin{thm}\label{thm04:11}
@@ -194,20 +198,43 @@ In the following Algorithm~\ref{alg04:1}, we will create new \emph{compound task
     For each \emph{method} $T \rightarrow T_1, \dots, T_k \; [C], \; k \geq 3$ we produce $k - 2$ $C_i$ \emph{compound tasks}, and construct new \emph{methods} $T \rightarrow T_1, C_1 \; [\{T_1 \prec C_1\} \; \cup \; \{\text{all \emph{state-constraints}} \\ \text{targeting} \; T_1\}]$, $C_1 \rightarrow T_2, C_2 \; [\{T_2 \prec C_2\} \; \cup \; \{\text{all \emph{state-constraints} targeting $T_2$}\}]$, $\dots$, $C_{k-2} \rightarrow T_{k-1}, T_k \; [\{T_{k-1} \prec T_k\} \; \cup \; \{\text{all \emph{state-constraints} targeting $T_{k-1}, T_k$}\}]$.
 \end{proof}
 
+\begin{defn}\label{def04:18}
+    A \emph{hierarchical planning problem} $\mathcal{P} = (s_0,\omega,\mathcal{D})$ is said to be in \emph{HTN-GNF~\cite{gnf}} if all of its methods are of the form: $T \rightarrow a, T_1, T_2, \dots, T_i \; [C], \; i \geq 0$; where $T, T_i$ are \emph{compound tasks}, and $a$ is a \emph{primitive task}. 
+\end{defn}
+
 \begin{thm}\label{thm04:13}
-    htn-GNF
+    For each \emph{TO planning problem} in \emph{HTN-CNF} there is \emph{an equivalent planning problem} in \emph{HTN-GNF}.
 \end{thm}
 \begin{proof}
-    p
+    We assume that \emph{the planning problem} does not contain any \emph{between-constraints} as they can be easily eliminated in \emph{HTN-CNF}. The practice is to be found above.
+
+    The proof follows the~\cite{gnf} (Chapter 7.1) with the addition of HTN specifics. Initially, we rename \emph{compound tasks} to $A_1, A_2, \dots, A_n$ in some ascending order (and substitute these new tasks in constraints). \emph{The compound task} in \emph{the initial task network} is renamed to $A_1$. Our next goal is to modify \emph{methods} such that $A_i \rightarrow A_j, \alpha \; [C] \implies i > j$ where $T_j$ is the first \emph{compound task} with respect to ordering, and $\alpha$ is a set of both \emph{primitive and compound tasks}.
+
+    Starting from the $A_1$ and proceeding to \emph{the compound task} with the highest index, we find all \emph{methods} of a form:  $A_i \rightarrow A_j, \alpha \; [C], \; i > j$. For each such \emph{method} we construct new \emph{methods} replacing $A_j$ with the $subtasks(M)$ such that $compound(M) = A_j$ for \emph{methods} $M$. Constraints $C$ are unioned with the $constraints(M)$, transitive closure of \emph{ordering-constraints} between $subtasks(M)$ and $\alpha$ is made, and all \emph{state-constraints} targeting $A_j$ are substituted as follows: each $before(p, A_j)$ is substituted with $before(p, A_x)$ such that $A_x$ is the first task in $subtasks(M)$, and each $after(A_x, p)$ is substituted with $after(A_x, p)$ such that $A_x$ is the last task in $subtasks(M)$. By repeatedly using this technique we obtain \emph{methods} $A_i \rightarrow A_j, \alpha \; [C], \; i \leq j$, ones starting with \emph{an action}, or ones starting with a new \emph{compound symbol} $Z$. After that, we need to remove left recursion from our new \emph{methods} for $A_i$, that is $A_i \rightarrow A_i, \alpha \; [C]$. Doing so is more difficult than in \emph{CFG} because we need to handle \emph{state-constraints} properly. First, we need to slightly modify \emph{methods' constraints} containing left recursion. For each \emph{method} $A_i \rightarrow A_i, \alpha \; [C]$ ($\alpha$ is always nonempty) we find all \emph{after-constraints} targeting $A_i$ and shift them to the succeeding task resulting in \emph{before-constraint} on the first task in $\alpha$ (with respect to ordering). We can do this because our domain is \emph{TO} and the check will be made in the same state. Afterward, we will construct a $\Omega$ – set of sets with \emph{propositional symbols} where each element is a union of \emph{propositional symbols} found in \emph{a before-constraints} targeting the first task in \emph{a method} with left recursion of $A_i$. Now we need to find all \emph{methods} with $compound(M) = A_i$ and separate them into two groups (with/without left recursion):
+
+    \[
+        A_i \rightarrow A_i, \alpha_1 \; [C_1] \; | \; \dots \; | \; A_i, \alpha_m \; [C_m],
+    \]
+
+    \[
+        A_i \rightarrow \beta_1 \; [C_1] \; | \; \dots \; | \; \beta_p \; [C_p].
+    \].
+
+    With these two groups, we eliminate left recursion by introducing new \emph{compound task} $Z$, and substituting these \emph{methods} with:
+
+    \begin{gather*}
+        A_i \rightarrow \beta_i \; [C_i \cup \{before(Q, \beta_i) \; | \; Q \; \text{is a union of some elements from} \;\Omega\}] \; | \; \beta_i, Z \\ [C_i \cup \{before(Q, \beta_i) \; | \; Q \; \text{is a union of some elements from} \;\Omega \} \cup \{\beta_i \prec Z\}], \\ 1 \leq i \leq  p, \\ \\
+        Z \rightarrow \alpha_i \; [C_i] \; | \; \alpha_i, Z \; [C_i \cup \{\alpha_i \prec Z\}], 1 \leq i \leq m.
+    \end{gather*}
+
+    In the new \emph{methods} the former set of constraints $C_i$ is restricted to relevant tasks. Doing so, we can move on to the next task $A_{i + 1}$ and repeat the process.
+
+    At this point, $A_i \rightarrow A_j, \alpha \; [C] \implies i > j$ holds. For the last part, we will modify $A_i \rightarrow A_j, \alpha \; [C]$ for $i = n - 1, n - 2, \dots, 1$ so the \emph{methods} start with \emph{an action}, and at the same time we modify new $Z$ \emph{methods}. The final modification is analogous to the one in the third paragraph.
 \end{proof}
 
-\begin{thm}\label{thm04:14}
-    next
-\end{thm}
-\begin{proof}
-    p
-\end{proof}
 
-\section{many different formalisms and languages}
-look for features that can be transformed or deleted \\
-\cite{hddl}=list of formalisms with publication
+
+
+% \section{many different formalisms and languages}
+% look for features that can be transformed or deleted \\
+% \cite{hddl}=list of formalisms with publication

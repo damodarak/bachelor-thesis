@@ -11,5 +11,7 @@ dosazitelnost, uzitecne neuzitecne symboly
 TO
 nova semantika, ktera dovoluje empty methods...kdyz odstranime task tak vsechny constrainty poupravime, z after se muze stat before nasledujici akce atd.. odstranit orderingy
 
-PO -> TO
+PO -> TO 
+
+gnf for PO
  
