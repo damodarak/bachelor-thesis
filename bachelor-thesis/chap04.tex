@@ -1,7 +1,7 @@
 \chapter{Transformations of {HTN} {M}odels}
 
 \medskip\noindent
-After an exhaustive enumeration of various definitions and semantics, we will finally start discussing the transformation of different HTN models. This chapter will exhibit varying transformations along divergent contexts and preconditions. For example, HTN models might be partially-ordered, totally-ordered, with or without \emph{goal tasks}, having a different set of allowed \emph{state-constraints}. \xxx{HIDDEN TEXT} %Moreover, we will look at differing formalisms and try to compile away unsupported features. Our scope of interest is transformations that do not change the set of \emph{solutions} to the \emph{planning problem}.
+After an exhaustive enumeration of various definitions and semantics, we will finally start discussing the transformation of different HTN models. This chapter will exhibit varying transformations along divergent contexts and preconditions. For example, HTN models might be partially-ordered, totally-ordered, with or without \emph{goal tasks}, having a different set of allowed \emph{state-constraints}.
 
 \section{Normal Forms}
 
@@ -54,7 +54,18 @@ In Definitions~\ref{def04:14},~\ref{def04:15} we exclude the possibility of havi
 \end{proof}
 
 \begin{example}\label{ex04:7}
-    \xxx{proc ty podminky musi byt takhle, ukazat obrazky grafu kdy a jak to jde a grafu kdy to nelze rozdelit, problem je v tom ze se PO podulohy muzou prolinat a nektere ordering grafy nejde binarizovat, ktere obecne planning problemy muzou byt prevedeny do htn-cnf= nejmensi/nejvetsi prvek nebo obecne prvek ktery v kazdem topolo. uspor. ma stejne cislo}
+    If we want to binarize \emph{a planning domain} then we can use different types of \emph{ordering-constraints}. \emph{Method's} subtasks are binarizable if they can be split into two disjunctive sets of subtasks such that all subtasks in one set precede all subtasks in the second set, or if all subtasks in the first set have none \emph{order-constraints} with the second set of subtasks. \emph{A method} is binarizable if this process of splitting into two sets can be done repeatedly until all sets have a single task as an element. 
+    
+    In the words of graphs (\emph{DAG}) where tasks are nodes and an edge $(a,b)$ exists if an \emph{order-constraint} $a \prec b$ exists, we can say that the graph can be split if it contains $\geq 2$ components, or a vertex $u$ exists such that in every topological sorting $u$ has the same value. If such a vertex exists then we know that all vertices with a higher number must come after $u$ and other vertices before. Thus we have 2 disjunctive sets of vertices and $u$ can be added to either of these two sets. A graph is binarizable if this process can be repeated until only single vertices are left.
+
+    Figure~\ref{fig04:3} shows us the smallest \emph{DAG} that cannot be binarizable. Now we understand the reason for our choice of the \emph{linear ordering-constraints} in which we can always find the smallest or the biggest element.
+    
+    \begin{figure}
+        \centering
+        \includegraphics{img/graph.png}
+        \caption{Unbinarizable graph}
+        \label{fig04:3}
+    \end{figure}
 \end{example}
 
 \begin{thm}\label{thm04:7}
@@ -140,8 +151,6 @@ In the following Algorithm~\ref{alg04:1}, we will create new \emph{compound task
         \EndProcedure
     \end{algorithmic}
 \end{algorithm}
-\xxx{hidden text}
-%\alpha unique task names, swap only unique stuff
 
 \begin{thm}\label{thm04:9}
     For each \emph{TO planning problem} there is \emph{an equivalent planning problem} without any \emph{between-constraint}.

@@ -9,7 +9,15 @@ So far we have only discussed the definitions of classical and hierarchical plan
 The following section will describe different solutions of how to handle \emph{empty methods}.
 
 \begin{example}\label{ex03:5}
-    \xxx{motivate pro pouziti prazdnych method v praxi}
+    To understand the importance of \emph{empty methods} we will reuse Figure~\ref{fig01:2} as an example.
+
+    Suppose that the game's \emph{initial state} is $s_0 = \{at\text{-}loc1, key2\text{-}at\text{-}loc5, \\ key1\text{-}at\text{-}loc3, door1\text{-}locked, door2\text{-}locked, key1\text{-}picked\}$. We will assume that multiple keys can be held at the same time, and, for some reason, the player has already picked up the $key1$ (for example he picked it up in the previous level). \emph{The initial task network} is $(\{Get\text{-}to\text{-}loc6\}, \{\})$. An arrow $\rightarrow$ symbolizes \emph{a decomposition}.
+
+    \begin{gather*}
+       (\{Go\text{-}to\text{-}loc6\}, \{\}) \rightarrow (\{Get\text{-}key1, Get\text{-}key2, Go\text{-}to\text{-}loc4, Go\text{-}to\text{-}loc6\}, \\ \{Get\text{-}key1 \prec Go\text{-}to\text{-}loc4, Get\text{-}key2 \prec Go\text{-}to\text{-}loc6, before(key1\text{-}picked, \\ Get\text{-}key2\})
+    \end{gather*}
+
+    At this point it is very convenient to use \emph{an empty method} that decomposes $Get\text{-}key1$ into nothing because we have already picked up the key.
 \end{example}
 
 \begin{example}\label{ex03:6}
