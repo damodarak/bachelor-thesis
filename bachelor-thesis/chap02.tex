@@ -30,6 +30,9 @@ All of the following definitions are correspondent and equivalent to the definit
 \end{defn}
 
 \medskip\noindent
+The most used \emph{state-constraint} is \emph{a before-constraint} which can be modeled in various HTN planners. The usage and application of this constraint is obvious. Before the beginning of a task, we want to hold some preconditions that are significant for that particular task. For example, a user needs to input all of the information before he can continue with the paying; a player needs to complete all of the quests before he can move on to the next stage, or a warehouse robot needs to have permission set before he can execute some real-life tasks. Analogous \emph{after-constraint} has different use cases. We might use this constraint on the last task in \emph{the task network} to signalize our intentions which are not modeled with the tasks themselves. For example, we want to deallocate resources of the process after the completion, or we want to give a player new abilities after the completion of many tasks that might interleave. This constraint can be used as a shortcut in difficult models where the person responsible for the modeling cannot enumerate and decide the ordering of tasks perfectly. \emph{The between-constraint} represents an interval of states which hold some property. For example, we want a player to have a specific item in his inventory after the completion of one task and lasting until the other tasks, or an autonomous robot must hold a crate in all states meanwhile he moves from one location to another (possibly doing other unrelated things).
+
+\medskip\noindent
 In accordance with the Definition~\ref{def01:5}, the more formal definition~\cite{complexity}~\cite{langclassification}~\cite{nau} of the \emph{task network} would contain some function $\alpha: U \rightarrow N$, which would map instances of \emph{primitive} and \emph{compound tasks} to the set of names of all \emph{tasks}. This function would allow us to have multiple instances of the same \emph{task} in the set of tasks $U$, each with a unique identifier. We will omit a function $\alpha$ because its context will always be clear.
 
 \begin{defn}\label{def02:10}
@@ -50,7 +53,7 @@ In accordance with the Definition~\ref{def01:5}, the more formal definition~\cit
 \end{defn}
 
 \medbreak\noindent
-It is highly convenient to write planning \emph{methods} as a rewriting rules~\cite{ondrckova2023semantics}:
+It is highly convenient to write planning \emph{methods} as rewriting rules~\cite{ondrckova2023semantics}:
 
 \[
 T \rightarrow T_1,\dots,T_k \quad [C].
@@ -77,10 +80,11 @@ A first-order language $\mathcal{L}$ can be easily interchanged for a set of \em
 \end{defn}
 
 \begin{defn}\label{def02:13}
-    A \emph{solution} to the \emph{planning problem} $\mathcal{P}$ is a \emph{plan} $\pi=(a_1,\dots,a_k)$. This sequence of \emph{actions} is assembled from a \emph{primitive task network} $\omega'=(U', C')$ after the application of a sequence of \emph{methods} from $M$ to the \emph{initial task network} $\omega$. A \emph{solution} $\pi$ needs to be valid, i.e., $\gamma(s_0,\pi)$ is not undefined and also needs to satisfy all of the constraints in $C'$. That is:
+    A \emph{solution} to the \emph{planning problem} $\mathcal{P}$ is a \emph{plan} $\pi=(a_1,\dots,a_k)$. This sequence of \emph{actions} is assembled from a \emph{primitive task network} $\omega'=(U', C'), \; U' = 
+ \{a_i \; | \; 1 \leq i \leq k\}$, after the application of a sequence of \emph{methods} from $M$ to the \emph{initial task network} $\omega$. A \emph{solution} $\pi$ needs to be valid, i.e., $\gamma(s_0,\pi)$ is not undefined and also needs to satisfy all of the constraints in $C'$. That is:
     
     \begin{itemize}
-        \item $t_i \prec t_j \implies i < j$,
+        \item $a_i \prec a_j \implies i < j$,
         
         \item $before(l, V) \implies l \in s_{min\{i \; | \; a_i \; \in \; V\} \; - \; 1}$ (if the literal $l$ is negative then it must not be in a state, same applies for other constraints),
         
@@ -125,7 +129,7 @@ The simplest example is to map \emph{classical planning problem} to the equivale
         g = \{ goal \}.
     \end{gather*}
 
-    Every generated word $\sigma_1\dots\sigma_n \in L(D)$ is correspondent to single \emph{solution} $\pi = (a_1, \dots, a_n)$. Each state of $\mathcal{P}$ is represented by an index (\emph{propositional symbol}) $i$ which specifies the state $q_i \in Q$. If a state is an accepting state, then the planning state $s$ has \emph{propositional symbol} $goal$. This is forced by the positive and negative effects of \emph{actions}.
+    Every generated word $\sigma_1\dots\sigma_n \in L(D)$ corresponds to a single \emph{solution} $\pi = (a_1, \dots, a_n)$. Each state of $\mathcal{P}$ is represented by an index (\emph{propositional symbol}) $i$ which specifies the state $q_i \in Q$. If a state is an accepting state, then the planning state $s$ has \emph{propositional symbol} $goal$. This is forced by the positive and negative effects of \emph{actions}.
 \end{proof}
 
 \begin{cor}\label{cor2:1}
@@ -162,7 +166,7 @@ Now we will prove that \emph{totally-ordered} HTN planning can be represented as
 \end{proof}
 
 \begin{cor}\label{cor2:2}
-Totally-ordered HTN planning is classified into the class of context-free languages.
+Totally-ordered HTN planning without state-constraints is classified into the class of context-free languages.
 \end{cor}
 
 \section{HTN Plan Verification}
