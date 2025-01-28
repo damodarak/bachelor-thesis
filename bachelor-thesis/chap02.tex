@@ -19,9 +19,9 @@ All of the following definitions are correspondent and equivalent to the definit
     \begin{itemize}
         \item $t_i \prec t_j$ where $t_i,t_j \in U$: an \emph{ordering-constraint} meaning that in every valid \emph{solution} the last \emph{primitive task} (\emph{action}) in the \emph{solution} to which $t_i$ decomposes must precede the first \emph{primitive task} (\emph{action}) in the \emph{solution} to which $t_j$ decomposes,
         
-        \item $before(l,U')$: \emph{before-constraint} symbolizing that in every valid \emph{solution} the literal $l$ must hold in a state right before the \emph{application} of a first \emph{action} to which $U' \subseteq U$ decomposes,
+        \item $be\text{f}ore(l,U')$: \emph{before-constraint} symbolizing that in every valid \emph{solution} the literal $l$ must hold in a state right before the \emph{application} of a first \emph{action} to which $U' \subseteq U$ decomposes,
     
-        \item $after(U',l)$: \emph{after-constraint} is similar to \emph{before-constraint} with the difference that the literal $l$ must hold in a state right after the last \emph{action} to which set $U'$ decomposes,
+        \item $a\text{f}ter(U',l)$: \emph{after-constraint} is similar to \emph{before-constraint} with the difference that the literal $l$ must hold in a state right after the last \emph{action} to which set $U'$ decomposes,
     
         \item $between(U',l,U'')$: \emph{between-constraint} is saying that the literal $l$ must hold in all states starting after the last \emph{action} of $U'$ and lasting until the state right before the \emph{application} of a first \emph{action} of $U''$.
     \end{itemize}
@@ -48,7 +48,7 @@ In accordance with the Definition~\ref{def01:5}, the more formal definition~\cit
     \begin{itemize}
         \item replace each \emph{ordering-constraint} containing $c$ with new ones containing $subtasks(m)$, i.e., $\forall c' \in subtasks(m): c \prec x$ is replaced with $c' \prec x$ and $x \prec c$ is replaced with $x \prec c'$,
         
-        \item replace each \emph{before-, after-, between-constraint} containing $c$ with new ones containing $subtasks(m)$. For example, we would replace \emph{before-constraint} $before(l,V)$ with $before(l,(V - \{c\}) \cup subtasks(m))$.
+        \item replace each \emph{before-, after-, between-constraint} containing $c$ with new ones containing $subtasks(m)$. For example, we would replace \emph{before-constraint} $be\text{f}ore(l,V)$ with $be\text{f}ore(l,(V - \{c\}) \cup subtasks(m))$.
     \end{itemize}
 \end{defn}
 
@@ -86,9 +86,9 @@ A first-order language $\mathcal{L}$ can be easily interchanged for a set of \em
     \begin{itemize}
         \item $a_i \prec a_j \implies i < j$,
         
-        \item $before(l, V) \implies l \in s_{min\{i \; | \; a_i \; \in \; V\} \; - \; 1}$ (if the literal $l$ is negative then it must not be in a state, same applies for other constraints),
+        \item $be\text{f}ore(l, V) \implies l \in s_{min\{i \; | \; a_i \; \in \; V\} \; - \; 1}$ (if the literal $l$ is negative then it must not be in a state, same applies for other constraints),
         
-        \item $after(V,l) \implies l \in s_{max\{i \; | \; a_i \; \in \; V\}}$,
+        \item $a\text{f}ter(V,l) \implies l \in s_{max\{i \; | \; a_i \; \in \; V\}}$,
         
         \item $between(V',l,V'') \implies (\forall j, \; max\{i \; | \; a_i \; \in \; V'\} \; \leq \; j \; < \; min\{i \; | \; a_i \; \in \; V''\}: l \; \in \; s_j)$.
     \end{itemize}

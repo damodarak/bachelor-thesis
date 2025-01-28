@@ -14,28 +14,28 @@ The following section will describe different solutions of how to handle \emph{e
     Suppose that the game's \emph{initial state} is $s_0 = \{at\text{-}loc1, key2\text{-}at\text{-}loc5, \\ key1\text{-}at\text{-}loc3, door1\text{-}locked, door2\text{-}locked, key1\text{-}picked\}$. We will assume that multiple keys can be held at the same time, and, for some reason, the player has already picked up the $key1$ (for example he picked it up in the previous level). \emph{The initial task network} is $(\{Get\text{-}to\text{-}loc6\}, \{\})$. An arrow $\rightarrow$ symbolizes \emph{a decomposition}.
 
     \begin{gather*}
-       (\{Go\text{-}to\text{-}loc6\}, \{\}) \rightarrow (\{Get\text{-}key1, Get\text{-}key2, Go\text{-}to\text{-}loc4, Go\text{-}to\text{-}loc6\}, \\ \{Get\text{-}key1 \prec Go\text{-}to\text{-}loc4, Get\text{-}key2 \prec Go\text{-}to\text{-}loc6, before(key1\text{-}picked, \\ Get\text{-}key2\})
+       (\{Go\text{-}to\text{-}loc6\}, \{\}) \rightarrow (\{Get\text{-}key1, Get\text{-}key2, Go\text{-}to\text{-}loc4, Go\text{-}to\text{-}loc6\}, \\ \{Get\text{-}key1 \prec Go\text{-}to\text{-}loc4, Get\text{-}key2 \prec Go\text{-}to\text{-}loc6, be\text{f}ore(key1\text{-}picked, \\ Get\text{-}key2\})
     \end{gather*}
 
     At this point it is very convenient to use \emph{an empty method} that decomposes $Get\text{-}key1$ into nothing because we have already picked up the key.
 \end{example}
 
 \begin{example}\label{ex03:6}
-    Suppose we have a simple \emph{task network} $\omega = (\{t1, t2\}, \{t1 \prec t2, \\ before(p, t2)\})$. In natural language, we would say that task (\emph{primitive} or \emph{compound}) $t1$ must precede task $t2$, and at the same time, before executing the first \emph{primitive task} to which task $t2$ decomposes (in case of a \emph{primitive task}, we mean the state before the \emph{application} of the task $t2$) the \emph{propositional symbol} $p$ must hold in a state. Having an \emph{empty method} $m$ such that:
+    Suppose we have a simple \emph{task network} $\omega = (\{t1, t2\}, \{t1 \prec t2, \\ be\text{f}ore(p, t2)\})$. In natural language, we would say that task (\emph{primitive} or \emph{compound}) $t1$ must precede task $t2$, and at the same time, before executing the first \emph{primitive task} to which task $t2$ decomposes (in case of a \emph{primitive task}, we mean the state before the \emph{application} of the task $t2$) the \emph{propositional symbol} $p$ must hold in a state. Having an \emph{empty method} $m$ such that:
     
     \[
         t2 \rightarrow \varepsilon \quad [C], \; where \; C = \emptyset \; and \; \varepsilon \; denotes \; no \; subtasks,
     \]
     
     \noindent
-    we can decompose the $t2$ in \emph{task network} $\omega$. After the $application$ of the \emph{empty method} $m$, we are not able to tell with certainty the result \emph{task network}. By \emph{applying} $m$, we erase the task $t2$ from the set of tasks in $\omega$ and we modify all of the constraints in $C$. The unclear result might look like this: $\omega' = (\{t1\}, \{t1 \prec \; ?, \\ before(p, ?)\})$ with $?$ symbolizing undefined behaviour. Thus, the following section will study different ways of representing HTN planning with the goal of resolving undefined behavior of \emph{empty methods}. Usually, we will need some additional information about \emph{task network's} decomposition process which will deal with unclear situations. Sometimes we will need to modify existing definitions from the previous chapters.
+    we can decompose $t2$ in \emph{task network} $\omega$. After the $application$ of the \emph{empty method} $m$, we are not able to tell with certainty the semantics of the result \emph{task network}. By \emph{applying} $m$, we erase the task $t2$ from the set of tasks in $\omega$ and we modify all of the constraints in $C$. The unclear result might look like this: $\omega' = (\{t1\}, \{t1 \prec \; ?, be\text{f}ore(p, ?)\})$ with $?$ symbolizing undefined behaviour. Thus, the following section will study different ways of representing HTN planning with the goal of resolving undefined behavior of \emph{empty methods}. Usually, we will need some additional information about \emph{task network's} decomposition process which will deal with unclear situations. Sometimes we will need to modify existing definitions from the previous chapters.
 \end{example}
 
 \medskip\noindent
 Another possible use case of \emph{empty methods} concerns situations when the decomposed task is contained in \emph{the method's} constraints set. Our definitions of decomposition do not allow this behavior, nonetheless, it might be beneficial for the architect of \emph{a planning domain}. Suppose \emph{a task network} containing \emph{a compound task} $Pick\text{-}up\text{-}item\text{-}X$. With the extended \emph{method decomposition} definition, we would be able to decompose this task into nothing while not saying explicitly where the state check should be made:
 
 \[
-    Pick\text{-}up\text{-}item\text{-}X \rightarrow \varepsilon \; [\{before(X\text{-}in\text{-}inventory, Pick\text{-}up\text{-}item\text{-}X)\}]
+    Pick\text{-}up\text{-}item\text{-}X \rightarrow \varepsilon \; [\{be\text{f}ore(X\text{-}in\text{-}inventory, Pick\text{-}up\text{-}item\text{-}X)\}]
 \]
 
 This extended definition also contains undefined behavior because it is unclear where the \emph{state-constraint} needs to be checked. Transformations of HTN models with the extended decomposition definition can be found here~\cite{ondrckova2024empty}.
@@ -50,7 +50,7 @@ The most effortless way to handle \emph{empty methods} is to forbid them (every 
 \]
 
 \noindent
-The main benefit of this semantics is regarding the \emph{method} decomposition Definition~\ref{def02:10}. By forbidding the usage of \emph{empty methods} we are not able to create fuzzy situations with unclear constraints. This way we do not need to adjust any definition and everything works as it should.
+The main benefit of this semantics is regarding \emph{the method} decomposition in Definition~\ref{def02:10}. By forbidding the usage of \emph{empty methods} we are not able to create fuzzy situations with unclear constraints. This way we do not need to adjust any definition and everything works as it should.
 
 \medskip\noindent
 As it happens in life, forbidding something might help in some cases but, on the other hand, it closes doors for the flexibility and advantages of \emph{empty methods}. Now, it is not possible to fulfill the task by doing nothing which might be very convenient in states that already hold all desired \emph{propositional symbols}. In such states, the decomposition of certain \emph{compound tasks} is meaningless and creates \emph{plans} that are longer and more redundant than \emph{plans} which would allow \emph{empty methods}.
@@ -64,7 +64,7 @@ Succeeding models will allow different kinds of \emph{empty methods}, usually by
 Another possible way to resolve the issue with \emph{empty methods} is the No-op model~\cite{ondrckova2023semantics}~\cite{ondrckova2024empty}. The no-op model introduces a new symbol $no\text{-}op()$ which is not presented in the \emph{hierarchical planning domain}. Formally, the $no\text{-}op()$ symbol is just another \emph{primitive task} with no preconditions and effects, i.e. $no\text{-}op() = (\{\}, \{\}, \{\})$. The semantics behind this symbol is hidden right in the name, "no operation", meaning that this action has no impact on the world that we model. It serves as a regular symbol during the planning phase concerning all of the \emph{ordering-constraints} and \emph{before-, after-, between-constraint}. After the checking of all available constraints, the $no\text{-}op()$ symbol is deleted from the final \emph{plan} as it was not part of the former \emph{planning problem}.
 
 \medskip\noindent
-Pros of the no-op model are easily seen. We have solved the issue of \emph{empty methods} by introducing a new symbol $no\text{-}op()$ and at the same time we did not need to allow regular \emph{empty methods} which decompose a task into an empty set. The no-op model extends the previous model Section~\ref{sub03:311}.
+Pros of the no-op model are easily seen. We have solved the issue of \emph{empty methods} by introducing a new symbol $no\text{-}op()$ and at the same time we did not need to allow regular \emph{empty methods} which decompose a task into an empty set. The no-op model extends the previous model in Section~\ref{sub03:311}.
 
 \medskip\noindent
 Cons of this model lies in the HTN plan verification, reverse process to the \emph{hierarchical planning}. The main problem is due to the fact that the $no\text{-}op()$ symbols are not part of the input to the plan verification because they are removed after the check of all constraints in a \emph{primitive task network} (consists only of \emph{primitive tasks}). For this reason, the no-op model is inefficient for plan verification because it would be needed to guess the locations and number of no-op() symbols in the input \emph{plan}, e.g.:
@@ -92,16 +92,16 @@ A similar yet not equivalent ideas can be viewed in the book \emph{Automated Pla
 The constraint graph model will be the first in the series of models that will allow actual usage of \emph{empty methods}. For this purpose, we will redefine \emph{task network} and \emph{method decomposition}. \emph{Task network} will be represented with a directed acyclic graph (DAG) displaying the evolution of the \emph{initial task network} into the \emph{primitive task network}. \emph{Method decomposition} will append new directed edges to the \emph{task network} (graph). Each directed edge $(u,v)$ determines the \emph{compound task $u$} and task (\emph{primitive or compound}) $v$ to which the \emph{compound task $u$} decomposes. Vertices will hold additional information about constraints. Now, let's put it all more formally.
 
 \medskip\noindent
-\emph{Task network} is a DAG $G = (V, E)$ in which the set of vertices $V$ portray \emph{primitive and compound tasks} and edges depict \emph{task decomposition} done by \emph{methods}. As we know, only \emph{compound tasks} can be decomposed, which is why edges can emerge only from vertices with \emph{compound tasks}. In this model, only the graph's leaves can be decomposed (which are \emph{compound tasks}), otherwise, it would be possible to decompose a task multiple times, which is unwanted. Having a (nonempty) \emph{method} $m = (compound(m), subtasks(m), constr(m))$ and a \emph{task network} $G$ with a leaf symbolizing a \emph{compound task} $compound(m)$, we can apply the \emph{method} $m$ to \emph{task network} $G$. As a result, we get $G' = (V \cup subtasks(m), \; E \; \cup \{(compound(m), \;sub) \; | \; sub \in subtasks(m)\})$. The definition of \emph{task decomposition} has one special case: unsurprisingly, \emph{an empty method}. In this model, we do not want to follow practices of no-op models by forcing the planner to use a special symbol like $no\text{-}op()$. The desirable outcome is to support real \emph{empty methods}, i.e. $T \rightarrow \varepsilon \; [C], \; C = \emptyset$, meanwhile allowing the planner to check all types of constraints completely. To fulfill this requirement an \emph{empty method} will also create a new special vertex denoted by $\square$. This vertex serves for the sake of constraints in the \emph{primitive task network}. E.g. having a \emph{compound task} $comp$ and \emph{an empty method} $comp \rightarrow \varepsilon \; [C] \; C = \emptyset$, applying the \emph{method} to the \emph{task} $comp$ would create a new vertex $\square$ and a new directed edge $(comp, \square)$. The difference between this approach and $no\text{-}op()$ model approach is that here the empty vertex does not have any impact on actual \emph{plan} (sequence of \emph{primitive tasks}). Thus, the planner does not need to integrate or use any new symbols in the solving phase of a \emph{planning problem}. 
+\emph{Task network} is a DAG $G = (V, E)$ in which the set of vertices $V$ portray \emph{primitive and compound tasks} and arcs depict \emph{task decomposition} done by \emph{methods}. As we know, only \emph{compound tasks} can be decomposed, which is why edges can emerge only from vertices with \emph{compound tasks}. In this model, only the graph's leaves can be decomposed (which are \emph{compound tasks}), otherwise, it would be possible to decompose a task multiple times, which is unwanted. Having a (nonempty) \emph{method} $m = (compound(m), subtasks(m), constr(m))$ and a \emph{task network} $G$ with a leaf symbolizing a \emph{compound task} $compound(m)$, we can apply the \emph{method} $m$ to \emph{task network} $G$. As a result, we get $G' = (V \cup subtasks(m), \; E \; \cup \{(compound(m), \;sub) \; | \; sub \in subtasks(m)\})$. The definition of \emph{task decomposition} has one special case: unsurprisingly, \emph{an empty method}. In this model, we do not want to follow practices of no-op models by forcing the planner to use a special symbol like $no\text{-}op()$. The desirable outcome is to support real \emph{empty methods}, i.e. $T \rightarrow \varepsilon \; [C], \; C = \emptyset$, meanwhile allowing the planner to check all types of constraints completely. To fulfill this requirement an \emph{empty method} will also create a new special vertex denoted by $\square$. This vertex serves for the sake of constraints in the \emph{primitive task network}. E.g. having a \emph{compound task} $comp$ and \emph{an empty method} $comp \rightarrow \varepsilon \; [C] \; C = \emptyset$, applying the \emph{method} to the \emph{task} $comp$ would create a new vertex $\square$ and a new directed edge $(comp, \square)$. The difference between this approach and $no\text{-}op()$ model approach is that here the empty vertex does not have any impact on actual \emph{plan} (sequence of \emph{primitive tasks}). Thus, the planner does not need to integrate or use any new symbols in the solving phase of a \emph{planning problem}. 
 
 \medskip\noindent
 Now, we should talk about the constraints and their semantics in this model. Constraints, as we know them from the previous models, have their meaning in the planning phase. Instead of having one single set with all constraints in the \emph{task network}, each vertex in the graph will have its own set of constraints. Every \emph{task decomposition} provided by a \emph{method} creates new vertices in the graph with \textbf{an empty set of constraints}. If a \emph{method}, $T \rightarrow T_1, \dots, T_k \; [C]$ has a non-empty set of constraints then (when the application of a \emph{method} takes place) they are passed to \textbf{the set of constraints of a vertex which is being decomposed} (in our example it is the vertex with \emph{compound task} $T$). Before the decomposition, the set of constraints of $T$ was empty. For this purpose, each vertex in the graph is a pair of vertex and the set of constraints linked to that task. \emph{Primitive tasks'} set of constraints is always \textbf{empty} due to the inability to decompose.
 
 \medskip\noindent
-The constraints can be checked only when the \emph{task network} is \emph{primitive} and \emph{a plan} $\pi = (a_1, \dots, a_k)$ is assembled. At this point, we can start with the bottom-up analysis of the graph to check all of the constraints in all of the vertices. Starting from the leaves which have no constraints in their vertices, the information about the \emph{primitive tasks} is propagated to the parent vertices which might have some constraints. If a \emph{compound task} has constraints then the information about \emph{primitive tasks} alongside total-ordering created by the \emph{plan} $\pi$ (not be confused with total-, partial-order \emph{planning domains}) can easily serve for an efficient constraint checks. Now let's put it more formally and clearly.
+The constraints can be checked only when the \emph{task network} is \emph{primitive} and \emph{a plan} $\pi = (a_1, \dots, a_k)$ is assembled. At this point, we can start with the bottom-up analysis of the graph to check all of the constraints in all of the vertices. Starting from the leaves which have no constraints in their vertices, the information (task position) about the \emph{primitive tasks} is propagated to the parent vertices which might have some constraints. If a \emph{compound task} has constraints then the information about \emph{primitive tasks} alongside total-ordering created by the \emph{plan} $\pi$ (not be confused with total-, partial-order \emph{planning domains}) can easily serve for an efficient constraint checks. Now let's put it more formally and clearly.
 
 \medskip\noindent
-\emph{A plan} $\pi = (a_1, \dots, a_k)$ (with the parallel states $(s_0, \dots, s_k)$) is created from \emph{the primitive task network}, i.e. all leaves of the graph are either empty vertices $\square$ or vertices representing \emph{primitive tasks}. \emph{The plan} $\pi$ is created only from \emph{the primitive tasks} but before that, we need to find a total ordering of \textbf{all} leaves, including empty vertices $\square$. For that, each leaf is assigned a natural number ranging from 1 to the number of leaves. Having a leaf vertex $v$, his ordering can be viewed with the function $order(v)$. Along the actual \emph{plan} $\pi$ we also need \emph{a preplan} $\phi$, that is \emph{a plan} that also contains empty vertices in the proper places. $\phi$ is created with the $order$ function. Having $\phi = (x_1, \dots, x_l)$, we can create a parallel series of states $(s_0, \dots, s_l)$ such that $\gamma(s_{i-1}, x_i) = s_i$ if $x_i$ is \emph{an action}, and $s_{i-1} = s_i$ if $x_i$ is an empty vertex. This \emph{preplan} is then used to check constraints.
+\emph{A plan} $\pi = (a_1, \dots, a_k)$ (with the parallel states $(s_0, \dots, s_k)$) is created from \emph{the primitive task network}, i.e. all leaves of the graph are either empty vertices $\square$ or vertices representing \emph{primitive tasks}. \emph{The plan} $\pi$ is created only from \emph{the primitive tasks} but before that, we need to find a total ordering of \textbf{all} leaves, including empty vertices $\square$. For that, each leaf is assigned a natural number ranging from 1 to the number of leaves. Having a leaf vertex $v$, its ordering can be viewed with the function $order(v)$. Along the actual \emph{plan} $\pi$ we also need \emph{a preplan} $\phi$, that is \emph{a plan} that also contains empty vertices in the proper places. $\phi$ is created with the $order$ function. Having $\phi = (x_1, \dots, x_l)$, we can create a parallel series of states $(s_0, \dots, s_l)$ such that $\gamma(s_{i-1}, x_i) = s_i$ if $x_i$ is \emph{an action}, and $s_{i-1} = s_i$ if $x_i$ is an empty vertex. This \emph{preplan} is then used to check constraints.
 
 \medskip\noindent
 Let $m = T \rightarrow T_1, \dots, T_k \; [C]$ be a \emph{method} and $U,V \subseteq \{ T_1, \dots, T_k \}$. Then, the constraints defined earlier in Definition~\ref{def02:10} are checked accordingly:
@@ -109,11 +109,11 @@ Let $m = T \rightarrow T_1, \dots, T_k \; [C]$ be a \emph{method} and $U,V \subs
 \begin{itemize}
     \item $T_i \prec T_j$ – in a valid \emph{solution plan}, all \emph{primitive tasks} and empty vertices in a sub-tree with a root vertex $T_i$ must precede (using the function $order$) all \emph{primitive tasks} and empty vertices in a sub-tree with a root vertex $T_j$,
 
-    \item $before(p, U)$ – $p \in s_{i-1}$, $i$ is the minimal value of \emph{primitive tasks} and empty vertices (using $order$ function) in sub-trees with roots $U$,
+    \item $be\text{f}ore(p, U)$ – $p \in s_{i-1}$, $i$ is the minimal value of \emph{primitive tasks} and empty vertices (using $order$ function) in sub-trees with roots $U$,
 
-    \item $after(U, p)$ – $p \in s_{i-}$, $i$ is the maximal value of \emph{primitive tasks} and empty vertices (using $order$ function) in sub-trees with roots $U$,
+    \item $a\text{f}ter(U, p)$ – $p \in s_i$, $i$ is the maximal value of \emph{primitive tasks} and empty vertices (using $order$ function) in sub-trees with roots $U$,
 
-    \item $between(U, p, V)$ – $p$ must hold in states $after(U, p)$, $before(p, U)$, and in all states in between.
+    \item $between(U, p, V)$ – $p$ must hold in states that target $a\text{f}ter(U, p)$, $be\text{f}ore(p, V)$, and in all states in between.
 \end{itemize}
 
 \medskip\noindent
@@ -126,12 +126,12 @@ On contrary to previous models and definitions, in this model the tasks and cons
 The constraint graph model allows planners to create and verify plans without the demand of new symbols for the representation of \emph{empty methods}. Since the constraints are appended to the model, rather than adjusted, it is possible to spot constraint collisions much earlier. The downside of this model is the graph itself which will need additional space for storing information.
 
 \medskip\noindent
-By extending this model and the decomposition definition, it would be possible to use \emph{state-constraints} targeting a decomposing task because the decomposed task is not removed from the graph. For example, $T \rightarrow \varepsilon \; [C], C = \{before(p, T)\}$ would create a new empty vertex $\square$, and later, during the phase of constraint checking, the check would be made in $s_{order(\square) - 1}$ (in \emph{the preplan} $\phi$).
+By extending this model and the decomposition definition, it would be possible to use \emph{state-constraints} targeting a decomposing task because the decomposed task is not removed from the graph. For example, $T \rightarrow \varepsilon \; [C], C = \{be\text{f}ore(p, T)\}$ would create a new empty vertex $\square$, and later, during the phase of constraint checking, the check would be made in $s_{order(\square) - 1}$ (in \emph{the preplan} $\phi$).
 
 \subsection{Index-Based Model}
 
 \medskip\noindent
-In this subsection, we will inspect a model that will combine ideas of a \emph{task network} defined in Definition~\ref{def02:9} and a constraint satisfaction problem. The index-based model was first proposed here~\cite{ondrckova2023semantics}. The core idea lies in two functions: $start(t)$ and $end(t)$ with $t$ being a task (\emph{primitive or compound}). These two functions indicate the beginning and the end of the task, or, in other words, the first and the last \emph{primitive task} in \emph{plan} to which the task decomposes. If the task is already \emph{primitive} then $start(t) = end(t)$, and at the same time, this value means the position of the \emph{primitive task} in a valid \emph{plan}. The image of functions $start$ and $end$ is $\mathbb{N} \cup \{n + 0.5 \; | \; n \in \mathbb{N}_0\}$. The image of these functions is differentiated between natural numbers which express actions that actually do something (\emph{primitive tasks}) and so-called half-indices which represent \emph{empty methods}. The meaning behind half-indices is that the task that expresses no action or an \emph{empty method} points to a specific place between tasks. This helps the planner to identify the location of \emph{empty methods} and to check all constraints properly. The Index-based model is also allowing real \emph{empty methods} for the cost of extra information that is needed during the planning phase. Like the constraint graph model, the index-based model does not modify the set of constraints, instead, it appends new constraints that need to be satisfied.
+In this subsection, we will inspect a model that will combine ideas of a \emph{task network} defined in Definition~\ref{def02:9} and a constraint satisfaction problem~\cite{ondrckova2023semantics}. The core idea lies in two functions: $start(t)$ and $end(t)$ with $t$ being a task (\emph{primitive or compound}). These two functions indicate the beginning and the end of the task, or, in other words, the first and the last \emph{primitive task} in \emph{plan} to which the task decomposes. If the task is already \emph{primitive} then $start(t) = end(t)$, and at the same time, this value means the position of the \emph{primitive task} in a valid \emph{plan}. The image of functions $start$ and $end$ is $\mathbb{N} \cup \{n + 0.5 \; | \; n \in \mathbb{N}_0\}$. The image of these functions is differentiated between natural numbers which express actions that actually do something (\emph{primitive tasks}) and so-called half-indices which represent \emph{empty methods}. The meaning behind half-indices is that the task that expresses no action or an \emph{empty method} points to a specific place between tasks. This helps the planner to identify the location of \emph{empty methods} and to check all constraints properly. The Index-based model is also allowing real \emph{empty methods} for the cost of extra information that is needed during the planning phase. Like the constraint graph model, the index-based model does not modify the set of constraints, instead, it appends new constraints that need to be satisfied.
 
 \medskip\noindent
 \emph{Task network}, contrary to the constraint graph model, is a pair $\omega = (U, C)$ as in Definition~\ref{def02:9}. Tasks in $U$ are the inputs to the index functions $start$ and $end$. The actual indices of tasks are not known until the \emph{task network} is \emph{primitive} and a valid \emph{plan} is found. Even though the \emph{task network} definition is unchanged, the \emph{method decomposition} differs in this model. Let us be given a \emph{method} $m = T \rightarrow T_1, \dots, T_k \; [Constr]$ and a \emph{task network} $\omega = (V, C)$ with a \emph{compound task} $T \in V$, the \emph{decomposition} is as follows:
@@ -161,9 +161,9 @@ The index-based model allows analogous constraints as Definition~\ref{def02:9}. 
 \begin{itemize}
     \item $T_i \prec T_j$: $\lfloor end(T_i) \rfloor < \lceil start(T_j) \rceil$,
 
-    \item $before(p, U)$: $before(p, \lceil start(U) \rceil)$,
+    \item $be\text{f}ore(p, U)$: $be\text{f}ore(p, \lceil start(U) \rceil)$,
 
-    \item $after(U, p)$: $after(\lfloor end(U) \rfloor, p)$,
+    \item $a\text{f}ter(U, p)$: $a\text{f}ter(\lfloor end(U) \rfloor, p)$,
 
     \item $between(U, p, V)$: $between(\lfloor end(U) \rfloor, p, \lceil start(V) \rceil)$,
 \end{itemize}
@@ -175,9 +175,9 @@ where $start(U) = min\{start(t) \; | \; t \in U\}$ and $end(U) = max\{end(t) \; 
 Let us be given a \emph{primitive task network} $\omega = (U, C)$, a \emph{plan} $\pi = (a_1, \dots, a_k)$ (with the associated sequence of intermediate states $(s_0, \dots, s_k)$) is the \emph{solution} to the \emph{planning problem} if the \emph{task network} was decomposed from the \emph{initial task network} using \emph{methods} from the \emph{planning domain} and all constraints in $C$ are satisfied:
 
 \begin{itemize}
-    \item $before(p, I \in \{1, \dots, k\})$: $p \in s_{I - 1}$,
+    \item $be\text{f}ore(p, I \in \{1, \dots, k\})$: $p \in s_{I - 1}$,
 
-    \item $after(I \in \{1, \dots, k\}, p)$: $p \in s_{I}$,
+    \item $a\text{f}ter(I \in \{1, \dots, k\}, p)$: $p \in s_{I}$,
 
     \item $between(I, p, J)$: $(\forall f)$: $I \leq f < J$: $p \in s_f$.
 \end{itemize}
@@ -186,8 +186,8 @@ Let us be given a \emph{primitive task network} $\omega = (U, C)$, a \emph{plan}
 Another constraints for \emph{the solution} are:
 
 \begin{itemize}
-    \item $(\forall t): 0.5 \leq start(t) \leq 0.5 + k$,
-    \item $(\forall t): 0.5 \leq end(t) \leq 0.5 + k$.
+    \item $(\forall t): 0.5 \leq start(t) \leq 0.5 + k$, where $k$ is the length of \emph{a plan}
+    \item $(\forall t): 0.5 \leq end(t) \leq 0.5 + k$,  where $k$ is the length of \emph{a plan}.
 \end{itemize}
 
 This way, we make sure that the images of functions $start$, $end$ are not widespread more than needed.
@@ -196,7 +196,7 @@ This way, we make sure that the images of functions $start$, $end$ are not wides
 All empty tasks are mapped to correct half-indices. At the same time the constraints semantics work properly. Multiple empty tasks can have the same values of $start$ and $end$. Suppose a task $t1$ with function values $start(t1) = end(t1) = 3.5$ and a task $t2$ with identical function values. Due to ceiling ($\lceil \; \rceil$) and floor ($\lfloor \; \rfloor$) functions there is no collision in \emph{ordering-constraints}: $t1 \prec t2$: $\lfloor 3.5 \rfloor < \lceil 3.5 \rceil$. 
 
 \noindent
-State conditions are also checked correctly with the \emph{empty tasks}. A task $t1$ with function values $start(t1) = end(t1) = 3.5$ is placed correctly between the third and fourth action. In this example, both $before(p, \{ t1 \})$ and $after(\{ t1 \}, p)$ are checked in the same state $s_3$ because $before(p, \lceil 3.5 \rceil)$: $s_{\lceil 3.5 \rceil - 1}$ and $after(\lfloor 3.5 \rfloor, p)$: $s_{\lfloor 3.5 \rfloor}$. This behavior makes perfect sense by cause of the fact that \emph{empty tasks} do not change the state in any sense. Indeed, the state to be checked is after the last applied action in a plan before the \emph{empty task}.
+State conditions are also checked correctly with the \emph{empty tasks}. A task $t1$ with function values $start(t1) = end(t1) = 3.5$ is placed correctly between the third and fourth action. In this example, both $be\text{f}ore(p, \{ t1 \})$ and $a\text{f}ter(\{ t1 \}, p)$ are checked in the same state $s_3$ because $be\text{f}ore(p, \lceil 3.5 \rceil)$: $s_{\lceil 3.5 \rceil - 1}$ and $a\text{f}ter(\lfloor 3.5 \rfloor, p)$: $s_{\lfloor 3.5 \rfloor}$. This behavior makes perfect sense by cause of the fact that \emph{empty tasks} do not change the state in any sense. Indeed, the state to be checked is after the last applied action in a plan before the \emph{empty task}.
 
 \medskip\noindent
 Moreover, every \emph{solution plan} $\pi = (a_1, \dots, a_k)$ regarding the constraints or \emph{a planning domain} must satisfy these properties:
@@ -207,21 +207,21 @@ Moreover, every \emph{solution plan} $\pi = (a_1, \dots, a_k)$ regarding the con
         \item that is obvious from the fact that the $start$ values are minimized and $end$ values are maximized,
     \end{itemize}
 
-    \item in \emph{totally-ordered domains} each \emph{compound task} $T$ decomposed to nothing holds $start(T) = end(T)$ which is half-index,
+    \item in \emph{totally-ordered domains} each \emph{compound task} $T$ decomposed to nothing holds $start(T) = end(T)$ (which is half-index),
     \begin{itemize}
         \item task $T$ is decomposed into nothing. That means, $T$ is not decomposed into any of \emph{actions} thus all of the subtasks of $T$, his "grand-subtasks" and so on must have only half-indices as values of $start$, $end$. With that, $start(T)$, $end(T)$ must have also half-indices,
 
         \item suppose, that there is $T$ such that $start(T) \neq end(T)$ (both half-indices), this would mean that there exist \emph{an action} that is placed in between indices $start(T)$ and $end(T)$ but that contradicts with \emph{total-ordering} and the fact that $T$ is decomposed into nothing (this \emph{action} would be decomposed from $T$),
     \end{itemize}
 
-    \item if two \emph{compound tasks} $t1$, $t2$ with $start(t2) < end(t1) < end(t2)$ (and $t1$ is not decomposed from $t2$) exist then \emph{the planning domain} cannot be \emph{totally-ordered},
+    \item if two \emph{compound tasks} $t1$, $t2$ with $start(t2) < end(t1) < end(t2)$ (and $t1$ is not decomposed from $t2$) exist then \emph{the planning domain} is not \emph{totally-ordered},
     \begin{itemize}
         \item tasks in \emph{totally-ordered domains} that are not decomposed from each other (independent tasks) have disjunctive intervals created with $start$, $end$. Two independent \emph{compound tasks} might have identical values of $start$ and $end$ but only if they point to the half-index. This is the only possible interleaving.
 
         \item this property is possible only in \emph{partially-ordered domains},
     \end{itemize}
 
-     \item no two \emph{compound tasks} $t1$, $t2$ can have identical values of $start$ or $end$ functions (also $start(t1)$ with $end(t2)$) if they both point to the full-index and $t1$ is not decomposed from $t2$ (or vice versa),
+     \item no two \emph{compound tasks} $t1$, $t2$ can have identical values of $start$ or $end$ functions (also $start(t1)$ with $end(t2)$) if they both point to the full-index and $t1$ is not decomposed from $t2$ (and vice versa),
     \begin{itemize}
         \item each \emph{action} has an unique index (position in \emph{the plan}). Having two independent \emph{compound tasks} and \emph{an action}, at most one of those tasks can have this \emph{action} in their decomposition tree. Therefore, at most one of those tasks can use this index,
     \end{itemize}
@@ -254,7 +254,7 @@ Furthermore, in this model, we will introduce the first model transformation tec
 The increment-based model tries to solve issues of \emph{empty methods} caused by Definition~\ref{def02:10} directly. The semantics of this model are somewhat special and differ from the previous semantics. In this model, not only the \emph{method} selection matters but also the order of the \emph{method} (especially \emph{empty methods}).
 
 \medskip\noindent
-The main problem with the Definition~\ref{def02:10} is the \emph{task decomposition} using an \emph{empty method}. In this case, all constraints containing a decomposed task are removed, and new modified constraints should be added but because we do not have any subtasks, we cannot say with certainty the final result of the \emph{task network}. To solve this problem, we need to deal with \emph{ordering-constraints} and \emph{state-constraints}. 
+The main problem with the Definition~\ref{def02:10} is the \emph{task decomposition} using an \emph{empty method}. In this case, all constraints containing a decomposed task are removed, and new modified constraints should be added but because we do not have any subtasks, we cannot say with certainty the semantics of the result \emph{task network}. To solve this problem, we need to deal with \emph{ordering-constraints} and \emph{state-constraints}. 
 
 \medskip\noindent
 Now we will redefine \emph{task decomposition} that will allow usage of \emph{empty methods}. As was said earlier, we are only concerned about totally-ordered \emph{planning domains}. Having a \emph{method} $m = T \rightarrow T_1, \dots, T_k \; [Constr]$, $k \geq 0$, \emph{a task network} $\omega = (U, C)$ with a \emph{compound task} $T \in U$, the decomposition $\delta$ is defined followingly:
@@ -269,16 +269,16 @@ where $C'$ is a modification of C:
 \begin{itemize}
     \item replace each \emph{ordering-constraint} containing $T$ with new ones containing $\{ T_1, \dots, T_k \}$, i.e., $\forall i \in \{ 1, \dots, k \}: T \prec x$ is replaced with $T_i \prec x$ and $x \prec T$ is replaced with $x \prec T_i$. If $k = 0$, then we just remove all \emph{ordering-constraints} containing $T$,
         
-    \item replace each \emph{before-, after-constraint} containing $T$ with new ones containing $\{ T_1, \dots, T_k \}$. For example, we would replace \emph{before-constraint} $before(p,V)$ with $before(p, (V - \{T\}) \cup \{ T_1, \dots, T_k \})$. If $k = 0$, then we have two distinct situations. Either we remove one of the tasks or the last task in the set. Now, let's break down different outcomes:
+    \item replace each \emph{before-, after-constraint} containing $T$ with new ones containing $\{ T_1, \dots, T_k \}$. For example, we would replace \emph{before-constraint} $be\text{f}ore(p,V)$ with $be\text{f}ore(p, (V - \{T\}) \cup \{ T_1, \dots, T_k \})$. If $k = 0$, then we have two distinct situations. Either we remove one of the tasks or the last task in the set. Now, let's break down different outcomes:
 
         \begin{itemize}
-            \item $before(p, V), T \in V, |V| > 1$: we only remove the task $T$ and replace $before(p, V)$ with $before(p, V - \{ T \})$,
+            \item $be\text{f}ore(p, V), T \in V, |V| > 1$: we only remove the task $T$ and replace $be\text{f}ore(p, V)$ with $be\text{f}ore(p, V - \{ T \})$,
 
-            \item $before(p, V), T \in V, |V| = 1$: we find strict total order on the set $U$ (tasks of the \emph{task network} $\omega$) $T_i \prec T_j \prec \dots \prec T_k$, and locate the index $d$ of the decomposed task $T$. After that, we include a new constraint $before(p, \{ T_{d+1} \})$ into the set of constraints and remove the former constraint $before(p, V)$. If $T_{d+1}$ does not exist then we create a new constraint $after(\{ T_{d-1} \}, p)$. If $T_{d-1}$ also does not exist then $T$ is the only task in $\omega$, we can remove the task from the \emph{task network} but the planner needs to check if the \emph{initial state} $s_0$ contains required \emph{propositional symbol} $p$,
+            \item $be\text{f}ore(p, V), T \in V, |V| = 1$: we find strict total order on the set $U$ (tasks of the \emph{task network} $\omega$) $T_i \prec T_j \prec \dots \prec T_k$, and locate the index $d$ of the decomposed task $T$. After that, we include a new constraint $be\text{f}ore(p, \{ T_{d+1} \})$ into the set of constraints and remove the former constraint $be\text{f}ore(p, V)$. If $T_{d+1}$ does not exist then we create a new constraint $a\text{f}ter(\{ T_{d-1} \}, p)$. If $T_{d-1}$ also does not exist then $T$ is the only task in $\omega$, we can remove the task from the \emph{task network} but the planner needs to check if the \emph{initial state} $s_0$ contains required \emph{propositional symbol} $p$,
 
-            \item $after(V, p), T \in V, |V| > 1$: we only remove the task $T$ and replace $after(V, p)$ with $after(V - \{ T \}, p)$,
+            \item $a\text{f}ter(V, p), T \in V, |V| > 1$: we only remove the task $T$ and replace $a\text{f}ter(V, p)$ with $a\text{f}ter(V - \{ T \}, p)$,
 
-            \item $after(V, p), T \in V, |V| = 1$: we find strict total order on the set $U$ $T_i \prec T_j \prec \dots \prec T_k$, and locate the index $d$ of the decomposed task $T$. After that, we include a new constraint $after(\{ T_{d-1} \}, p)$ and remove the former $after(V, p)$ constraint. If $T_{d-1}$ does not exist, we include $before(p, \{ T_{d+1} \})$. If $T_{d+1}$ also does not exist then $T$ is the only task in $\omega$, we can remove the task from the \emph{task network} but the planner needs to check if the \emph{initial state} $s_0$ contains required \emph{propositional symbol} $p$.
+            \item $a\text{f}ter(V, p), T \in V, |V| = 1$: we find strict total order on the set $U$ $T_i \prec T_j \prec \dots \prec T_k$, and locate the index $d$ of the decomposed task $T$. After that, we include a new constraint $a\text{f}ter(\{ T_{d-1} \}, p)$ and remove the former $a\text{f}ter(V, p)$ constraint. If $T_{d-1}$ does not exist, we include $be\text{f}ore(p, \{ T_{d+1} \})$. If $T_{d+1}$ also does not exist then $T$ is the only task in $\omega$, we can remove the task from the \emph{task network} but the planner needs to check if the \emph{initial state} $s_0$ contains required \emph{propositional symbol} $p$.
         \end{itemize}
 \end{itemize}
 
@@ -295,7 +295,7 @@ Now, we will discuss constraint modification. First of all, we will look at the 
 On the other hand, \emph{state-constraints} cannot be removed from the \emph{task network} because they are telling the planner that they need to be checked at some point in the planning phase. Having \emph{an empty method} that decomposes a \emph{compound task} $T$, all \emph{state-constrains} containing $T$ needs to be modified as this task will be deleted from the \emph{task network}. With our model, we only remove the task from all constraints if the set of tasks in a particular constraint has more than one element. It could also be possible to modify all constraints right away but, for convenience, we have decided to do it this way. If the decomposed task is the last one then we have to modify all constraints holding $T$ to prevent undefined behavior. Since the task is empty it will produce no actions, meaning that there will be no transition between states. The state before the \emph{compound task} $T$ is identical to the state after the $T$. For this reason, it is possible to easily modify all existing \emph{state-constraints} containing $T$. The key for the constraint modification is the fact that the \emph{planning domain} is totally-ordered. At any point of planning, we can construct a strict total ordering of the tasks and shift the constraints to the next or the previous task in the ordering.
 
 \medskip\noindent
-With the increment-based model, we have finished our list of HTN semantics that solve the problem of \emph{empty methods}. The first two semantics do not allow usage of real \emph{empty methods} meanwhile the second three allow them. Different semantics might be beneficial in different situations, depending on the \emph{planning domain}. Some future software for hierarchical planning might even combine various features from the semantics presented, but that is left for future work.
+With the increment-based model, we have finished our list of HTN semantics that solve the problem of \emph{empty methods}. The first two semantics do not allow usage of real \emph{empty methods} meanwhile the last three allow them. Different semantics might be beneficial in different situations, depending on the \emph{planning domain}. Some future software for hierarchical planning might even combine various features from the semantics presented, but that is left for future work.
  
 \section{{HTN} Semantics with Goal Tasks}
 
