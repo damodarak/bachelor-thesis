@@ -88,7 +88,7 @@ Before we start with the transformation of \emph{totally-ordered planning proble
 \medskip\noindent
 Now, all \emph{TO} domains will implicitly have only \emph{state-constraints} described in Theorem~\ref{thm04:8}.
 
-\medskip\noindent
+\medskip\noindent\label{rem-between-two-tasks}
 In the following parts, we will try to convert general \emph{TO planning problems} into ones of a \emph{HTN-CNF}. Initially, we will compile away $between$ constraints because this type of \emph{state-constraint} spans throughout states which is undesirable. This behavior complicates the conversion because the \emph{HTN-CNF} has at most two tasks as subtasks. In this case, the $between(T_1, p, T_2)$ constraint is saying that the check is made before the application of the first \emph{action} to which $T_2$ decomposes, after the last \emph{action} to which $T_1$ decomposes, and also all states in between are checked. This means that the test is made in a single state after the last \emph{action} of $T_1$. This can be easily transformed to a single \emph{before-, after-constraint}. Complications with \emph{between-constraints} begin if we have at least three \emph{TO} subtasks $T_1 \prec T_2 \prec T_3$ and a $between(T_1, p, T_3)$ constraint. Having this, the check has to be made in (potentially) multiple states depending on a decomposition tree of \emph{a compound task} $T_2$. Transformation of this feature becomes difficult if we do not want to lose any information about \emph{a planning domain}.
 
 \medskip\noindent
@@ -212,33 +212,41 @@ In the following Algorithm~\ref{alg04:1}, we will create new \emph{compound task
 \end{defn}
 
 \begin{thm}\label{thm04:13}
-    For each \emph{TO planning problem} in \emph{HTN-CNF} there is \emph{an equivalent planning problem} in \emph{HTN-GNF}.
+    For each \emph{TO planning problem} in \emph{HTN-CNF} there is \emph{an equivalent planning problem} in \emph{TO HTN-GNF}.
 \end{thm}
 \begin{proof}
-    We assume that \emph{the planning problem} does not contain any \emph{between-constraints} as they can be easily eliminated in \emph{HTN-CNF}. The practice is to be found above.
+    We assume that \emph{the planning problem} does not contain any \emph{between-constraints} as they can be easily eliminated~\ref{rem-between-two-tasks} in \emph{HTN-CNF}.
 
-    The proof follows the~\cite{gnf} (Chapter 7.1) with the addition of HTN specifics. Initially, we rename \emph{compound tasks} to $A_1, A_2, \dots, A_n$ in some ascending order (and substitute these new tasks in constraints). \emph{The compound task} in \emph{the initial task network} is renamed to $A_1$. Our next goal is to modify \emph{methods} such that $A_i \rightarrow A_j, \alpha \; [C] \implies i > j$ where $T_j$ is the first \emph{compound task} with respect to ordering, and $\alpha$ is a set of both \emph{primitive and compound tasks}.
+    The proof follows the~\cite{gnf_bartak} with the addition of HTN specifics. Initially, we rename \emph{compound tasks} to $A_1, A_2, \dots, A_n$ in some ascending order (and substitute these new tasks in constraints). \emph{The compound task} in \emph{the initial task network} is renamed to $A_1$. 
+    
+    Our next goal is to modify \emph{methods} such that $A_i \rightarrow A_j, \alpha \; [C] \implies i < j$, where $A_j$ is the first \emph{compound task} with respect to ordering and $\alpha$, is a set of \emph{compound tasks}. For this, we will iterate over $A_i$ starting from $i = 1$ and proceeding to $i = n$. Having $A_i \rightarrow A_j, \alpha \; [C]$, we might have two scenarios that need adjustment:
 
-    Starting from the $A_1$ and proceeding to \emph{the compound task} with the highest index, we find all \emph{methods} of a form:  $A_i \rightarrow A_j, \alpha \; [C], \; i > j$. For each such \emph{method} we construct new \emph{methods} replacing $A_j$ with the $subtasks(M)$ such that $compound(M) = A_j$ for \emph{methods} $M$. Constraints $C$ are unioned with the $constraints(M)$, transitive closure of \emph{ordering-constraints} between $subtasks(M)$ and $\alpha$ is made, and all \emph{state-constraints} targeting $A_j$ are substituted as follows: each $before(p, A_j)$ is substituted with $before(p, A_x)$ such that $A_x$ is the first task in $subtasks(M)$, and each $after(A_x, p)$ is substituted with $after(A_x, p)$ such that $A_x$ is the last task in $subtasks(M)$. By repeatedly using this technique we obtain \emph{methods} $A_i \rightarrow A_j, \alpha \; [C], \; i \leq j$, ones starting with \emph{an action}, or ones starting with a new \emph{compound symbol} $Z$. After that, we need to remove left recursion from our new \emph{methods} for $A_i$, that is $A_i \rightarrow A_i, \alpha \; [C]$. Doing so is more difficult than in \emph{CFG} because we need to handle \emph{state-constraints} properly. First, we need to slightly modify \emph{methods' constraints} containing left recursion. For each \emph{method} $A_i \rightarrow A_i, \alpha \; [C]$ ($\alpha$ is always nonempty) we find all \emph{after-constraints} targeting $A_i$ and shift them to the succeeding task resulting in \emph{before-constraint} on the first task in $\alpha$ (with respect to ordering). We can do this because our domain is \emph{TO} and the check will be made in the same state. Afterward, we will construct a $\Omega$ – set of sets with \emph{propositional symbols} where each element is a union of \emph{propositional symbols} found in \emph{a before-constraints} targeting the first task in \emph{a method} with left recursion of $A_i$. Now we need to find all \emph{methods} with $compound(M) = A_i$ and separate them into two groups (with/without left recursion):
+    \begin{enumerate}
+        \item If $i > j$ then we generate new \emph{methods} substituting $A_j$ with $subtasks(M)$ such that $compound(M) = A_j$ for \emph{methods} $M$. Constraints of these new \emph{methods} are unioned with the old one ($constraints(M) \cup C)$. After we generate new \emph{methods} we can remove the unsuitable one.
 
-    \[
-        A_i \rightarrow A_i, \alpha_1 \; [C_1] \; | \; \dots \; | \; A_i, \alpha_m \; [C_m],
-    \]
+        \item If $i = j$ then we have encountered the incompatible left recursion. To remove that, we need to handle constraints targeting $A_j$. Now we need to find all \emph{methods} with $compound(M) = A_i$ and separate them into two groups (with/without left recursion):
 
-    \[
-        A_i \rightarrow \beta_1 \; [C_1] \; | \; \dots \; | \; \beta_p \; [C_p].
-    \].
+        \[
+            A_i \rightarrow A_i, \alpha_1 \; [C_{\alpha_1}] \; | \; \dots \; | \; A_i, \alpha_m \; [C_{\alpha_m}],
+        \]
+    
+        \[
+            A_i \rightarrow \beta_1 \; [C_{\beta_1}] \; | \; \dots \; | \; \beta_p \; [C_{\beta_p}].
+        \]
 
-    With these two groups, we eliminate left recursion by introducing new \emph{compound task} $Z$, and substituting these \emph{methods} with:
+        For each $A_i \rightarrow A_i, \alpha \; [C]$ we remove all \emph{after-constraints} targeting $A_i$ and append new \emph{before-constraints} targeting the first task in $\alpha$ (same state in \emph{a plan}). This can always be done as we have \emph{HTN-CNF} which contains two \emph{compound tasks} in subtasks (if the first one is \emph{compound}). To handle \emph{before-constraints} targeting $A_i$, we need to find all possible outcomes of all recursions. We will construct a $\Omega = \{\{ p \in P \; | \; before(p, A_i) \in C\} \; | \; (A_i \rightarrow A_i, \alpha \; [C]) \in M \}$. In other words – a set of sets with \emph{propositional symbols} where each element is a union of \emph{propositional symbols} found in \emph{a before-constraints} targeting the first task in \emph{a method} with a left recursion of $A_i$.
 
-    \begin{gather*}
-        A_i \rightarrow \beta_i \; [C_i \cup \{before(Q, \beta_i) \; | \; Q \; \text{is a union of some elements from} \;\Omega\}] \; | \; \beta_i, Z \\ [C_i \cup \{before(Q, \beta_i) \; | \; Q \; \text{is a union of some elements from} \;\Omega \} \cup \{\beta_i \prec Z\}], \\ 1 \leq i \leq  p, \\ \\
-        Z \rightarrow \alpha_i \; [C_i] \; | \; \alpha_i, Z \; [C_i \cup \{\alpha_i \prec Z\}], 1 \leq i \leq m.
-    \end{gather*}
+        With these two groups, we eliminate left recursion by introducing new \emph{compound tasks} $Z_Q^R$ with $R \subseteq Q \subseteq \{1, \dots, |\Omega|\}$ ($Q$ is a set of possible decompositions, $R$ is a set of mandatory decompositions that have not been used yet) and a bijective function $f: \{1, \dots, |\Omega|\} \rightarrow \Omega$. We will substitute these \emph{methods} with:
 
-    In the new \emph{methods} the former set of constraints $C_i$ is restricted to relevant tasks. Doing so, we can move on to the next task $A_{i + 1}$ and repeat the process.
+        \begin{gather*}
+            A_i \rightarrow \beta_i \; [C_{\beta_i}] \; | \; \beta_i, Z_Q^Q \; [C_{\beta_i} \cup \{before(f(Q), \beta_i) \; | \; Q \subseteq \{1, \dots, |\Omega|\}\} \; \cup \\ \{\beta_i \prec Z_Q^Q\}], \\ \\
+            Z_Q^R \rightarrow \alpha_{q \in Q \; (R = \emptyset)} \; | \; \alpha_{q \in Q}, Z_Q^R \; | \; \alpha_{r \in R}, Z_Q^{R - \{r\}}.
+        \end{gather*}
+    \end{enumerate}
+    
+    The next step is to make sure that $A_i \rightarrow pt, \alpha \; [C]$ with \emph{a primitive task} $pt$ holds for all \emph{methods} with $compound(M) = A_i$. For this, we will start from $i = n - 1$ and move on to $i = 1$. For each $i$ we will find all unsuitable \emph{methods} $A_i \rightarrow A_j, \alpha \; [C]$. These \emph{methods} will be substituted with $subtasks(M)$ and $constraint(M)$ as was done earlier in this proof.
 
-    At this point, $A_i \rightarrow A_j, \alpha \; [C] \implies i > j$ holds. For the last part, we will modify $A_i \rightarrow A_j, \alpha \; [C]$ for $i = n - 1, n - 2, \dots, 1$ so the \emph{methods} start with \emph{an action}, and at the same time we modify new $Z$ \emph{methods}. The final modification is analogous to the one in the third paragraph.
+    The same procedure will be carried out to the new \emph{methods}, where \\ $compound(M) = Z_Q^{R}$.
 \end{proof}
 
 
