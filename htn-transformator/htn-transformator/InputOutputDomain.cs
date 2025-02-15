@@ -17,9 +17,33 @@ namespace htn_transformator
         }
         public PlanningDomain LoadDomain()
         {
-            throw new NotImplementedException();
+            PlanningDomain domain = new PlanningDomain();
+
+            using (StreamReader sr = new StreamReader(inputFile))
+            {
+                string? line;
+
+                while ((line = sr.ReadLine()) != null)
+                {
+                    appendMethod(domain, line);
+                }
+            }
+
+            return domain;
         }
-        public void StoreDomain()
+        private void appendMethod(PlanningDomain d, string line)
+        {
+            string[] methodPart = line.Split("-->");
+
+            if (!char.IsUpper(methodPart[0][0]))
+            {
+                Console.WriteLine("Left side of a method must be a compound task!");
+                throw new Exception();
+            }
+
+            CompoundTask head = new CompoundTask(methodPart[0]);
+        }
+        public void StoreDomain(PlanningDomain d)
         {
             throw new NotImplementedException();
         }

@@ -8,5 +8,7 @@ namespace htn_transformator
 {
     internal class PlanningDomain
     {
+        List<Method> methods = new List<Method>();
+        public PlanningDomain() { }
     }
 }

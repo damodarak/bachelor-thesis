@@ -30,7 +30,7 @@
 
                 PlanningDomain result = trns.Transform();
 
-                iod.LoadDomain();
+                iod.StoreDomain(result);
             }
 			catch (Exception)
 			{
