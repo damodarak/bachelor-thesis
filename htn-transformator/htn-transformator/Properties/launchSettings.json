@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "htn-transformator": {
+      "commandName": "Project",
+      "commandLineArgs": "-i domain.txt -o output.txt --between"
+    }
+  }
+}

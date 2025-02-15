@@ -1,0 +1,7 @@
+COMPOUND_TASK->(COMPOUND_TASK1,pRIMITIVE_TASK2,...)[constr1,constr2]
+
+constraints:
+	TASK1<TASK2
+	before(p,TASK)
+	after(TASK,p)
+	between(TASK,p,TASK)

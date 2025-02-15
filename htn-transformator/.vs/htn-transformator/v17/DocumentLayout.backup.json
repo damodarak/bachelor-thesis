@@ -5,6 +5,18 @@
     {
       "AbsoluteMoniker": "D:0:0:{E5363936-38C0-4343-82B5-C0955F080CFF}|htn-transformator\\htn-transformator.csproj|c:\\users\\david kroupa\\source\\repos\\bachelor-thesis\\htn-transformator\\htn-transformator\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{E5363936-38C0-4343-82B5-C0955F080CFF}|htn-transformator\\htn-transformator.csproj|solutionrelative:htn-transformator\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E5363936-38C0-4343-82B5-C0955F080CFF}|htn-transformator\\htn-transformator.csproj|c:\\users\\david kroupa\\source\\repos\\bachelor-thesis\\htn-transformator\\htn-transformator\\inputoutputdomain.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E5363936-38C0-4343-82B5-C0955F080CFF}|htn-transformator\\htn-transformator.csproj|solutionrelative:htn-transformator\\inputoutputdomain.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E5363936-38C0-4343-82B5-C0955F080CFF}|htn-transformator\\htn-transformator.csproj|c:\\users\\david kroupa\\source\\repos\\bachelor-thesis\\htn-transformator\\htn-transformator\\argparser.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E5363936-38C0-4343-82B5-C0955F080CFF}|htn-transformator\\htn-transformator.csproj|solutionrelative:htn-transformator\\argparser.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E5363936-38C0-4343-82B5-C0955F080CFF}|htn-transformator\\htn-transformator.csproj|c:\\users\\david kroupa\\source\\repos\\bachelor-thesis\\htn-transformator\\htn-transformator\\removebetween.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E5363936-38C0-4343-82B5-C0955F080CFF}|htn-transformator\\htn-transformator.csproj|solutionrelative:htn-transformator\\removebetween.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -14,8 +26,21 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 2,
+          "SelectedChildIndex": 5,
           "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "ArgParser.cs",
+              "DocumentMoniker": "C:\\Users\\David Kroupa\\source\\repos\\bachelor-thesis\\htn-transformator\\htn-transformator\\ArgParser.cs",
+              "RelativeDocumentMoniker": "htn-transformator\\ArgParser.cs",
+              "ToolTip": "C:\\Users\\David Kroupa\\source\\repos\\bachelor-thesis\\htn-transformator\\htn-transformator\\ArgParser.cs",
+              "RelativeToolTip": "htn-transformator\\ArgParser.cs",
+              "ViewState": "AgIAAAoAAAAAAAAAAAAtwAwAAAAmAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-02-15T14:51:21.95Z",
+              "EditorCaption": ""
+            },
             {
               "$type": "Bookmark",
               "Name": "ST:128:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
@@ -26,13 +51,39 @@
             },
             {
               "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "RemoveBetween.cs",
+              "DocumentMoniker": "C:\\Users\\David Kroupa\\source\\repos\\bachelor-thesis\\htn-transformator\\htn-transformator\\RemoveBetween.cs",
+              "RelativeDocumentMoniker": "htn-transformator\\RemoveBetween.cs",
+              "ToolTip": "C:\\Users\\David Kroupa\\source\\repos\\bachelor-thesis\\htn-transformator\\htn-transformator\\RemoveBetween.cs",
+              "RelativeToolTip": "htn-transformator\\RemoveBetween.cs",
+              "ViewState": "AgIAAAMAAAAAAAAAAAAAABMAAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-02-15T14:46:24.656Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "InputOutputDomain.cs",
+              "DocumentMoniker": "C:\\Users\\David Kroupa\\source\\repos\\bachelor-thesis\\htn-transformator\\htn-transformator\\InputOutputDomain.cs",
+              "RelativeDocumentMoniker": "htn-transformator\\InputOutputDomain.cs",
+              "ToolTip": "C:\\Users\\David Kroupa\\source\\repos\\bachelor-thesis\\htn-transformator\\htn-transformator\\InputOutputDomain.cs",
+              "RelativeToolTip": "htn-transformator\\InputOutputDomain.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAuwAgAAAAkAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-02-15T14:38:48.213Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
               "DocumentIndex": 0,
               "Title": "Program.cs",
               "DocumentMoniker": "C:\\Users\\David Kroupa\\source\\repos\\bachelor-thesis\\htn-transformator\\htn-transformator\\Program.cs",
               "RelativeDocumentMoniker": "htn-transformator\\Program.cs",
               "ToolTip": "C:\\Users\\David Kroupa\\source\\repos\\bachelor-thesis\\htn-transformator\\htn-transformator\\Program.cs",
               "RelativeToolTip": "htn-transformator\\Program.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAACAAAAAhAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-02-15T13:23:38.287Z",
               "EditorCaption": ""
