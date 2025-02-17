@@ -236,9 +236,15 @@ In the following Algorithm~\ref{alg04:1}, we will create new \emph{compound task
             A_i \rightarrow \beta_1 \; [C_{\beta_1}] \; | \; \dots \; | \; \beta_p \; [C_{\beta_p}].
         \]
 
-        For each $A_i \rightarrow A_i, \alpha \; [C]$ we remove all \emph{after-constraints} targeting $A_i$ and append new \emph{before-constraints} targeting the first task in $\alpha$ (same state in \emph{a plan}). This can always be done as we have \emph{HTN-CNF} which contains two \emph{compound tasks} in subtasks (if the first one is \emph{compound}). To handle \emph{before-constraints} targeting $A_i$, we need to find all possible outcomes of all recursions. We will construct a $\Omega = \{\{ p \in P \; | \; be\text{f}ore(p, A_i) \in C\} \; | \; (A_i \rightarrow A_i, \alpha \; [C]) \in M \}$. In other words – a set of sets with \emph{propositional symbols} where each element is a union of \emph{propositional symbols} found in \emph{a before-constraints} targeting the first task in \emph{a method} with a left recursion of $A_i$.
+        For each $A_i \rightarrow A_i, \alpha \; [C]$ we remove all \emph{after-constraints} targeting $A_i$ and append new \emph{before-constraints} targeting the first task in $\alpha$ (same state in \emph{a plan}). This can always be done as we have \emph{HTN-CNF} which contains two \emph{compound tasks} in subtasks (if the first one is \emph{compound}). To handle \emph{before-constraints} targeting $A_i$, we need to find all possible outcomes of all recursions. We will construct a 
+        
+        \[
+            \Omega = \{\{ p \in P \; | \; be\text{f}ore(p, A_i) \in C\} \; | \; (A_i \rightarrow A_i, \alpha \; [C]) \in M \} \; (|\Omega| = m).
+        \]
+        
+        In other words – a set of sets with \emph{propositional symbols} where each element is a union of \emph{propositional symbols} found in \emph{a before-constraints} targeting the first task in \emph{a method} with a left recursion of $A_i$.
 
-        With these two groups, we eliminate left recursion by introducing new \emph{compound tasks} $Z_Q^R$ with $R \subseteq Q \subseteq \{1, \dots, |\Omega|\}$ ($Q$ is a set of possible decompositions, $R$ is a set of mandatory decompositions that have not been used yet) and a bijective function $f: \{1, \dots, |\Omega|\} \rightarrow \Omega$. We will substitute these \emph{methods} with:
+        With these two groups, we eliminate left recursion by introducing new \emph{compound tasks} $Z_Q^R$ with $R \subseteq Q \subseteq \{1, \dots, |\Omega|\}$ ($Q$ is a set of possible decompositions, $R$ is a set of mandatory decompositions that have not been used yet) and a bijective function $f: \{1, \dots, |\Omega|\} \rightarrow \Omega$ (s.t. $f(j) = \{p \in P \; | \; be\text{f}ore(p, A_i) \in C_{\alpha_j}\}$). We will substitute these \emph{methods} with:
 
         \begin{gather*}
             A_i \rightarrow \beta_i \; [C_{\beta_i}] \; | \; \beta_i, Z_Q^Q \; [C_{\beta_i} \cup \{be\text{f}ore(f(Q), \beta_i) \; | \; Q \subseteq \{1, \dots, |\Omega|\}\} \; \cup \\ \{\beta_i \prec Z_Q^Q\}], \\ \\
