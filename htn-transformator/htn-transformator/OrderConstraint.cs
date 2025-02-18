@@ -12,6 +12,8 @@ namespace htn_transformator
         public Task second { get; private set; }
         public OrderConstraint(Task first, Task second)
         {
+            if (first == second) throw new Exception("Ordering constraints must target different tasks!");
+
             this.first = first;
             this.second = second;
         }

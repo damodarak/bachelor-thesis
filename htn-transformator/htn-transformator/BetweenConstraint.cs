@@ -12,6 +12,8 @@ namespace htn_transformator
         public Task ToTask { get; private set; }
         public BetweenConstraint(PropositionalSymbol symbol, Task from, Task to)
         {
+            if (from == to) throw new Exception("Between constraints must target different tasks!");
+
             Symbol = symbol;
             FromTask = from;
             ToTask = to;

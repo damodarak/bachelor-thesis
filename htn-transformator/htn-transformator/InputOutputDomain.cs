@@ -37,7 +37,7 @@ namespace htn_transformator
             if (line == "") return;
 
             string tPattern = "[a-zA-Z][a-zA-Z0-9]*#[0-9]+";
-            string compoundPattern = @"^[A-Z][a-zA-Z0-9]*-->";
+            string compoundPattern = "^[A-Z][a-zA-Z0-9]*-->";
             string subtasksPattern = $@"\((({tPattern})(,{tPattern})*)?\);";
             string constrPattern = $@"({tPattern}<{tPattern}|before\([a-zA-Z]+:{tPattern}\)|after\({tPattern}:[a-zA-Z]+\)|between\({tPattern}:[a-zA-Z]+:{tPattern}\))";
             string constrsPattern = $@"\[({constrPattern}(,{constrPattern})*)?\]$";
@@ -46,8 +46,7 @@ namespace htn_transformator
 
             if (!Regex.IsMatch(line, completePattern))
             {
-                Console.WriteLine("Incorrect domain format!");
-                throw new Exception();
+                throw new Exception("Incorrect domain format!");
             }
 
             string[] headAndRest = line.Split("-->");
@@ -57,6 +56,9 @@ namespace htn_transformator
             string[] subtasksAndConstr = headAndRest[1].Split(';');
             string[] tasks = subtasksAndConstr[0].Split(['(', ')', ','], StringSplitOptions.RemoveEmptyEntries);
             string[] constrs = subtasksAndConstr[1].Split(['[', ']', ','], StringSplitOptions.RemoveEmptyEntries);
+
+            List<string> uniqueTasks = removeDuplicates(tasks);
+            List<string> uniqueConstrs = removeDuplicates(constrs);
 
             Method method = new Method(head);
             Dictionary<string, Task> concreteTasks = new Dictionary<string, Task>();
@@ -73,6 +75,10 @@ namespace htn_transformator
 
             d.AppendMethod(method);
         }
+        private List<string> removeDuplicates(string[] strings)
+        {
+            return new HashSet<string>(strings).ToList();
+        }
         private void parseAndAppendTask(Method m, string task, Dictionary<string, Task> concreteTasks)
         {
             string[] taskAndIndex = task.Split('#');
@@ -81,18 +87,17 @@ namespace htn_transformator
             {
                 CompoundTask ct = new CompoundTask(taskAndIndex[0], int.Parse(taskAndIndex[1]));
                 concreteTasks[task] = ct;
-                m.rightSideCompound.Add(ct);
+                m.RightSideCompound.Add(ct);
             }
             else if (char.IsLower(task[0]))
             {
                 PrimitiveTask pt = new PrimitiveTask(taskAndIndex[0], int.Parse(taskAndIndex[1]));
                 concreteTasks[task] = pt;
-                m.rightSidePrimitive.Add(pt);
+                m.RightSidePrimitive.Add(pt);
             }
             else
             {
-                Console.WriteLine("Task names must begin with a letter character!");
-                throw new Exception();
+                throw new Exception("Task names must begin with a letter character!");
             }
         }
         private void parseAndAppendConstraint(Method m, string con, Dictionary<string, Task> concreteTasks)
@@ -130,8 +135,7 @@ namespace htn_transformator
             }
             else
             {
-                Console.WriteLine("Unknown constraint!");
-                throw new Exception();
+                throw new Exception("Unknown constraint!");
             }
         }
         public void StoreDomain(PlanningDomain d)

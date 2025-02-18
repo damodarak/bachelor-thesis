@@ -12,7 +12,19 @@ namespace htn_transformator
         public PlanningDomain() { }
         public void AppendMethod(Method m)
         {
-            throw new NotImplementedException(); // checks
+            if (m.IsEmpty() && m.ConstraintsCount() > 0)
+            {
+                throw new Exception("Empty methods cannot have any constraints!");
+            }
+
+            if (m.RightSidePrimitive.Count == 0 &&
+                m.TaskCount() == 1 &&
+                m.LeftSide.TaskName.TaskNameID == m.RightSideCompound[0].TaskName.TaskNameID)
+            {
+                return; // we can discard unit methods even though there are state constraints
+            }
+
+            methods.Add(m);
         }
         public bool IsTotallyOrdered()
         {

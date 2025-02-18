@@ -16,8 +16,7 @@ namespace htn_transformator
         {
             if (args.Length != 5)
             {
-                Console.WriteLine("Incorrect argument length!");
-                throw new Exception();
+                throw new Exception("Incorrect argument length!");
             }
 
             for (int i = 0; i < args.Length; i++)
@@ -46,15 +45,13 @@ namespace htn_transformator
                 }
                 else
                 {
-                    Console.WriteLine("Incorrect arguments!");
-                    throw new Exception();
+                    throw new Exception("Incorrect arguments!");
                 }               
             }
 
             if(!File.Exists(inputFile))
             {
-                Console.WriteLine("Incorrect input file!");
-                throw new Exception();
+                throw new Exception("Incorrect input file!");
             }
         }
     }

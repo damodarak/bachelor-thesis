@@ -32,10 +32,11 @@
 
                 iod.StoreDomain(result);
             }
-			catch (Exception)
+			catch (Exception e)
 			{
+                Console.WriteLine(e.Message);
 				return;
 			}
-        }
+            }
     }
 }
