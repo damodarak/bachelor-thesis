@@ -1,6 +1,6 @@
-COMPOUND_TASK-->(COMPOUND_TASK,pRIMITIVE_TASK,COMPOUND_TASK#1,COMPOUND_TASK#2,...);[constr1,constr2]
+COMPOUND_TASK-->(COMPOUND_TASK#1,pRIMITIVE_TASK#1,COMPOUND_TASK#2,COMPOUND_TASK1#1,...);[constr1,constr2]
 constraints:
-	TASK1<TASK2
-	before(p,TASK)
-	after(TASK,p)
-	between(TASK,p,TASK)
+	TASK1#1<TASK2#1
+	before(p:TASK#1)
+	after(TASK#1:p)
+	between(TASK#1:p:TASK#1)

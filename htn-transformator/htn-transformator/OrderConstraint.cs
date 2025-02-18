@@ -6,7 +6,14 @@ using System.Threading.Tasks;
 
 namespace htn_transformator
 {
-    internal class OrderConstraint
+    internal class OrderConstraint : Constraint
     {
+        public Task first { get; private set; }
+        public Task second { get; private set; }
+        public OrderConstraint(Task first, Task second)
+        {
+            this.first = first;
+            this.second = second;
+        }
     }
 }

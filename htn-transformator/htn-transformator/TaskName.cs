@@ -9,12 +9,12 @@ namespace htn_transformator
     internal class TaskName
     {
         public string Name { get; private set; }
-        public int TaskID { get; private set; }
+        public int TaskNameID { get; private set; }
 
-        public TaskName(string name, int taskID)
+        public TaskName(string name, int taskNameID)
         {
             Name = name;
-            TaskID = taskID;
+            TaskNameID = taskNameID;
         }
     }
 }

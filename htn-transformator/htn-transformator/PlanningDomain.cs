@@ -8,7 +8,20 @@ namespace htn_transformator
 {
     internal class PlanningDomain
     {
-        List<Method> methods = new List<Method>();
+        private List<Method> methods = new List<Method>();
         public PlanningDomain() { }
+        public void AppendMethod(Method m)
+        {
+            throw new NotImplementedException();
+        }
+        public bool IsTotallyOrdered()
+        {
+            foreach (Method m in methods)
+            {
+                if (!m.IsTotallyOrdered()) return false;
+            }
+
+            return true;
+        }
     }
 }

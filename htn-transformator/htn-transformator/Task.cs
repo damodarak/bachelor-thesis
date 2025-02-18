@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace htn_transformator
 {
-    internal class Task
+    internal abstract class Task
     {
         private static int nextID = 0;
         private static Dictionary<string, TaskName> existingTaskNames = new Dictionary<string, TaskName>();
