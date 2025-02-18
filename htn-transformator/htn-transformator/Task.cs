@@ -8,24 +8,35 @@ namespace htn_transformator
 {
     internal abstract class Task
     {
-        private static int nextID = 0;
+        public static readonly int LeftSideIndex = -1;
+
+        private static int nextTaskNameID = 0;
         private static Dictionary<string, TaskName> existingTaskNames = new Dictionary<string, TaskName>();
 
-        public TaskName Name { get; private set; }
-
-        public Task(string name)
+        public TaskName TaskName { get; private set; }
+        public int TaskIndex { get; private set; }
+        public Task(string name, int taskIndex)
         {
+            TaskIndex = taskIndex;
+
             if (existingTaskNames.ContainsKey(name))
             {
-                Name = existingTaskNames[name];
+                TaskName = existingTaskNames[name];
             }
             else
             {
-                TaskName tn = new TaskName(name, nextID++);
+                TaskName tn = new TaskName(name, nextTaskNameID++);
                 existingTaskNames.Add(name, tn);
 
-                Name = tn;
+                TaskName = tn;
             }
+        }
+
+        public override string ToString()
+        {
+            if (TaskIndex == -1) return TaskName.Name;
+
+            return $"{TaskName.Name}#{TaskIndex}";
         }
     }
 }

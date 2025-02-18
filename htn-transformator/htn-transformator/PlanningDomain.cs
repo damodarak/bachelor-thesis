@@ -12,7 +12,7 @@ namespace htn_transformator
         public PlanningDomain() { }
         public void AppendMethod(Method m)
         {
-            throw new NotImplementedException();
+            throw new NotImplementedException(); // checks
         }
         public bool IsTotallyOrdered()
         {

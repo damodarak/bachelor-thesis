@@ -8,6 +8,6 @@ namespace htn_transformator
 {
     internal class PrimitiveTask : Task
     {
-        public PrimitiveTask(string name) : base(name) { }
+        public PrimitiveTask(string name, int index) : base(name, index) { }
     }
 }

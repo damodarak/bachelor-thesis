@@ -11,7 +11,10 @@ namespace htn_transformator
         public CompoundTask leftSide { get; private set; }
         public List<CompoundTask> rightSideCompound { get; set; } = new List<CompoundTask>();
         public List<PrimitiveTask> rightSidePrimitive { get; set; } = new List<PrimitiveTask>();
-        public List<Constraint> constraints { get; set; } = new List<Constraint>();
+        public List<OrderConstraint> Orderings { get; set; } = new List<OrderConstraint>();
+        public List<BeforeConstraint> Befores { get; set; } = new List<BeforeConstraint>();
+        public List<AfterConstraint> Afters { get; set; } = new List<AfterConstraint>();
+        public List<BetweenConstraint> Betweens { get; set; } = new List<BetweenConstraint>();
         public Method(CompoundTask leftSide)
         {
             this.leftSide = leftSide;

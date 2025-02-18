@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace htn_transformator
 {
-    internal class StateConstraint : Constraint
+    internal abstract class StateConstraint : Constraint
     {
+        public PropositionalSymbol Symbol { get; protected set; }
     }
 }

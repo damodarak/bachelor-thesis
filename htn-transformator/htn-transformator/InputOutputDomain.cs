@@ -36,15 +36,15 @@ namespace htn_transformator
         {
             if (line == "") return;
 
-            string t = "[a-zA-Z][a-zA-Z0-9]*#[0-9]+";
-            string compound = @"^[A-Z][a-zA-Z0-9]*-->";
-            string subtasks = $@"\((({t})(,{t})*)?\);";
-            string constrPattern = $@"({t}<{t}|before\([a-zA-Z]+:{t}\)|after\({t}:[a-zA-Z]+\)|between\({t}:[a-zA-Z]+:{t}\))";
-            string constrs = $@"\[({constrPattern}(,{constrPattern})*)?\]$";
+            string tPattern = "[a-zA-Z][a-zA-Z0-9]*#[0-9]+";
+            string compoundPattern = @"^[A-Z][a-zA-Z0-9]*-->";
+            string subtasksPattern = $@"\((({tPattern})(,{tPattern})*)?\);";
+            string constrPattern = $@"({tPattern}<{tPattern}|before\([a-zA-Z]+:{tPattern}\)|after\({tPattern}:[a-zA-Z]+\)|between\({tPattern}:[a-zA-Z]+:{tPattern}\))";
+            string constrsPattern = $@"\[({constrPattern}(,{constrPattern})*)?\]$";
 
-            string complete = $"{compound}{subtasks}{constrs}";
+            string completePattern = $"{compoundPattern}{subtasksPattern}{constrsPattern}";
 
-            if (!Regex.IsMatch(line, complete))
+            if (!Regex.IsMatch(line, completePattern))
             {
                 Console.WriteLine("Incorrect domain format!");
                 throw new Exception();
@@ -52,36 +52,86 @@ namespace htn_transformator
 
             string[] headAndRest = line.Split("-->");
 
-            CompoundTask head = new CompoundTask(headAndRest[0]);
+            CompoundTask head = new CompoundTask(headAndRest[0], Task.LeftSideIndex);
 
             string[] subtasksAndConstr = headAndRest[1].Split(';');
             string[] tasks = subtasksAndConstr[0].Split(['(', ')', ','], StringSplitOptions.RemoveEmptyEntries);
-            string[] constr = subtasksAndConstr[1].Split(['[', ']', ','], StringSplitOptions.RemoveEmptyEntries);
+            string[] constrs = subtasksAndConstr[1].Split(['[', ']', ','], StringSplitOptions.RemoveEmptyEntries);
 
             Method method = new Method(head);
             Dictionary<string, Task> concreteTasks = new Dictionary<string, Task>();
 
             foreach (string task in tasks)
             {
-                string[] taskAndIndex = task.Split('#');
+                parseAndAppendTask(method, task, concreteTasks);
+            }
 
-                if (char.IsUpper(task[0]))
-                {
-                    CompoundTask ct = new CompoundTask(taskAndIndex[0]);
-                    concreteTasks[task] = ct;
-                    method.rightSideCompound.Add(ct);
-                }
-                else if (char.IsLower(task[0]))
-                {
-                    PrimitiveTask pt = new PrimitiveTask(taskAndIndex[0]);
-                    concreteTasks[task] = pt;
-                    method.rightSidePrimitive.Add(pt);
-                }
-                else
-                {
-                    Console.WriteLine("Task names must begin with a letter character!");
-                    throw new Exception();
-                }
+            foreach (string con in constrs)
+            {
+                parseAndAppendConstraint(method, con, concreteTasks);
+            }
+
+            d.AppendMethod(method);
+        }
+        private void parseAndAppendTask(Method m, string task, Dictionary<string, Task> concreteTasks)
+        {
+            string[] taskAndIndex = task.Split('#');
+
+            if (char.IsUpper(task[0]))
+            {
+                CompoundTask ct = new CompoundTask(taskAndIndex[0], int.Parse(taskAndIndex[1]));
+                concreteTasks[task] = ct;
+                m.rightSideCompound.Add(ct);
+            }
+            else if (char.IsLower(task[0]))
+            {
+                PrimitiveTask pt = new PrimitiveTask(taskAndIndex[0], int.Parse(taskAndIndex[1]));
+                concreteTasks[task] = pt;
+                m.rightSidePrimitive.Add(pt);
+            }
+            else
+            {
+                Console.WriteLine("Task names must begin with a letter character!");
+                throw new Exception();
+            }
+        }
+        private void parseAndAppendConstraint(Method m, string con, Dictionary<string, Task> concreteTasks)
+        {
+            if (con.Contains("<"))
+            {
+                string[] orderConstr = con.Split('<');
+
+                OrderConstraint oc = new OrderConstraint(concreteTasks[orderConstr[0]], concreteTasks[orderConstr[1]]);
+                m.Orderings.Add(oc);
+            }
+            else if (con.Contains("before"))
+            {
+                string[] before = con.Split(['(', ')', ':'], StringSplitOptions.RemoveEmptyEntries);
+
+                PropositionalSymbol ps = new PropositionalSymbol(before[1]);
+                BeforeConstraint bc = new BeforeConstraint(ps, concreteTasks[before[2]]);
+                m.Befores.Add(bc);
+            }
+            else if (con.Contains("after"))
+            {
+                string[] after = con.Split(['(', ')', ':'], StringSplitOptions.RemoveEmptyEntries);
+
+                PropositionalSymbol ps = new PropositionalSymbol(after[2]);
+                AfterConstraint ac = new AfterConstraint(ps, concreteTasks[after[1]]);
+                m.Afters.Add(ac);
+            }
+            else if (con.Contains("between"))
+            {
+                string[] between = con.Split(['(', ')', ':'], StringSplitOptions.RemoveEmptyEntries);
+
+                PropositionalSymbol ps = new PropositionalSymbol(between[2]);
+                BetweenConstraint betc = new BetweenConstraint(ps, concreteTasks[between[1]], concreteTasks[between[3]]);
+                m.Betweens.Add(betc);
+            }
+            else
+            {
+                Console.WriteLine("Unknown constraint!");
+                throw new Exception();
             }
         }
         public void StoreDomain(PlanningDomain d)

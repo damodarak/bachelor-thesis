@@ -8,6 +8,6 @@ namespace htn_transformator
 {
     internal class CompoundTask : Task
     {
-        public CompoundTask(string name) : base(name) { }
+        public CompoundTask(string name, int index) : base(name, index) { }
     }
 }

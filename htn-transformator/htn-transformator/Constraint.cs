@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace htn_transformator
 {
-    internal class Constraint
+    internal abstract class Constraint
     {
     }
 }

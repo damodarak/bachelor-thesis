@@ -15,5 +15,9 @@ namespace htn_transformator
             this.first = first;
             this.second = second;
         }
+        public override string ToString()
+        {
+            return $"{first}<{second}";
+        }
     }
 }
