@@ -15,6 +15,13 @@ namespace htn_transformator
         }
         public PlanningDomain Transform()
         {
+            foreach (var m in domain.Methods)
+            {
+                Task[] strictOrdered = m.TaskOrdering();
+                int a = 8;
+            }
+
+
             throw new NotImplementedException();
         }
     }

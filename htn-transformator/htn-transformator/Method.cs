@@ -36,5 +36,105 @@ namespace htn_transformator
         {
             return Befores.Count + Afters.Count + Betweens.Count + Betweens.Count + Orderings.Count;
         }
+        /// <summary>
+        /// In case of totally ordered domains, returns linear ordering of tasks, otherwise the ordering is undefined
+        /// </summary>
+        /// <returns></returns>
+        public Task[] TaskOrdering()
+        {
+            Task[] ordered = new Task[TaskCount()];
+
+            int j = 0;
+            for (; j < RightSideCompound.Count; j++)
+            {
+                ordered[j] = RightSideCompound[j];
+            }
+
+            for (int i = 0; i < RightSidePrimitive.Count; i++)
+            {
+                ordered[j + i] = RightSidePrimitive[i];
+            }
+
+            // Bubble sort
+            for (int k = 0; k < ordered.Length; k++)
+            {
+                for (int l = 0; l < ordered.Length - 1; l++)
+                {
+                    if (isSmaller(ordered[l + 1], ordered[l]))
+                    {
+                        // swap
+                        Task smaller = ordered[l + 1];
+                        ordered[l + 1] = ordered[l];
+                        ordered[l] = smaller;
+                    }
+                }
+            }
+
+            return ordered;
+        }
+        private bool isSmaller(Task left, Task righ)
+        {
+            foreach (OrderConstraint oc in Orderings)
+            {
+                if (oc.first == left && oc.second == righ)
+                {
+                    return true;
+                }
+                else if (oc.first == righ && oc.second == left)
+                {
+                    return false;
+                }
+            }
+
+            return false;
+        }
+        public override string ToString()
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Append($"{LeftSide}-->(");
+
+            foreach (Task pt in RightSidePrimitive)
+            {
+                sb.Append($"{pt},");
+            }
+
+            foreach (Task ct in RightSideCompound)
+            {
+                sb.Append($"{ct},");
+            }
+
+            if (!IsEmpty())
+            {
+                sb.Remove(sb.Length - 1, 1);
+            }
+
+            sb.Append(");[");
+
+            foreach (Constraint c in Orderings)
+            {
+                sb.Append($"{c},");
+            }
+            foreach (Constraint c in Befores)
+            {
+                sb.Append($"{c},");
+            }
+            foreach (Constraint c in Afters)
+            {
+                sb.Append($"{c},");
+            }
+            foreach (Constraint c in Betweens)
+            {
+                sb.Append($"{c},");
+            }
+
+            if (ConstraintsCount() > 0)
+            {
+                sb.Remove(sb.Length - 1, 1);
+            }
+
+            sb.Append("]");
+
+            return sb.ToString();
+        }
     }
 }

@@ -63,12 +63,12 @@ namespace htn_transformator
             Method method = new Method(head);
             Dictionary<string, Task> concreteTasks = new Dictionary<string, Task>();
 
-            foreach (string task in tasks)
+            foreach (string task in uniqueTasks)
             {
                 parseAndAppendTask(method, task, concreteTasks);
             }
 
-            foreach (string con in constrs)
+            foreach (string con in uniqueConstrs)
             {
                 parseAndAppendConstraint(method, con, concreteTasks);
             }
@@ -140,7 +140,13 @@ namespace htn_transformator
         }
         public void StoreDomain(PlanningDomain d)
         {
-            throw new NotImplementedException();
+            using (StreamWriter sw = new StreamWriter(outputFile))
+            {
+                foreach (Method m in d.Methods)
+                {
+                    sw.WriteLine(m.ToString());
+                }
+            }
         }
     }
 }

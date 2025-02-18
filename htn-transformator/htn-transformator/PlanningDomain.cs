@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,6 +10,7 @@ namespace htn_transformator
     internal class PlanningDomain
     {
         private List<Method> methods = new List<Method>();
+        public List<Method> Methods { get { return methods; } }
         public PlanningDomain() { }
         public void AppendMethod(Method m)
         {
