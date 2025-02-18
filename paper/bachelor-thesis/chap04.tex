@@ -206,7 +206,7 @@ In the following Algorithm~\ref{alg04:1}, we will create new \emph{compound task
     For each \emph{TO planning problem} that does not generate empty \emph{plan} as a \emph{solution}, there is \emph{an equivalent planning problem} in \emph{HTN-ChNF}.
 \end{thm}
 \begin{proof}
-    The proof is akin to proofs of Theorems~\ref{thm04:5}~\ref{thm04:6} with some extra steps to handle \emph{state-constraints}. At the beginning, we will use Theorem~\ref{thm04:9} to remove all \emph{between-constraints}. Afterwards, we will use Theorem~\ref{thm04:10} to remove all \emph{empty methods} which does not create any new \emph{between-constraints}. Now we need to handle \emph{unit methods}. We will find all \emph{unit pairs} which is identical to the proof to the Theorem~\ref{thm04:5}. Analogous to the process of discarding \emph{empty methods} \emph{unit pairs} might have different decompositions which lead to different sets of constraints. As for \emph{empty methods}, we will find all such combinations of \emph{unit pairs} with sets of constraints with the help of an auxiliary function $Nulifies(T, F)$ with $(T, F)$ being an \emph{unit pair}. \textbf{Base:} for each \emph{unit method} $T \rightarrow F \; [C]$: $Nullifies(T, F) = \{C\}$ (if there are multiple \emph{unit methods} with identical \emph{compound tasks} but with different constraints then each set of constraints is added separately). \textbf{Induction:} having \emph{a unit pair} $(T, F)$ and \emph{a unit method} $F \rightarrow H \; [C]$: $Nullifies(T, H) = Nullifies(T, H) \; \cup \; \{constr_t \cup constr_h \; | \; (\forall constr_t \in Nullifies(T, F)) \; and \; (\forall constr_h \in Nullifies(F, H))\}$. Hence, for each \emph{unit pair} $(T, F)$ and for each \emph{non-unit method} $F \rightarrow F_1, \dots, F_k \; [C]$ we create new \emph{methods} for each set of constraints in $Nullifies(T, F)$. New \emph{method} is of a form $T \rightarrow F_1, \dots, F_k \; [C \cup newC]$ where $newC$ are newly produced constraints from $newConstr \in Nullifies(T, F)$. $newC = \{be\text{f}ore(p, F_1) \; | \; be\text{f}ore(p, X) \in newConstr\} \cup \{a\text{f}ter(F_k, p) \; | \; a\text{f}ter(X, p) \in newConstr\}$. After that, we can remove all \emph{unit methods}.
+    The proof is akin to proofs of Theorems~\ref{thm04:5}~\ref{thm04:6} with some extra steps to handle \emph{state-constraints}. At the beginning, we will use Theorem~\ref{thm04:9} to remove all \emph{between-constraints}. Afterwards, we will use Theorem~\ref{thm04:10} to remove all \emph{empty methods} which does not create any new \emph{between-constraints}. Now we need to handle \emph{unit methods}. We will find all \emph{unit pairs} which is identical to the proof to the Theorem~\ref{thm04:5}. Analogous to the process of discarding \emph{empty methods} \emph{unit pairs} might have different decompositions which lead to different sets of constraints. As for \emph{empty methods}, we will find all such combinations of \emph{unit pairs} with sets of constraints with the help of an auxiliary function $Nulifies(T, F)$ with $(T, F) \; T \neq F$ being an \emph{unit pair}. \textbf{Base:} for each \emph{unit method} $T \rightarrow F \; [C]$: $Nullifies(T, F) = \{C\}$ (if there are multiple \emph{unit methods} with identical \emph{compound tasks} but with different constraints then each set of constraints is added separately). \textbf{Induction:} having \emph{a unit pair} $(T, F)$ and \emph{a unit method} $F \rightarrow H \; [C]$: $Nullifies(T, H) = Nullifies(T, H) \; \cup \; \{constr_t \cup constr_h \; | \; (\forall constr_t \in Nullifies(T, F)) \; and \; (\forall constr_h \in Nullifies(F, H))\}$. Hence, for each \emph{unit pair} $(T, F)$ and for each \emph{non-unit method} $F \rightarrow F_1, \dots, F_k \; [C]$ we create new \emph{methods} for each set of constraints in $Nullifies(T, F)$. New \emph{method} is of a form $T \rightarrow F_1, \dots, F_k \; [C \cup newC]$ where $newC$ are newly produced constraints from $newConstr \in Nullifies(T, F)$. $newC = \{be\text{f}ore(p, F_1) \; | \; be\text{f}ore(p, X) \in newConstr\} \cup \{a\text{f}ter(F_k, p) \; | \; a\text{f}ter(X, p) \in newConstr\}$. After that, we can remove all \emph{unit methods}.
 
     For each \emph{method} with multiple subtasks with at least one \emph{primitive task} as a subtask, we substitute \emph{a primitive task} $a$ with \emph{a compound task} $T_a$. All constraints targeting $a$ are interchanged with constraints targeting $T_a$. We also create a new \emph{method} $T_a \rightarrow a \; [\{\}]$. Now, our \emph{planning problem} is in $\text{NF}_{\geq 2}$. To finish the proof we need to divide long \emph{methods}.
 
@@ -226,30 +226,41 @@ In the following Algorithm~\ref{alg04:1}, we will create new \emph{compound task
     \begin{enumerate}
         \item If $i > j$ then we generate new \emph{methods} substituting $A_j$ with $subtasks(M)$ such that $compound(M) = A_j$ for \emph{methods} $M$. Constraints of these new \emph{methods} are unioned with the old one ($constraints(M) \cup C)$. After we generate new \emph{methods} we can remove the unsuitable one.
 
-        \item If $i = j$ then we have encountered the incompatible left recursion. To remove that, we need to handle constraints targeting $A_j$. Now we need to find all \emph{methods} with $compound(M) = A_i$ and separate them into two groups (with/without left recursion):
+        \item
+        \begin{enumerate}
+            \item If $i = j$ then we have encountered the incompatible left recursion. To remove that, we need to handle constraints targeting $A_j$. Now we need to find all \emph{methods} with $compound(M) = A_i$ and separate them into two groups (with/without left recursion):
 
-        \[
-            A_i \rightarrow A_i, \alpha_1 \; [C_{\alpha_1}] \; | \; \dots \; | \; A_i, \alpha_m \; [C_{\alpha_m}],
-        \]
+            \[
+                A_i \rightarrow A_i, \alpha_1 \; [C_{\alpha_1}] \; | \; \dots \; | \; A_i, \alpha_m \; [C_{\alpha_m}],
+            \]
+        
+            \[
+                A_i \rightarrow \beta_1 \; [C_{\beta_1}] \; | \; \dots \; | \; \beta_p \; [C_{\beta_p}].
+            \]
     
-        \[
-            A_i \rightarrow \beta_1 \; [C_{\beta_1}] \; | \; \dots \; | \; \beta_p \; [C_{\beta_p}].
-        \]
+            For each $A_i \rightarrow A_i, \alpha \; [C]$ we remove all \emph{after-constraints} targeting $A_i$ and append new \emph{before-constraints} targeting the first task in $\alpha$ (same state in \emph{a plan}). This can always be done as we have \emph{HTN-ChNF} which contains two \emph{compound tasks} in subtasks (if the first one is \emph{compound}). To handle \emph{before-constraints} targeting $A_i$, we need to find all possible outcomes of all recursions. We will construct a 
+            
+            \[
+                \Omega = \{\{ p \in P \; | \; be\text{f}ore(p, A_i) \in C\} \; | \; (A_i \rightarrow A_i, \alpha \; [C]) \in M \} \; (|\Omega| = m).
+            \]
+            
+            In other words – a set of sets with \emph{propositional symbols} where each element is a union of \emph{propositional symbols} found in \emph{a before-constraints} targeting the first task in \emph{a method} with a left recursion of $A_i$.
+    
+            With these two groups, we eliminate left recursion by introducing new \emph{compound tasks} $Z_Q^R$ with $R \subseteq Q \subseteq \{1, \dots, |\Omega|\}$ ($Q$ is a set of possible decompositions, $R$ is a set of mandatory decompositions that have not been used yet) and a bijective function $f: \{1, \dots, |\Omega|\} \rightarrow \Omega$ (s.t. $f(j) = \{p \in P \; | \; be\text{f}ore(p, A_i) \in C_{\alpha_j}\}$). We will substitute these \emph{methods} with:
+    
+            \begin{gather*}
+                A_i \rightarrow \beta_i \; [C_{\beta_i}] \; | \; \beta_i, Z_Q^Q \; [C_{\beta_i} \cup \{be\text{f}ore(f(Q), \beta_i) \; | \; Q \subseteq \{1, \dots, |\Omega|\}\} \; \cup \\ \{\beta_i \prec Z_Q^Q\}], \\ \\
+                Z_Q^R \rightarrow \alpha_{q \in Q \; (R = \emptyset)} \; | \; \alpha_{q \in Q}, Z_Q^R \; | \; \alpha_{r \in R}, Z_Q^{R - \{r\}}.
+            \end{gather*}
+            
+            \item Alternatively, we could remove left recursion differently with lesser number of \emph{methods}. With this approach, it could be possible to create \emph{task networks} with more \emph{state-constraints} than needed, but it will not change the set of possible solutions of the domain. As in the previous approach, we will construct $\Omega$ and $f$. New \emph{methods} will look as follows:
 
-        For each $A_i \rightarrow A_i, \alpha \; [C]$ we remove all \emph{after-constraints} targeting $A_i$ and append new \emph{before-constraints} targeting the first task in $\alpha$ (same state in \emph{a plan}). This can always be done as we have \emph{HTN-ChNF} which contains two \emph{compound tasks} in subtasks (if the first one is \emph{compound}). To handle \emph{before-constraints} targeting $A_i$, we need to find all possible outcomes of all recursions. We will construct a 
-        
-        \[
-            \Omega = \{\{ p \in P \; | \; be\text{f}ore(p, A_i) \in C\} \; | \; (A_i \rightarrow A_i, \alpha \; [C]) \in M \} \; (|\Omega| = m).
-        \]
-        
-        In other words – a set of sets with \emph{propositional symbols} where each element is a union of \emph{propositional symbols} found in \emph{a before-constraints} targeting the first task in \emph{a method} with a left recursion of $A_i$.
-
-        With these two groups, we eliminate left recursion by introducing new \emph{compound tasks} $Z_Q^R$ with $R \subseteq Q \subseteq \{1, \dots, |\Omega|\}$ ($Q$ is a set of possible decompositions, $R$ is a set of mandatory decompositions that have not been used yet) and a bijective function $f: \{1, \dots, |\Omega|\} \rightarrow \Omega$ (s.t. $f(j) = \{p \in P \; | \; be\text{f}ore(p, A_i) \in C_{\alpha_j}\}$). We will substitute these \emph{methods} with:
-
-        \begin{gather*}
-            A_i \rightarrow \beta_i \; [C_{\beta_i}] \; | \; \beta_i, Z_Q^Q \; [C_{\beta_i} \cup \{be\text{f}ore(f(Q), \beta_i) \; | \; Q \subseteq \{1, \dots, |\Omega|\}\} \; \cup \\ \{\beta_i \prec Z_Q^Q\}], \\ \\
-            Z_Q^R \rightarrow \alpha_{q \in Q \; (R = \emptyset)} \; | \; \alpha_{q \in Q}, Z_Q^R \; | \; \alpha_{r \in R}, Z_Q^{R - \{r\}}.
-        \end{gather*}
+            \begin{gather*}
+                A_i \rightarrow \beta_i \; [C_{\beta_i}] \; | \; \beta_i, Z_Q \; [C_{\beta_i} \cup \{be\text{f}ore(f(Q), \beta_i) \; | \; Q \subseteq \{1, \dots, |\Omega|\}\} \; \cup \\ \{\beta_i \prec Z_Q\}], \\ \\
+                Z_Q \rightarrow \; \alpha_j, Z_Q \; (\{p \in P \; | \; be\text{f}ore(p,A_i) \in C_{\alpha_j}\} \subseteq f(Q)), \\ \\
+                Z_Q \rightarrow \alpha_j \; (\{p \in P \; | \; be\text{f}ore(p,A_i) \in C_{\alpha_j}\} \subseteq f(Q)).
+            \end{gather*}
+        \end{enumerate}
     \end{enumerate}
     
     The next step is to make sure that $A_i \rightarrow pt, \alpha \; [C]$ with \emph{a primitive task} $pt$ holds for all \emph{methods} with $compound(M) = A_i$. For this, we will start from $i = n - 1$ and move on to $i = 1$. For each $i$ we will find all unsuitable \emph{methods} $A_i \rightarrow A_j, \alpha \; [C]$. These \emph{methods} will be substituted with $subtasks(M)$ and $constraint(M)$ as was done earlier in this proof.
