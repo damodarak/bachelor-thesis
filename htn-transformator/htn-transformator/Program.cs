@@ -3,9 +3,9 @@
     internal class Program
     {
         static void Main(string[] args)
-        {
-            try
-			{
+        { // TODO: state constraints always target only one task, cannot be extended for PO domains
+   //         try
+			//{
 				ArgParser ap = new ArgParser(args);
 
                 InputOutputDomain iod = new InputOutputDomain(ap.inputFile, ap.outputFile);
@@ -31,12 +31,12 @@
                 PlanningDomain result = trns.Transform();
 
                 iod.StoreDomain(result);
-            }
-			catch (Exception e)
-			{
-                Console.WriteLine(e.Message);
-				return;
-			}
+   //         }
+			//catch (Exception e)
+			//{
+   //             Console.WriteLine(e.Message);
+			//	return;
+			//}
         }
     }
 }

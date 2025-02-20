@@ -31,7 +31,6 @@ namespace htn_transformator
                 TaskName = tn;
             }
         }
-
         public override string ToString()
         {
             if (TaskIndex == -1) return TaskName.Name;

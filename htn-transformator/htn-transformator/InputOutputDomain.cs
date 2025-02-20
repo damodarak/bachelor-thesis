@@ -34,12 +34,12 @@ namespace htn_transformator
         }
         private void parseAndAppendMethod(PlanningDomain d, string line)
         {
-            if (line == "") return;
+            if (line == "" || line[0] == '#') return;
 
             string tPattern = "[a-zA-Z][a-zA-Z0-9]*#[0-9]+";
             string compoundPattern = "^[A-Z][a-zA-Z0-9]*-->";
             string subtasksPattern = $@"\((({tPattern})(,{tPattern})*)?\);";
-            string constrPattern = $@"({tPattern}<{tPattern}|before\([a-zA-Z]+:{tPattern}\)|after\({tPattern}:[a-zA-Z]+\)|between\({tPattern}:[a-zA-Z]+:{tPattern}\))";
+            string constrPattern = $@"({tPattern}<{tPattern}(<{tPattern})*|before\([a-zA-Z]+:{tPattern}\)|after\({tPattern}:[a-zA-Z]+\)|between\({tPattern}:[a-zA-Z]+:{tPattern}\))";
             string constrsPattern = $@"\[({constrPattern}(,{constrPattern})*)?\]$";
 
             string completePattern = $"{compoundPattern}{subtasksPattern}{constrsPattern}";
@@ -104,10 +104,7 @@ namespace htn_transformator
         {
             if (con.Contains("<"))
             {
-                string[] orderConstr = con.Split('<');
-
-                OrderConstraint oc = new OrderConstraint(concreteTasks[orderConstr[0]], concreteTasks[orderConstr[1]]);
-                m.Orderings.Add(oc);
+                appendOrderings(m, con, concreteTasks);
             }
             else if (con.Contains("before"))
             {
@@ -136,6 +133,19 @@ namespace htn_transformator
             else
             {
                 throw new Exception("Unknown constraint!");
+            }
+        }
+        private void appendOrderings(Method m, string con, Dictionary<string, Task> concreteTasks)
+        {
+            string[] orderConstr = con.Split('<');
+
+            for (int i = 0; i < orderConstr.Length; i++)
+            {
+                for (int j = i + 1; j < orderConstr.Length; j++)
+                {
+                    OrderConstraint oc = new OrderConstraint(concreteTasks[orderConstr[i]], concreteTasks[orderConstr[j]]);
+                    m.AppendOrderingConstraint(oc);
+                }
             }
         }
         public void StoreDomain(PlanningDomain d)

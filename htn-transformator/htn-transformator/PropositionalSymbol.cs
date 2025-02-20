@@ -10,7 +10,13 @@ namespace htn_transformator
     {
         private static int nextPropID = 0;
         private static Dictionary<string, int> nameToInt = new Dictionary<string, int>();
+        private static Dictionary<int, string> idToName = new Dictionary<int, string>();
+        public static string GetName(int id)
+        {
+            if (idToName.ContainsKey(id)) return idToName[id];
 
+            return "";
+        }
         public int PropID { get; private set; }
         public string Name { get; private set; }
         public  PropositionalSymbol(string name)
@@ -25,6 +31,7 @@ namespace htn_transformator
             {
                 PropID = nextPropID++;
                 nameToInt.Add(name, PropID);
+                idToName.Add(PropID, name);
             }
         }
     }
