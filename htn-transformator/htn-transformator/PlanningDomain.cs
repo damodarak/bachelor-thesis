@@ -21,7 +21,7 @@ namespace htn_transformator
 
             if (m.RightSidePrimitive.Count == 0 &&
                 m.TaskCount() == 1 &&
-                m.LeftSide.TaskName.TaskNameID == m.RightSideCompound[0].TaskName.TaskNameID)
+                m.Head.TaskName.ID == m.RightSideCompound[0].TaskName.ID)
             {
                 return; // we can discard unit methods even though there are state constraints
             }

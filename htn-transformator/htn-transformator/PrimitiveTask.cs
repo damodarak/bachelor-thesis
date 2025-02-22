@@ -9,5 +9,6 @@ namespace htn_transformator
     internal class PrimitiveTask : Task
     {
         public PrimitiveTask(string name, int index) : base(name, index) { }
+        public PrimitiveTask(int id, int index) : base(id, index) { }
     }
 }

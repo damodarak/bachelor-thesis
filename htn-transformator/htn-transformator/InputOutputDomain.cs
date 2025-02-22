@@ -112,7 +112,7 @@ namespace htn_transformator
 
                 PropositionalSymbol ps = new PropositionalSymbol(before[1]);
                 BeforeConstraint bc = new BeforeConstraint(ps, concreteTasks[before[2]]);
-                m.Befores.Add(bc);
+                m.AppendBefore(bc);
             }
             else if (con.Contains("after"))
             {
@@ -120,7 +120,7 @@ namespace htn_transformator
 
                 PropositionalSymbol ps = new PropositionalSymbol(after[2]);
                 AfterConstraint ac = new AfterConstraint(ps, concreteTasks[after[1]]);
-                m.Afters.Add(ac);
+                m.AppendAfter(ac);
             }
             else if (con.Contains("between"))
             {
@@ -128,7 +128,7 @@ namespace htn_transformator
 
                 PropositionalSymbol ps = new PropositionalSymbol(between[2]);
                 BetweenConstraint betc = new BetweenConstraint(ps, concreteTasks[between[1]], concreteTasks[between[3]]);
-                m.Betweens.Add(betc);
+                m.AppendBetween(betc);
             }
             else
             {
