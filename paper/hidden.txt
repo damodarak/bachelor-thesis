@@ -1,5 +1,0 @@
-\xxx{HIDDEN TEXT ALGO 1}
-%\alpha unique task names, swap only unique stuff
-
-\medskip\noindent
-After an exhaustive enumeration of various definitions and semantics, we will finally start discussing the transformation of different HTN models. This chapter will exhibit varying transformations along divergent contexts and preconditions. For example, HTN models might be partially-ordered, totally-ordered, with or without \emph{goal tasks}, having a different set of allowed \emph{state-constraints}. \xxx{HIDDEN TEXT} %Moreover, we will look at differing formalisms and try to compile away unsupported features. Our scope of interest is transformations that do not change the set of \emph{solutions} to the \emph{planning problem}.
