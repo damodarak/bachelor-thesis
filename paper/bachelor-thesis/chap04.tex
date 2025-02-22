@@ -109,12 +109,12 @@ In the following Algorithm~\ref{alg04:1}, we will create new \emph{compound task
         \Procedure {Main}{\emph{TO planning problem}: $\mathcal{P} = (s_0,\omega,\mathcal{D})$}
             \State $NewCT \gets \{\}$ \Comment{New \emph{Compound Tasks}}
             \While {$\mathcal{D}$ contains \emph{a method} $m$ with \emph{a between-constraint}}            
-                \For {each \emph{compound task} $t$ in $subtasks(m)$ that is part of $\geq 1$ \emph{between-constraints}}
+                \For {each \emph{compound task} $CT$ in $subtasks(m)$ that is part of $\geq 1$ \emph{between-constraints}}
                     \State $PropSymbols \gets \{p: between(T, p, F) \; and \; T \prec t \prec F \}$
-                    \If {$T_{PropSymbols}$ not in $NewCT$}
-                        \State find \emph{methods} $m'$ with $t = compound(m')$ and create new $M=(T_{PropSymbols}, subtasks(m'), constraints(m'))$
+                    \If {$CT_{PropSymbols}$ not in $NewCT$}
+                        \State find \emph{methods} $m'$ with $CT = compound(m')$ and create new $M=(CT_{PropSymbols}, subtasks(m'), constraints(m'))$
                     \EndIf
-                    \State swap all occurrences of $t$ with $T_{PropSymbols}$ in \emph{a method} $m$
+                    \State swap all occurrences of $CT$ with $CT_{PropSymbols}$ in \emph{a method} $m$
                 \EndFor
 
                 \For {each task $t$ in $subtasks(m)$}
@@ -125,33 +125,33 @@ In the following Algorithm~\ref{alg04:1}, we will create new \emph{compound task
                 
                 \State remove all \emph{between-constraints} from $constraints(m)$
 
-                \For {each $T_{symbols}$ in $subtasks(m)$ ($T_{symbols}$ not in $NewCT$)}
-                    \State $NewCT \gets NewCT \cup T_{symbols}$
-                    \State SearchCompoundTask($T_{symbols}$)
+                \For {each $CT_{symbols}$ in $subtasks(m)$ ($CT_{symbols}$ not in $NewCT$)}
+                    \State $NewCT \gets NewCT \cup CT_{symbols}$
+                    \State SearchCompoundTask($CT_{symbols}$)
                 \EndFor
             \EndWhile
         \EndProcedure
-        \Procedure {SearchCompoundTask}{\emph{Compound task}: $T_{InputSymbols}$}
-            \For {each \emph{method} $m$ with $T_{InputSymbols} = compound(m)$}
+        \Procedure {SearchCompoundTask}{\emph{Compound task}: $CT_{InputSymbols}$}
+            \For {each \emph{method} $m$ with $CT_{InputSymbols} = compound(m)$}
                 \For {each task $t$ in $subtasks(m)$}
                     \State $PropSymbols \gets \{p: between(T, p, F) \; and \; T \prec t \prec F \}$
                     \State add $be\text{f}ore(PropSymbols \cup InputSymbols, t)$ to $m$
                     \State add $a\text{f}ter(t, PropSymbols \cup InputSymbols)$ to $m$
                 \EndFor
 
-                \For {each \emph{compound task} $T$ in $subtasks(m)$}
+                \For {each \emph{compound task} $CT$ in $subtasks(m)$}
                     \State $PropSymbols \gets \{p: between(K, p, L) \; and \; K \prec T \prec L \}$
-                    \If {$T_{PropSymbols \cup InputSymbols}$ not in $NewCT$}
-                        \State find \emph{methods} $m'$ with $T = compound(m')$ and create new $M=(T_{PropSymbols \cup InputSymbols}, subtasks(m'), constraints(m'))$
+                    \If {$CT_{PropSymbols \cup InputSymbols}$ not in $NewCT$}
+                        \State find \emph{methods} $m'$ with $CT = compound(m')$ and create new $M=(CT_{PropSymbols \cup InputSymbols}, subtasks(m'), constraints(m'))$
                     \EndIf
-                    \State swap all occurrences of $T$ with $T_{PropSymbols \cup InputSymbols}$ in $m$
+                    \State swap all occurrences of $CT$ with $CT_{PropSymbols \cup InputSymbols}$ in $m$
                 \EndFor
 
                 \State remove all \emph{between-constraints} from $constraints(m)$
 
-                \For {each $T_{symbols}$ in $subtasks(m)$ ($T_{symbols}$ not in $NewCT$)}
-                    \State $NewCT \gets NewCT \cup T_{symbols}$
-                    \State SearchCompoundTask($T_{symbols}$)
+                \For {each $CT_{symbols}$ in $subtasks(m)$ ($CT_{symbols}$ not in $NewCT$)}
+                    \State $NewCT \gets NewCT \cup CT_{symbols}$
+                    \State SearchCompoundTask($CT_{symbols}$)
                 \EndFor
             \EndFor
         \EndProcedure
