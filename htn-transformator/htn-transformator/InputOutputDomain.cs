@@ -51,7 +51,7 @@ namespace htn_transformator
 
             string[] headAndRest = line.Split("-->");
 
-            CompoundTask head = new CompoundTask(headAndRest[0], Task.LeftSideIndex);
+            CompoundTask head = new CompoundTask(headAndRest[0], Task.HeadIndex);
 
             string[] subtasksAndConstr = headAndRest[1].Split(';');
             string[] tasks = subtasksAndConstr[0].Split(['(', ')', ','], StringSplitOptions.RemoveEmptyEntries);

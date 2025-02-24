@@ -6,14 +6,31 @@ using System.Threading.Tasks;
 
 namespace htn_transformator
 {
-    internal class TaskName
+    internal struct TaskName
     {
-        public string Name { get; private set; }
-        public int ID { get; private set; }
+        private static int nextTaskNameID = 0;
+        private static Dictionary<string, int> nameToID = new();
+        private static Dictionary<int, string> idToTaName = new();
+        public string Name { get { return idToTaName[ID]; } } // to save up memory
+        public int ID { get; init; }
 
-        public TaskName(string name, int taskNameID)
+        public TaskName(string name)
         {
-            Name = name;
+            if (nameToID.ContainsKey(name))
+            {
+                ID = nameToID[name];
+            }
+            else
+            {
+                ID = nextTaskNameID++;
+                nameToID.Add(name, ID);
+                idToTaName.Add(ID, name);
+            }
+        }
+        public TaskName(int taskNameID)
+        {
+            if (!idToTaName.ContainsKey(taskNameID)) throw new Exception("Creating TaskName with non-existing TaskNameID!");
+
             ID = taskNameID;
         }
     }

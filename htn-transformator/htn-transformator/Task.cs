@@ -9,35 +9,18 @@ namespace htn_transformator
 {
     internal abstract class Task
     {
-        public static readonly int LeftSideIndex = -1;
-
-        private static int nextTaskNameID = 0;
-        private static Dictionary<string, TaskName> nameToTaskName = new Dictionary<string, TaskName>();
-        private static Dictionary<int, TaskName> idToTaskName = new Dictionary<int, TaskName>();
-
+        public static readonly int HeadIndex = -1;
         public TaskName TaskName { get; private set; }
         public int TaskIndex { get; private set; }
         public Task(int id, int taskIndex)
         {
             TaskIndex = taskIndex;
-            TaskName = idToTaskName[id];
+            TaskName = new TaskName(id);
         }
         public Task(string name, int taskIndex)
         {
             TaskIndex = taskIndex;
-
-            if (nameToTaskName.ContainsKey(name))
-            {
-                TaskName = nameToTaskName[name];
-            }
-            else
-            {
-                TaskName tn = new TaskName(name, nextTaskNameID++);
-                nameToTaskName.Add(name, tn);
-                idToTaskName.Add(tn.ID, tn);
-
-                TaskName = tn;
-            }
+            TaskName = new TaskName(name);
         }
         public Task(Task father, HashSet<int> symbols, int index)
         {
@@ -55,11 +38,7 @@ namespace htn_transformator
             sb.Remove(sb.Length - 1, 1);
             sb.Append('}');
 
-            TaskName tn = new TaskName(sb.ToString(), nextTaskNameID++);
-            nameToTaskName.Add(tn.Name, tn);
-            idToTaskName.Add(tn.ID, tn);
-
-            TaskName = tn;
+            TaskName = new TaskName(sb.ToString());
         }
         public override string ToString()
         {
