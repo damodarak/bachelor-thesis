@@ -10,5 +10,6 @@ namespace htn_transformator
     {
         public PrimitiveTask(string name, int index) : base(name, index) { }
         public PrimitiveTask(int id, int index) : base(id, index) { }
+        public PrimitiveTask(TaskName tn, int index) : base(tn, index) { }
     }
 }

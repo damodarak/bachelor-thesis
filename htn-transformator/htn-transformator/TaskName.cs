@@ -44,5 +44,14 @@ namespace htn_transformator
         {
             return ID.GetHashCode();
         }
+        public static bool operator ==(TaskName left, TaskName right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(TaskName left, TaskName right)
+        {
+            return !left.Equals(right);
+        }
     }
 }

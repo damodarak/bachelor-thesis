@@ -8,6 +8,7 @@ namespace htn_transformator
 {
     internal class Method
     {
+        private Dictionary<Task, List<Task>> proceedingTasks = new();
         public CompoundTask Head { get; private set; }
         public List<CompoundTask> RightSideCompound { get; set; } = new();
         public List<PrimitiveTask> RightSidePrimitive { get; set; } = new();
@@ -15,8 +16,6 @@ namespace htn_transformator
         public List<BeforeConstraint> Befores { get; set; } = new();
         public List<AfterConstraint> Afters { get; set; } = new();
         public List<BetweenConstraint> Betweens { get; set; } = new();
-
-        private Dictionary<Task, List<Task>> proceedingTasks = new();
         public Method(CompoundTask head)
         {
             if (head.TaskIndex != -1) throw new Exception("Head of the method must have index == -1!");

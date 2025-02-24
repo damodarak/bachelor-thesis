@@ -22,6 +22,11 @@ namespace htn_transformator
             TaskIndex = taskIndex;
             TaskName = new TaskName(name);
         }
+        public Task(TaskName taskName, int taskIndex)
+        {
+            TaskName = taskName;
+            TaskIndex = taskIndex;
+        }
         public Task(Task father, HashSet<int> symbols, int index)
         {
             TaskIndex = index;

@@ -11,10 +11,10 @@ namespace htn_transformator
         private int nextNewCompoundIndex = 1;
         private PlanningDomain d;
 
-        // translation between Task and the set of mandatory IDs of propositional symbols
-        private Dictionary<CompoundTask, HashSet<int>> mandatoryPropSymbols = new();
-        private Dictionary<CompoundTask, CompoundTask> derivedFrom = new(); // father compound task
-        private Dictionary<CompoundTask, HashSet<CompoundTask>> derivesTo = new(); // children compound tasks
+        // translation between TaskName and the set of mandatory IDs of propositional symbols
+        private Dictionary<TaskName, HashSet<int>> mandatoryPropSymbols = new();
+        private Dictionary<TaskName, TaskName> derivedFrom = new(); // father TaskName
+        private Dictionary<TaskName, HashSet<TaskName>> derivesTo = new(); // children TaskNames
         public RemoveBetween(PlanningDomain pd) 
         {
             d = pd;
@@ -106,10 +106,10 @@ namespace htn_transformator
                 }
                 else // CompoundTask
                 {
-                    CompoundTask? existingCT = existingNewCompound((CompoundTask)linearOrdering[i], symbols[i], linearOrdering);
+                    CompoundTask? existingCT = existingNewCompound(linearOrdering[i], symbols[i], linearOrdering);
                     if (existingCT == null) // create new, swap in constraints, copy methods
                     {
-                        CompoundTask newCT = createNewCompoundTask((CompoundTask)linearOrdering[i], symbols[i]);
+                        CompoundTask newCT = createNewCompoundTask(linearOrdering[i], symbols[i]);
                         toBeSearched.Add(newCT);
                         swapCompoundTask(m, (CompoundTask)linearOrdering[i], newCT);
                     }
@@ -122,25 +122,25 @@ namespace htn_transformator
 
             foreach (CompoundTask newCT in toBeSearched)
             {
-                copyMethods(newCT);
+                copyMethods(newCT.TaskName); // dont copy if the same TaskName was already copied with the same Symbols
             }
 
             foreach (CompoundTask ct in toBeSearched)
             {
-                searchCompoundTask(ct);
+                searchCompoundTask(ct); // dont search if it was already searched
             }
         }
-        private void copyMethods(CompoundTask newCT)
+        private void copyMethods(TaskName newCompoundTask)
         {
-            CompoundTask oldCT = derivedFrom[newCT];
+            TaskName oldCompoundTaskName = derivedFrom[newCompoundTask];
 
             List<Method> toBeAdded = new();
 
             foreach (Method m in d.Methods)
             {
-                if (m.Head.TaskName.ID == oldCT.TaskName.ID)
+                if (m.Head.TaskName == oldCompoundTaskName)
                 {
-                    Method copied = new Method(new CompoundTask(newCT.TaskName.ID, -1), m);
+                    Method copied = new Method(new CompoundTask(newCompoundTask, -1), m);
                     toBeAdded.Add(copied);
                 }
             }
@@ -150,16 +150,16 @@ namespace htn_transformator
                 d.AppendMethod(m);
             }
         }
-        private CompoundTask createNewCompoundTask(CompoundTask father, HashSet<int> symbols)
+        private CompoundTask createNewCompoundTask(Task father, HashSet<int> symbols)
         {
             CompoundTask newCT = new CompoundTask(father, symbols, nextNewCompoundIndex++);
-            mandatoryPropSymbols[newCT] = symbols;
-            derivedFrom[newCT] = father;
+            mandatoryPropSymbols[newCT.TaskName] = symbols;
+            derivedFrom[newCT.TaskName] = father.TaskName;
 
-            if (!derivesTo.ContainsKey(father))
+            if (!derivesTo.ContainsKey(father.TaskName))
             {
-                derivesTo[father] = new HashSet<CompoundTask>();
-                derivesTo[father].Add(newCT);
+                derivesTo[father.TaskName] = new HashSet<TaskName>();
+                derivesTo[father.TaskName].Add(newCT.TaskName);
             }
 
             return newCT;
@@ -233,19 +233,17 @@ namespace htn_transformator
             }
             m.Betweens.AddRange(insertBetweens);
         }
-        private CompoundTask? existingNewCompound(CompoundTask t, HashSet<int> neededSymbols, List<Task> ordering)
+        private CompoundTask? existingNewCompound(Task t, HashSet<int> neededSymbols, List<Task> ordering)
         {
             int index = ordering.IndexOf(t);
 
-            int id = ordering[index].TaskName.ID;
+            if (!derivesTo.ContainsKey(ordering[index].TaskName)) return null;
 
-            if (!derivesTo.ContainsKey((CompoundTask)ordering[index])) return null;
-
-            foreach (CompoundTask child in derivesTo[t])
+            foreach (TaskName tn in derivesTo[ordering[index].TaskName])
             {
-                if (mandatoryPropSymbols.ContainsKey(child) && mandatoryPropSymbols[child] == neededSymbols)
+                if (mandatoryPropSymbols.ContainsKey(tn) && mandatoryPropSymbols[tn] == neededSymbols)
                 {
-                    return new CompoundTask(child.TaskName.ID, nextNewCompoundIndex++);
+                    return new CompoundTask(tn, nextNewCompoundIndex++);
                 }
             }
 
