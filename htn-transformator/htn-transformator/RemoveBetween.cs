@@ -10,11 +10,11 @@ namespace htn_transformator
     {
         private int nextNewCompoundIndex = 1;
         private PlanningDomain d;
-
         // translation between TaskName and the set of mandatory IDs of propositional symbols
         private Dictionary<TaskName, HashSet<int>> mandatoryPropSymbols = new();
         private Dictionary<TaskName, TaskName> derivedFrom = new(); // father TaskName
         private Dictionary<TaskName, HashSet<TaskName>> derivesTo = new(); // children TaskNames
+        private HashSet<TaskName> searched = new();
         public RemoveBetween(PlanningDomain pd) 
         {
             d = pd;
@@ -26,16 +26,109 @@ namespace htn_transformator
             ITransformable removeIdenticalUnits = new RemoveIdenticalUnitMethods(d);
             d = removeIdenticalUnits.Transform();
 
-            foreach (var m in d.Methods)
+            foreach (Method m in d.Methods)
             {
-                removeBetweens(m);
+                List<Task> linearOrdering = m.TaskOrdering();
+                removeNeighbourBetweens(m, linearOrdering);
+                if (containtsIrrationalBetweens(m, linearOrdering))
+                {
+                    throw new Exception("Input planning domains contains irrational between constraint!");
+                }
+            }
+
+            int methodCount = d.Methods.Count; // new methods are appended to the end of a list
+
+            for (int i = 0; i < methodCount; i++)
+            {
+                removeBetweens(d.Methods[i]);
             }
 
             return d;
         }
-        private void searchCompoundTask(CompoundTask compoundTask)
+        private void removeBetweens(Method m)
         {
-            throw new NotImplementedException();
+            if (m.Betweens.Count == 0) return;
+
+            List<Task> linearOrdering = m.TaskOrdering();
+
+            foreach (BetweenConstraint bw in m.Betweens) // in case that all intermedieate tasks are empty
+            {
+                BeforeConstraint bc = new BeforeConstraint(bw.Symbol, bw.ToTask);
+                m.AppendBefore(bc);
+            }
+
+            List<HashSet<int>> symbols = symbolsFromBetweens(m, linearOrdering);
+            m.Betweens = new List<BetweenConstraint>(); // remove all betweens from the method
+
+            HashSet<TaskName> toBeSearched = new();
+            for (int i = 0; i < symbols.Count; i++) // == linearOrdering.Count
+            {
+                if (symbols[i] == null) continue;
+
+                if (linearOrdering[i] is PrimitiveTask pt)
+                {
+                    appendBeforesToPrimitiveTask(m, pt, symbols[i]);
+                }
+                else // CompoundTask
+                {
+                    CompoundTask? existingCT = existingNewCompoundTaskName(linearOrdering[i], symbols[i], linearOrdering);
+                    if (existingCT == null) // create new, swap in constraints, copy methods
+                    {
+                        CompoundTask newCT = createNewCompoundTask(linearOrdering[i], symbols[i]);
+                        toBeSearched.Add(newCT.TaskName);
+                        swapCompoundTask(m, (CompoundTask)linearOrdering[i], newCT);
+                    }
+                    else
+                    {
+                        swapCompoundTask(m, (CompoundTask)linearOrdering[i], existingCT);
+                    }
+                }
+            }
+
+            copyMethodsAndSearchTask(toBeSearched);
+        }
+        private void searchCompoundTask(TaskName tn)
+        {
+            List<Method> searchMethods = methodsWithHead(tn);
+            HashSet<TaskName> toBeSearched = new();
+
+            foreach (Method m in searchMethods)
+            {
+                List<Task> ordering = m.TaskOrdering();
+                List<HashSet<int>> methodSymbols = symbolsFromBetweens(m, ordering);
+                m.Betweens = new List<BetweenConstraint>();
+
+                for (int i = 0; i < ordering.Count; i++)
+                {
+                    if (ordering[i] is PrimitiveTask pt)
+                    {
+                        appendBeforesToPrimitiveTask(m, pt, methodSymbols[i]);
+                    }
+                    else
+                    {
+                        HashSet<int> neededSymbols = mandatoryPropSymbols[tn]; // this is never null here
+                        neededSymbols.UnionWith(methodSymbols[i]);
+
+                        CompoundTask? existingCT = existingNewCompoundTaskName(ordering[i], neededSymbols, ordering);
+                        if (existingCT == null)
+                        {
+                            CompoundTask newCT = createNewCompoundTask(ordering[i], neededSymbols);
+                            toBeSearched.Add(newCT.TaskName);
+                            swapCompoundTask(m, (CompoundTask)ordering[i], newCT);
+                        }
+                        else
+                        {
+                            swapCompoundTask(m, (CompoundTask)ordering[i], existingCT);
+                        }
+                    }
+                }
+            }
+
+            copyMethodsAndSearchTask(toBeSearched);
+        }
+        private HashSet<TaskName> removeBetweensAndSwapTasks()
+        {
+            return null;
         }
         private List<HashSet<int>> symbolsFromBetweens(Method m, List<Task> ordering)
         {
@@ -73,82 +166,44 @@ namespace htn_transformator
                 }
             }
         }
-        private void removeBetweens(Method m)
+        private void copyMethodsAndSearchTask(HashSet<TaskName> toBeSearched)
         {
-            if (m.Betweens.Count == 0) return;
-
-            List<Task> linearOrdering = m.TaskOrdering();
-            removeNeighbourBetweens(m, linearOrdering);
-            if (containtsIrrationalBetweens(m, linearOrdering))
+            foreach (TaskName newCompoundTaskName in toBeSearched)
             {
-                throw new Exception("Input planning domains contains irrational between constraint!");
+                copyMethods(newCompoundTaskName);
             }
 
-            foreach (BetweenConstraint bw in m.Betweens)
+            foreach (TaskName newCompoundTaskName in toBeSearched)
             {
-                AfterConstraint ac = new AfterConstraint(bw.Symbol, bw.FromTask);
-                BeforeConstraint bc = new BeforeConstraint(bw.Symbol, bw.ToTask);
-                m.AppendAfter(ac);
-                m.AppendBefore(bc);
-            }
-
-            List<HashSet<int>> symbols = symbolsFromBetweens(m, linearOrdering);
-            m.Betweens = new List<BetweenConstraint>(); // remove all betweens from the method
-
-            List<CompoundTask> toBeSearched = new();
-            for (int i = 0; i < symbols.Count; i++) // == linearOrdering.Count
-            {
-                if (symbols[i] == null) continue;
-
-                if (linearOrdering[i] is PrimitiveTask pt)
+                if (!searched.Contains(newCompoundTaskName))
                 {
-                    appendStateConstraintsToPrimitiveTask(m, pt, symbols[i]);
+                    searched.Add(newCompoundTaskName);
+                    searchCompoundTask(newCompoundTaskName); // don't search if it was already searched in recursion, TaskName + symbols
                 }
-                else // CompoundTask
-                {
-                    CompoundTask? existingCT = existingNewCompound(linearOrdering[i], symbols[i], linearOrdering);
-                    if (existingCT == null) // create new, swap in constraints, copy methods
-                    {
-                        CompoundTask newCT = createNewCompoundTask(linearOrdering[i], symbols[i]);
-                        toBeSearched.Add(newCT);
-                        swapCompoundTask(m, (CompoundTask)linearOrdering[i], newCT);
-                    }
-                    else
-                    {
-                        swapCompoundTask(m, (CompoundTask)linearOrdering[i], existingCT);
-                    }
-                }
-            }
-
-            foreach (CompoundTask newCT in toBeSearched)
-            {
-                copyMethods(newCT.TaskName); // dont copy if the same TaskName was already copied with the same Symbols
-            }
-
-            foreach (CompoundTask ct in toBeSearched)
-            {
-                searchCompoundTask(ct); // dont search if it was already searched
             }
         }
         private void copyMethods(TaskName newCompoundTask)
         {
             TaskName oldCompoundTaskName = derivedFrom[newCompoundTask];
+            List<Method> toCopy = methodsWithHead(oldCompoundTaskName);
 
-            List<Method> toBeAdded = new();
+            foreach (Method old in toCopy)
+            {
+                Method copied = new Method(new CompoundTask(newCompoundTask, -1), old);
+                d.AppendMethod(copied);
+            }
+        }
+        private List<Method> methodsWithHead(TaskName searchedHead)
+        {
+            List<Method> result = new();
 
             foreach (Method m in d.Methods)
             {
-                if (m.Head.TaskName == oldCompoundTaskName)
-                {
-                    Method copied = new Method(new CompoundTask(newCompoundTask, -1), m);
-                    toBeAdded.Add(copied);
-                }
+                if (m.Head.TaskName == searchedHead)
+                    result.Add(m);
             }
 
-            foreach (Method m in toBeAdded)
-            {
-                d.AppendMethod(m);
-            }
+            return result;
         }
         private CompoundTask createNewCompoundTask(Task father, HashSet<int> symbols)
         {
@@ -159,8 +214,8 @@ namespace htn_transformator
             if (!derivesTo.ContainsKey(father.TaskName))
             {
                 derivesTo[father.TaskName] = new HashSet<TaskName>();
-                derivesTo[father.TaskName].Add(newCT.TaskName);
             }
+            derivesTo[father.TaskName].Add(newCT.TaskName);
 
             return newCT;
         }
@@ -233,7 +288,7 @@ namespace htn_transformator
             }
             m.Betweens.AddRange(insertBetweens);
         }
-        private CompoundTask? existingNewCompound(Task t, HashSet<int> neededSymbols, List<Task> ordering)
+        private CompoundTask? existingNewCompoundTaskName(Task t, HashSet<int> neededSymbols, List<Task> ordering)
         {
             int index = ordering.IndexOf(t);
 
@@ -241,7 +296,7 @@ namespace htn_transformator
 
             foreach (TaskName tn in derivesTo[ordering[index].TaskName])
             {
-                if (mandatoryPropSymbols.ContainsKey(tn) && mandatoryPropSymbols[tn] == neededSymbols)
+                if (mandatoryPropSymbols.ContainsKey(tn) && mandatoryPropSymbols[tn].SetEquals(neededSymbols))
                 {
                     return new CompoundTask(tn, nextNewCompoundIndex++);
                 }
@@ -249,8 +304,10 @@ namespace htn_transformator
 
             return null;
         }
-        private void appendStateConstraintsToPrimitiveTask(Method m, PrimitiveTask pt, HashSet<int> symbols)
+        private void appendBeforesToPrimitiveTask(Method m, PrimitiveTask pt, HashSet<int> symbols)
         {
+            if (symbols == null) return;
+
             int index = m.RightSidePrimitive.IndexOf(pt);
             if (index == -1)
             {
@@ -261,8 +318,6 @@ namespace htn_transformator
             {
                 BeforeConstraint bc = new BeforeConstraint(new PropositionalSymbol(id), m.RightSidePrimitive[index]);
                 m.AppendBefore(bc);
-                AfterConstraint ac = new AfterConstraint(new PropositionalSymbol(id), m.RightSidePrimitive[index]);
-                m.AppendAfter(ac);
             }
         }
         private bool containtsIrrationalBetweens(Method m, List<Task> linearOrdering)

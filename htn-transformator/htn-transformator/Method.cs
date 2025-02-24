@@ -150,7 +150,7 @@ namespace htn_transformator
 
             Betweens.Add(bc);
         }
-        public void AppendAfter(AfterConstraint ac)
+        public void AppendAfter(AfterConstraint ac) // todo check also befores and vica verse
         {
             foreach (AfterConstraint insertedAfter in Afters)
             {
