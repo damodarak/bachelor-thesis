@@ -3,16 +3,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Collections.ObjectModel;
 
 namespace htn_transformator
 {
     internal class Method
     {
-        private Dictionary<Task, List<Task>> proceedingTasks = new();
+        private Dictionary<Task, List<Task>> proceedingTasks = new(); // still memory leak, when the task is remove it is in other lists
+        private List<OrderConstraint> orderings { get; set; } = new();
         public CompoundTask Head { get; private set; }
         public List<CompoundTask> RightSideCompound { get; set; } = new();
         public List<PrimitiveTask> RightSidePrimitive { get; set; } = new();
-        public List<OrderConstraint> Orderings { get; set; } = new();
+        public ReadOnlyCollection<OrderConstraint> Orderings => orderings.AsReadOnly();
         public List<BeforeConstraint> Befores { get; set; } = new();
         public List<AfterConstraint> Afters { get; set; } = new();
         public List<BetweenConstraint> Betweens { get; set; } = new();
@@ -44,7 +46,7 @@ namespace htn_transformator
             }
             foreach (OrderConstraint oc in copy.Orderings)
             {
-                Orderings.Add(new OrderConstraint(taskTranslation[oc.first], taskTranslation[oc.second]));
+                AppendOrderingConstraint(new OrderConstraint(taskTranslation[oc.first], taskTranslation[oc.second]));
             }
             foreach (BeforeConstraint bc in copy.Befores)
             {
@@ -76,6 +78,48 @@ namespace htn_transformator
         {
             return Befores.Count + Afters.Count + Betweens.Count + Betweens.Count + Orderings.Count;
         }
+        public void RemoveTask(Task t)
+        {
+            proceedingTasks.Remove(t);
+
+            if (t is CompoundTask ct)
+                RightSideCompound.Remove(ct);
+            else
+                RightSidePrimitive.Remove((PrimitiveTask)t);
+
+            for (int i = 0; i < Orderings.Count; i++)
+            {
+                if (Orderings[i].first == t || Orderings[i].second == t)
+                {
+                   orderings.RemoveAt(i);
+                    i--;
+                }
+            }
+            for (int i = 0; i < Befores.Count; i++)
+            {
+                if (Befores[i].Task == t)
+                {
+                    Befores.RemoveAt(i);
+                    i--;
+                }
+            }
+            for (int i = 0; i < Afters.Count; i++)
+            {
+                if (Afters[i].Task == t)
+                {
+                    Afters.RemoveAt(i);
+                    i--;
+                }
+            }
+            for (int i = 0; i < Betweens.Count; i++)
+            {
+                if (Betweens[i].FromTask == t || Betweens[i].ToTask == t)
+                {
+                    Betweens.RemoveAt(i);
+                    i--;
+                }
+            }
+        }
         public void AppendOrderingConstraint(OrderConstraint con)
         {
             if (con.first == con.second) return;
@@ -90,7 +134,7 @@ namespace htn_transformator
                 throw new Exception("Identical ordering constraint is inserted for the second time!");
             }
 
-            Orderings.Add(con);
+            orderings.Add(con);
 
             if (!proceedingTasks.ContainsKey(con.first))
             {
@@ -183,14 +227,26 @@ namespace htn_transformator
             StringBuilder sb = new StringBuilder();
             sb.Append($"{Head}-->(");
 
-            foreach (Task pt in RightSidePrimitive)
-            {
-                sb.Append($"{pt},");
-            }
+            List<Task> taskOrder = TaskOrdering();
 
-            foreach (Task ct in RightSideCompound)
+            if (IsTotallyOrdered())
             {
-                sb.Append($"{ct},");
+                foreach (Task t in taskOrder)
+                {
+                    sb.Append($"{t},");
+                }
+            }
+            else
+            {
+                foreach (Task pt in RightSidePrimitive)
+                {
+                    sb.Append($"{pt},");
+                }
+
+                foreach (Task ct in RightSideCompound)
+                {
+                    sb.Append($"{ct},");
+                }
             }
 
             if (!IsEmpty())
@@ -200,10 +256,26 @@ namespace htn_transformator
 
             sb.Append(");[");
 
-            foreach (Constraint c in Orderings)
+            if (IsTotallyOrdered() && TaskCount() > 1)
             {
-                sb.Append($"{c},");
+                foreach (Task t in taskOrder)
+                {
+                    sb.Append($"{t}<");
+                }
+                if (!IsEmpty())
+                {
+                    sb.Remove(sb.Length - 1, 1);
+                }
+                sb.Append(',');
             }
+            else
+            {
+                foreach (Constraint c in Orderings)
+                {
+                    sb.Append($"{c},");
+                }
+            }
+
             foreach (Constraint c in Befores)
             {
                 sb.Append($"{c},");
@@ -222,7 +294,7 @@ namespace htn_transformator
                 sb.Remove(sb.Length - 1, 1);
             }
 
-            sb.Append("]");
+            sb.Append(']');
 
             return sb.ToString();
         }

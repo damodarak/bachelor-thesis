@@ -23,9 +23,6 @@ namespace htn_transformator
         {
             if (!d.IsTotallyOrdered()) throw new Exception("This transformation operates only with totally ordered domains!");
 
-            ITransformable removeIdenticalUnits = new RemoveIdenticalUnitMethods(d);
-            d = removeIdenticalUnits.Transform();
-
             foreach (Method m in d.Methods)
             {
                 List<Task> linearOrdering = m.TaskOrdering();
@@ -49,86 +46,67 @@ namespace htn_transformator
         {
             if (m.Betweens.Count == 0) return;
 
-            List<Task> linearOrdering = m.TaskOrdering();
-
             foreach (BetweenConstraint bw in m.Betweens) // in case that all intermedieate tasks are empty
             {
                 BeforeConstraint bc = new BeforeConstraint(bw.Symbol, bw.ToTask);
                 m.AppendBefore(bc);
             }
 
-            List<HashSet<int>> symbols = symbolsFromBetweens(m, linearOrdering);
+            List<Task> ordering = m.TaskOrdering();
+            List<HashSet<int>> symbols = symbolsFromBetweens(m, ordering);
             m.Betweens = new List<BetweenConstraint>(); // remove all betweens from the method
 
-            HashSet<TaskName> toBeSearched = new();
-            for (int i = 0; i < symbols.Count; i++) // == linearOrdering.Count
-            {
-                if (symbols[i] == null) continue;
-
-                if (linearOrdering[i] is PrimitiveTask pt)
-                {
-                    appendBeforesToPrimitiveTask(m, pt, symbols[i]);
-                }
-                else // CompoundTask
-                {
-                    CompoundTask? existingCT = existingNewCompoundTaskName(linearOrdering[i], symbols[i], linearOrdering);
-                    if (existingCT == null) // create new, swap in constraints, copy methods
-                    {
-                        CompoundTask newCT = createNewCompoundTask(linearOrdering[i], symbols[i]);
-                        toBeSearched.Add(newCT.TaskName);
-                        swapCompoundTask(m, (CompoundTask)linearOrdering[i], newCT);
-                    }
-                    else
-                    {
-                        swapCompoundTask(m, (CompoundTask)linearOrdering[i], existingCT);
-                    }
-                }
-            }
-
+            HashSet<TaskName> toBeSearched = removeBetweensAndSwapTasks(m, ordering, symbols);
             copyMethodsAndSearchTask(toBeSearched);
         }
         private void searchCompoundTask(TaskName tn)
         {
             List<Method> searchMethods = methodsWithHead(tn);
-            HashSet<TaskName> toBeSearched = new();
 
             foreach (Method m in searchMethods)
             {
                 List<Task> ordering = m.TaskOrdering();
-                List<HashSet<int>> methodSymbols = symbolsFromBetweens(m, ordering);
-                m.Betweens = new List<BetweenConstraint>();
+                List<HashSet<int>> neededSymbols = symbolsFromBetweens(m, ordering);
+                m.Betweens = new List<BetweenConstraint>(); // remove all betweens
 
-                for (int i = 0; i < ordering.Count; i++)
+                foreach (var symbols in neededSymbols)
                 {
-                    if (ordering[i] is PrimitiveTask pt)
+                    symbols.UnionWith(mandatoryPropSymbols[tn]); // mandatoryPropSymbols[tn] is never null here
+                }
+
+                HashSet<TaskName> toBeSearched = removeBetweensAndSwapTasks(m, ordering, neededSymbols);
+                copyMethodsAndSearchTask(toBeSearched);
+            }
+        }
+        private HashSet<TaskName> removeBetweensAndSwapTasks(Method m, List<Task> ordering, List<HashSet<int>> symbols)
+        {
+            HashSet<TaskName> toBeSearched = new();
+
+            for (int i = 0; i < ordering.Count; i++)
+            {
+                if (symbols[i].Count == 0) continue;
+
+                if (ordering[i] is PrimitiveTask pt)
+                {
+                    appendBeforesToPrimitiveTask(m, pt, symbols[i]);
+                }
+                else
+                {
+                    CompoundTask? existingCT = existingNewCompoundTaskName(ordering[i], symbols[i], ordering);
+                    if (existingCT == null)
                     {
-                        appendBeforesToPrimitiveTask(m, pt, methodSymbols[i]);
+                        CompoundTask newCT = createNewCompoundTask(ordering[i], symbols[i]);
+                        toBeSearched.Add(newCT.TaskName);
+                        swapCompoundTask(m, (CompoundTask)ordering[i], newCT);
                     }
                     else
                     {
-                        HashSet<int> neededSymbols = mandatoryPropSymbols[tn]; // this is never null here
-                        neededSymbols.UnionWith(methodSymbols[i]);
-
-                        CompoundTask? existingCT = existingNewCompoundTaskName(ordering[i], neededSymbols, ordering);
-                        if (existingCT == null)
-                        {
-                            CompoundTask newCT = createNewCompoundTask(ordering[i], neededSymbols);
-                            toBeSearched.Add(newCT.TaskName);
-                            swapCompoundTask(m, (CompoundTask)ordering[i], newCT);
-                        }
-                        else
-                        {
-                            swapCompoundTask(m, (CompoundTask)ordering[i], existingCT);
-                        }
+                        swapCompoundTask(m, (CompoundTask)ordering[i], existingCT);
                     }
                 }
             }
 
-            copyMethodsAndSearchTask(toBeSearched);
-        }
-        private HashSet<TaskName> removeBetweensAndSwapTasks()
-        {
-            return null;
+            return toBeSearched;
         }
         private List<HashSet<int>> symbolsFromBetweens(Method m, List<Task> ordering)
         {
@@ -146,6 +124,11 @@ namespace htn_transformator
 
                     symbols[i].Add(bc.Symbol.PropID);
                 }
+            }
+
+            for (int i = 0; i < symbols.Length; i++)
+            {
+                if (symbols[i] == null) symbols[i] = new(); // we don't want null values
             }
 
             return new List<HashSet<int>>(symbols);
@@ -221,7 +204,6 @@ namespace htn_transformator
         }
         private void swapCompoundTask(Method m, CompoundTask oldCT, CompoundTask newCT)
         {
-            m.RightSideCompound.Remove(oldCT);
             m.RightSideCompound.Add(newCT);
 
             List<OrderConstraint> insertOrders = new();
@@ -231,17 +213,16 @@ namespace htn_transformator
                 if (oc.first == oldCT)
                 {
                     insertOrders.Add(new OrderConstraint(newCT, oc.second));
-                    m.Orderings.RemoveAt(i);
-                    i--;
                 }
                 else if (oc.second == oldCT)
                 {
                     insertOrders.Add(new OrderConstraint(oc.first, newCT));
-                    m.Orderings.RemoveAt(i);
-                    i--;
                 }
             }
-            m.Orderings.AddRange(insertOrders);
+            foreach (OrderConstraint oc in insertOrders)
+            {
+                m.AppendOrderingConstraint(oc);
+            }
 
             List<BeforeConstraint> insertBefores = new();
             for (int i = 0; i < m.Befores.Count; i++)
@@ -287,6 +268,8 @@ namespace htn_transformator
                 }
             }
             m.Betweens.AddRange(insertBetweens);
+
+            m.RemoveTask(oldCT);
         }
         private CompoundTask? existingNewCompoundTaskName(Task t, HashSet<int> neededSymbols, List<Task> ordering)
         {
