@@ -9,12 +9,12 @@ namespace htn_transformator
     internal class ArgParser
     {
         public string inputFile { get; private set; }
-        public string outputFile { get; private set; }
+        public string outputFile { get; private set; } = "";
         public TransformationType type { get; private set; }
 
         public ArgParser(string[] args) 
         {
-            if (args.Length != 5)
+            if (args.Length != 5 && args.Length != 3)
             {
                 throw new Exception("Incorrect argument length!");
             }

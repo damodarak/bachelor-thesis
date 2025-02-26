@@ -150,6 +150,16 @@ namespace htn_transformator
         }
         public void StoreDomain(PlanningDomain d)
         {
+            if (outputFile == "")
+            {
+                foreach (Method m in d.Methods)
+                {
+                    Console.WriteLine(m.ToString());
+                }
+
+                return;
+            }
+
             using (StreamWriter sw = new StreamWriter(outputFile))
             {
                 foreach (Method m in d.Methods)
