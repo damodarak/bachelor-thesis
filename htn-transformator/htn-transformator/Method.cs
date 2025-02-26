@@ -55,7 +55,7 @@ namespace htn_transformator
             }
             foreach (BeforeConstraint bc in copy.Befores)
             {
-                AppendBefore(new BeforeConstraint(bc.Symbol, taskTranslation[bc.Task])); // check how the symbol are copied
+                AppendBefore(new BeforeConstraint(bc.Symbol, taskTranslation[bc.Task]));
             }
             foreach (AfterConstraint ac in copy.Afters)
             {

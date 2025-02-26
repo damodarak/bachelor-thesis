@@ -85,6 +85,7 @@ namespace htn_transformator
             for (int i = 0; i < ordering.Count; i++)
             {
                 if (symbols[i].Count == 0) continue;
+                if (searched.Contains(ordering[i].TaskName)) continue;
 
                 if (ordering[i] is PrimitiveTask pt)
                 {

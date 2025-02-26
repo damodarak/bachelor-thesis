@@ -11,14 +11,18 @@
 #D-->(ac#1,ac#2);[ac#1<ac#2,between(ac#1:p:ac#2)] // neighbours
 #D-->(ac#1,ac#2);[ac#1<ac#2,between(ac#2:p:ac#1)] // irrational
 
-A-->(B#2,C#1,C#2,B#1);[B#2<C#1<C#2<B#1,between(B#2:p:B#1)]
-B-->(bact#1);[]
-C-->(cact#1,D#1);[cact#1<D#1]
-C-->();[]
-D-->();[]
+#works
+#A-->(B#2,C#1,C#2,B#1);[B#2<C#1<C#2<B#1,between(B#2:p:B#1)]
+#B-->(bact#1);[]
+#C-->(cact#1,D#1);[cact#1<D#1]
+#C-->();[]
+#D-->();[]
 
 #A-->(B#2,C#1,C#2,B#1);[B#2<C#1<C#2<B#1,between(B#2:p:B#1)] // solo works
 
-
-
-#A-->(B#2,C#1,C#2,B#1);[B#2<C#1<C#2<B#1,between(B#2:p:B#1)]
+#works
+A-->(B#1,C#1,A#2,B#2);[B#1<C#1<A#2<B#2,between(B#1:p:B#2)]
+A-->(a#1,C#1,a#2);[a#1<C#1<a#2,between(a#1:q:a#2)]
+B-->(bact#1);[]
+C-->();[]
+C-->(cact#1,cact#2);[cact#1<cact#2,after(cact#2:p)]
