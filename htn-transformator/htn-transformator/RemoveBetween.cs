@@ -54,7 +54,7 @@ namespace htn_transformator
 
             List<Task> ordering = m.TaskOrdering();
             List<HashSet<int>> symbols = symbolsFromBetweens(m, ordering);
-            m.Betweens = new List<BetweenConstraint>(); // remove all betweens from the method
+            m.ClearBetweens();
 
             HashSet<TaskName> toBeSearched = removeBetweensAndSwapTasks(m, ordering, symbols);
             copyMethodsAndSearchTask(toBeSearched);
@@ -67,7 +67,7 @@ namespace htn_transformator
             {
                 List<Task> ordering = m.TaskOrdering();
                 List<HashSet<int>> neededSymbols = symbolsFromBetweens(m, ordering);
-                m.Betweens = new List<BetweenConstraint>(); // remove all betweens
+                m.ClearBetweens();
 
                 foreach (var symbols in neededSymbols)
                 {
@@ -142,8 +142,8 @@ namespace htn_transformator
                 {
                     PropositionalSymbol ps = m.Betweens[i].Symbol;
                     Task t = m.Betweens[i].ToTask;
-                    m.Betweens.RemoveAt(i);
-                    m.Befores.Add(new BeforeConstraint(ps, t));
+                    m.RemoveBetweenAt(i);
+                    m.AppendBefore(new BeforeConstraint(ps, t));
 
                     i--;
                 }
@@ -204,7 +204,7 @@ namespace htn_transformator
         }
         private void swapCompoundTask(Method m, CompoundTask oldCT, CompoundTask newCT)
         {
-            m.RightSideCompound.Add(newCT);
+            m.AppendTask(newCT);
 
             List<OrderConstraint> insertOrders = new();
             for (int i = 0; i < m.Orderings.Count; i++)
@@ -231,11 +231,14 @@ namespace htn_transformator
                 if (bc.Task == oldCT)
                 {
                     insertBefores.Add(new BeforeConstraint(bc.Symbol, newCT));
-                    m.Befores.RemoveAt(i);
+                    m.RemoveBeforeAt(i);
                     i--;
                 }
             }
-            m.Befores.AddRange(insertBefores);
+            foreach (BeforeConstraint bc in insertBefores)
+            {
+                m.AppendBefore(bc);
+            }
 
             List<AfterConstraint> insertAfters = new();
             for (int i = 0; i < m.Afters.Count; i++)
@@ -244,11 +247,14 @@ namespace htn_transformator
                 if (ac.Task == oldCT)
                 {
                     insertAfters.Add(new AfterConstraint(ac.Symbol, newCT));
-                    m.Afters.RemoveAt(i);
+                    m.RemoveAfterAt(i);
                     i--;
                 }
             }
-            m.Afters.AddRange(insertAfters);
+            foreach (AfterConstraint ac in insertAfters)
+            {
+                m.AppendAfter(ac);
+            }
 
             List<BetweenConstraint> insertBetweens = new();
             for (int i = 0; i < m.Betweens.Count; i++)
@@ -257,17 +263,20 @@ namespace htn_transformator
                 if (bw.FromTask == oldCT)
                 {
                     insertBetweens.Add(new BetweenConstraint(bw.Symbol, newCT, bw.ToTask));
-                    m.Betweens.RemoveAt(i);
+                    m.RemoveBetweenAt(i);
                     i--;
                 }
                 else if (bw.ToTask == oldCT)
                 {
                     insertBetweens.Add(new BetweenConstraint(bw.Symbol, bw.FromTask, newCT));
-                    m.Betweens.RemoveAt(i);
+                    m.RemoveBetweenAt(i);
                     i--;
                 }
             }
-            m.Betweens.AddRange(insertBetweens);
+            foreach (BetweenConstraint bw in insertBetweens)
+            {
+                m.AppendBetween(bw);
+            }
 
             m.RemoveTask(oldCT);
         }

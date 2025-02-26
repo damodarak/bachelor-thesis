@@ -87,13 +87,13 @@ namespace htn_transformator
             {
                 CompoundTask ct = new CompoundTask(taskAndIndex[0], int.Parse(taskAndIndex[1]));
                 concreteTasks[task] = ct;
-                m.RightSideCompound.Add(ct);
+                m.AppendTask(ct);
             }
             else if (char.IsLower(task[0]))
             {
                 PrimitiveTask pt = new PrimitiveTask(taskAndIndex[0], int.Parse(taskAndIndex[1]));
                 concreteTasks[task] = pt;
-                m.RightSidePrimitive.Add(pt);
+                m.AppendTask(pt);
             }
             else
             {

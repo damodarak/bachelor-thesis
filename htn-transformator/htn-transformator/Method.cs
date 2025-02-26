@@ -9,15 +9,20 @@ namespace htn_transformator
 {
     internal class Method
     {
-        private Dictionary<Task, List<Task>> proceedingTasks = new(); // still memory leak, when the task is remove it is in other lists
+        private Dictionary<Task, List<Task>> proceedingTasks = new();
         private List<OrderConstraint> orderings { get; set; } = new();
+        private List<CompoundTask> rightSideCompound { get; set; } = new();
+        private List<PrimitiveTask> rightSidePrimitive { get; set; } = new();
+        private List<BeforeConstraint> befores { get; set; } = new();
+        private List<AfterConstraint> afters { get; set; } = new();
+        private List<BetweenConstraint> betweens { get; set; } = new();
         public CompoundTask Head { get; private set; }
-        public List<CompoundTask> RightSideCompound { get; set; } = new();
-        public List<PrimitiveTask> RightSidePrimitive { get; set; } = new();
+        public ReadOnlyCollection<CompoundTask> RightSideCompound => rightSideCompound.AsReadOnly();
+        public ReadOnlyCollection<PrimitiveTask> RightSidePrimitive => rightSidePrimitive.AsReadOnly();
         public ReadOnlyCollection<OrderConstraint> Orderings => orderings.AsReadOnly();
-        public List<BeforeConstraint> Befores { get; set; } = new();
-        public List<AfterConstraint> Afters { get; set; } = new();
-        public List<BetweenConstraint> Betweens { get; set; } = new();
+        public ReadOnlyCollection<BeforeConstraint> Befores => befores.AsReadOnly();
+        public ReadOnlyCollection<AfterConstraint> Afters => afters.AsReadOnly();
+        public ReadOnlyCollection<BetweenConstraint> Betweens => betweens.AsReadOnly();
         public Method(CompoundTask head)
         {
             if (head.TaskIndex != -1) throw new Exception("Head of the method must have index == -1!");
@@ -36,13 +41,13 @@ namespace htn_transformator
             {
                 PrimitiveTask newPT = new PrimitiveTask(pt.TaskName.ID, pt.TaskIndex);
                 taskTranslation[pt] = newPT;
-                RightSidePrimitive.Add(newPT);
+                rightSidePrimitive.Add(newPT);
             }
             foreach (Task ct in copy.RightSideCompound)
             {
                 CompoundTask newCT = new CompoundTask(ct.TaskName.ID, ct.TaskIndex);
                 taskTranslation[ct] = newCT;
-                RightSideCompound.Add(newCT);
+                rightSideCompound.Add(newCT);
             }
             foreach (OrderConstraint oc in copy.Orderings)
             {
@@ -50,15 +55,15 @@ namespace htn_transformator
             }
             foreach (BeforeConstraint bc in copy.Befores)
             {
-                Befores.Add(new BeforeConstraint(bc.Symbol, taskTranslation[bc.Task])); // check how the symbol are copied
+                AppendBefore(new BeforeConstraint(bc.Symbol, taskTranslation[bc.Task])); // check how the symbol are copied
             }
             foreach (AfterConstraint ac in copy.Afters)
             {
-                Afters.Add(new AfterConstraint(ac.Symbol, taskTranslation[ac.Task]));
+                afters.Add(new AfterConstraint(ac.Symbol, taskTranslation[ac.Task]));
             }
             foreach(BetweenConstraint bw in copy.Betweens)
             {
-                Betweens.Add(new BetweenConstraint(bw.Symbol, taskTranslation[bw.FromTask], taskTranslation[bw.ToTask]));
+                betweens.Add(new BetweenConstraint(bw.Symbol, taskTranslation[bw.FromTask], taskTranslation[bw.ToTask]));
             }
         }
         public bool IsTotallyOrdered()
@@ -78,14 +83,26 @@ namespace htn_transformator
         {
             return Befores.Count + Afters.Count + Betweens.Count + Betweens.Count + Orderings.Count;
         }
+        public void AppendTask(Task t)
+        {
+            if (t is PrimitiveTask pt)
+                rightSidePrimitive.Add(pt);
+            else
+                rightSideCompound.Add((CompoundTask)t);
+        }
         public void RemoveTask(Task t)
         {
             proceedingTasks.Remove(t);
 
+            foreach (var item in proceedingTasks)
+            {
+                item.Value.Remove(t);
+            }
+
             if (t is CompoundTask ct)
-                RightSideCompound.Remove(ct);
+                rightSideCompound.Remove(ct);
             else
-                RightSidePrimitive.Remove((PrimitiveTask)t);
+                rightSidePrimitive.Remove((PrimitiveTask)t);
 
             for (int i = 0; i < Orderings.Count; i++)
             {
@@ -99,7 +116,7 @@ namespace htn_transformator
             {
                 if (Befores[i].Task == t)
                 {
-                    Befores.RemoveAt(i);
+                    befores.RemoveAt(i);
                     i--;
                 }
             }
@@ -107,7 +124,7 @@ namespace htn_transformator
             {
                 if (Afters[i].Task == t)
                 {
-                    Afters.RemoveAt(i);
+                    afters.RemoveAt(i);
                     i--;
                 }
             }
@@ -115,10 +132,22 @@ namespace htn_transformator
             {
                 if (Betweens[i].FromTask == t || Betweens[i].ToTask == t)
                 {
-                    Betweens.RemoveAt(i);
+                    betweens.RemoveAt(i);
                     i--;
                 }
             }
+        }
+        public void RemoveBeforeAt(int index)
+        {
+            befores.RemoveAt(index);
+        }
+        public void RemoveAfterAt(int index)
+        {
+            afters.RemoveAt(index);
+        }
+        public void RemoveBetweenAt(int index)
+        {
+            betweens.RemoveAt(index);
         }
         public void AppendOrderingConstraint(OrderConstraint con)
         {
@@ -192,7 +221,11 @@ namespace htn_transformator
                 }
             }
 
-            Betweens.Add(bc);
+            betweens.Add(bc);
+        }
+        public void ClearBetweens()
+        {
+            betweens.Clear();
         }
         public void AppendAfter(AfterConstraint ac) // todo check also befores and vica verse
         {
@@ -201,7 +234,7 @@ namespace htn_transformator
                 if (insertedAfter.Task == ac.Task && insertedAfter.Symbol.PropID == ac.Symbol.PropID) return;
             }
 
-            Afters.Add(ac);
+            afters.Add(ac);
         }
         public void AppendBefore(BeforeConstraint bc)
         {
@@ -210,7 +243,7 @@ namespace htn_transformator
                 if (insertedBefore.Task == bc.Task && insertedBefore.Symbol.PropID == bc.Symbol.PropID) return;
             }
 
-            Befores.Add(bc);
+            befores.Add(bc);
         }
         /// <summary>
         /// Comparison between tasks with respect to ordering
