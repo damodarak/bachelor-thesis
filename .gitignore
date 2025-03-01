@@ -6,6 +6,9 @@
 *.user
 *.sln.docstates
 
+# Build start
+launchSettings.json
+
 # Build results
 
 [Dd]ebug/
