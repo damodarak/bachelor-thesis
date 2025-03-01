@@ -49,7 +49,6 @@ namespace htn_transformator
                 return;
             }
 
-
             string tPattern = "[a-zA-Z][a-zA-Z0-9]*#[0-9]+";
             string compoundPattern = "^[A-Z][a-zA-Z0-9]*-->";
             string subtasksPattern = $@"\((({tPattern})(,{tPattern})*)?\);";
