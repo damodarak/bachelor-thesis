@@ -271,12 +271,12 @@ namespace htn_transformator
             }
             else
             {
-                foreach (Task pt in RightSidePrimitive)
+                foreach (Task pt in rightSidePrimitive)
                 {
                     sb.Append($"{pt},");
                 }
 
-                foreach (Task ct in RightSideCompound)
+                foreach (Task ct in rightSideCompound)
                 {
                     sb.Append($"{ct},");
                 }
@@ -303,21 +303,21 @@ namespace htn_transformator
             }
             else
             {
-                foreach (Constraint c in Orderings)
+                foreach (Constraint c in orderings)
                 {
                     sb.Append($"{c},");
                 }
             }
 
-            foreach (Constraint c in Befores)
+            foreach (Constraint c in befores)
             {
                 sb.Append($"{c},");
             }
-            foreach (Constraint c in Afters)
+            foreach (Constraint c in afters)
             {
                 sb.Append($"{c},");
             }
-            foreach (Constraint c in Betweens)
+            foreach (Constraint c in betweens)
             {
                 sb.Append($"{c},");
             }
