@@ -65,6 +65,12 @@ namespace htn_transformator
 
             foreach (Method m in searchMethods)
             {
+                foreach (BetweenConstraint bw in m.Betweens) // in case that all intermedieate tasks are empty in the final plan
+                {
+                    BeforeConstraint bc = new BeforeConstraint(bw.Symbol, bw.ToTask);
+                    m.AppendBefore(bc);
+                }
+
                 List<Task> ordering = m.TaskOrdering();
                 List<HashSet<int>> neededSymbols = symbolsFromBetweensAndNewTaskNames(m, ordering);
                 m.ClearBetweens();
