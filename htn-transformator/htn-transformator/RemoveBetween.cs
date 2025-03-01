@@ -46,11 +46,7 @@ namespace htn_transformator
         {
             if (m.Betweens.Count == 0) return;
 
-            foreach (BetweenConstraint bw in m.Betweens) // in case that all intermedieate tasks are empty in the final plan
-            {
-                BeforeConstraint bc = new BeforeConstraint(bw.Symbol, bw.ToTask);
-                m.AppendBefore(bc);
-            }
+            betweensToBefores(m);
 
             List<Task> ordering = m.TaskOrdering();
             List<HashSet<int>> symbols = symbolsFromBetweensAndNewTaskNames(m, ordering);
@@ -65,11 +61,7 @@ namespace htn_transformator
 
             foreach (Method m in searchMethods)
             {
-                foreach (BetweenConstraint bw in m.Betweens) // in case that all intermedieate tasks are empty in the final plan
-                {
-                    BeforeConstraint bc = new BeforeConstraint(bw.Symbol, bw.ToTask);
-                    m.AppendBefore(bc);
-                }
+                betweensToBefores(m);
 
                 List<Task> ordering = m.TaskOrdering();
                 List<HashSet<int>> neededSymbols = symbolsFromBetweensAndNewTaskNames(m, ordering);
@@ -337,6 +329,14 @@ namespace htn_transformator
             }
 
             return false;
+        }
+        private void betweensToBefores(Method m)
+        {
+            foreach (BetweenConstraint bw in m.Betweens) // in case that all intermedieate tasks are empty in the final plan
+            {
+                BeforeConstraint bc = new BeforeConstraint(bw.Symbol, bw.ToTask);
+                m.AppendBefore(bc);
+            }
         }
     }
 }
