@@ -11,6 +11,7 @@ namespace htn_transformator
     {
         private string inputFile { get; set; }
         private string outputFile { get; set; }
+        private bool insideComment = false;
         public InputOutputDomain(string inputFile, string outputFile)
         {
             this.inputFile = inputFile;
@@ -34,7 +35,20 @@ namespace htn_transformator
         }
         private void parseAndAppendMethod(PlanningDomain d, string line)
         {
-            if (line == "" || line[0] == '#') return;
+            if (line.StartsWith("*/"))
+            {
+                insideComment = false;
+                return;
+            }
+
+            if (line == "" || line[0] == '#' || insideComment) return;
+
+            if (line.StartsWith("/*"))
+            {
+                insideComment = true;
+                return;
+            }
+
 
             string tPattern = "[a-zA-Z][a-zA-Z0-9]*#[0-9]+";
             string compoundPattern = "^[A-Z][a-zA-Z0-9]*-->";
