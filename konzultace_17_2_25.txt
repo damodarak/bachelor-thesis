@@ -1,4 +1,0 @@
-R se nemusi vynucovat, proste tam dame nejake random before a potom muzu pouzivat jenom ty alfy t.z. jejich predikaty jsou podmnozinou tech beforu
-
-
-A_i -> A_i [before(p, A_i)] lze ignorovat a odstranit, protoze nemusime tuto metodu pouzit 
