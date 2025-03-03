@@ -48,10 +48,13 @@ namespace htn_transformator
         {
             return left.Equals(right);
         }
-
         public static bool operator !=(TaskName left, TaskName right)
         {
             return !left.Equals(right);
+        }
+        public override string ToString()
+        {
+            return $"{Name}";
         }
     }
 }
