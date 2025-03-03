@@ -52,7 +52,7 @@ namespace htn_transformator
             string tPattern = "[a-zA-Z][a-zA-Z0-9]*#[0-9]+";
             string compoundPattern = "^[A-Z][a-zA-Z0-9]*-->";
             string subtasksPattern = $@"\((({tPattern})(,{tPattern})*)?\);";
-            string constrPattern = $@"({tPattern}<{tPattern}(<{tPattern})*|before\([a-zA-Z]+:{tPattern}\)|after\({tPattern}:[a-zA-Z]+\)|between\({tPattern}:[a-zA-Z]+:{tPattern}\))";
+            string constrPattern = $@"({tPattern}<{tPattern}(<{tPattern})*|before\([a-zA-Z0-9]+:{tPattern}\)|after\({tPattern}:[a-zA-Z0-9]+\)|between\({tPattern}:[a-zA-Z0-9]+:{tPattern}\))";
             string constrsPattern = $@"\[({constrPattern}(,{constrPattern})*)?\]$";
 
             string completePattern = $"{compoundPattern}{subtasksPattern}{constrsPattern}";
