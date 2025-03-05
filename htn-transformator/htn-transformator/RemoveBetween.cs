@@ -11,7 +11,7 @@ namespace htn_transformator
         private int nextNewCompoundIndex = 1;
         private PlanningDomain d;
         // translation between TaskName and the set of mandatory IDs of propositional symbols
-        private Dictionary<TaskName, HashSet<int>> mandatoryPropSymbols = new(); // IDs of mandatory Propositional Symbols of a TaskName
+        private Dictionary<TaskName, HashSet<PropositionalSymbol>> mandatoryPropSymbols = new(); // IDs of mandatory Propositional Symbols of a TaskName
         private Dictionary<TaskName, TaskName> derivedFrom = new(); // child TaskName -> father TaskName
         private Dictionary<TaskName, HashSet<TaskName>> derivesTo = new(); // father TaskName -> children TaskNames
         private HashSet<TaskName> searched = new();
@@ -49,7 +49,7 @@ namespace htn_transformator
             betweensToBefores(m);
 
             List<Task> ordering = m.TaskOrdering();
-            List<HashSet<int>> symbols = symbolsFromBetweensAndNewTaskNames(m, ordering);
+            List<HashSet<PropositionalSymbol>> symbols = symbolsFromBetweensAndNewTaskNames(m, ordering);
             m.ClearBetweens();
 
             HashSet<TaskName> toBeSearched = appendBeforesAndSwapTasks(m, ordering, symbols);
@@ -64,7 +64,7 @@ namespace htn_transformator
                 betweensToBefores(m);
 
                 List<Task> ordering = m.TaskOrdering();
-                List<HashSet<int>> neededSymbols = symbolsFromBetweensAndNewTaskNames(m, ordering);
+                List<HashSet<PropositionalSymbol>> neededSymbols = symbolsFromBetweensAndNewTaskNames(m, ordering);
                 m.ClearBetweens();
 
                 foreach (var symbols in neededSymbols)
@@ -76,7 +76,7 @@ namespace htn_transformator
                 copyMethodsAndSearchTask(toBeSearched);
             }
         }
-        private HashSet<TaskName> appendBeforesAndSwapTasks(Method m, List<Task> ordering, List<HashSet<int>> symbols)
+        private HashSet<TaskName> appendBeforesAndSwapTasks(Method m, List<Task> ordering, List<HashSet<PropositionalSymbol>> symbols)
         {
             HashSet<TaskName> toBeSearched = new();
 
@@ -106,10 +106,10 @@ namespace htn_transformator
 
             return toBeSearched;
         }
-        private List<HashSet<int>> symbolsFromBetweensAndNewTaskNames(Method m, List<Task> ordering)
+        private List<HashSet<PropositionalSymbol>> symbolsFromBetweensAndNewTaskNames(Method m, List<Task> ordering)
         {
             // ints are reffering to Propositional symbol IDs
-            HashSet<int>[] symbols = new HashSet<int>[ordering.Count];
+            HashSet<PropositionalSymbol>[] symbols = new HashSet<PropositionalSymbol>[ordering.Count];
 
             for (int i = 0; i < symbols.Length; i++)
             {
@@ -123,7 +123,7 @@ namespace htn_transformator
 
                 for (int i = fromIndex + 1; i < toIndex; i++)
                 {
-                    symbols[i].Add(bc.Symbol.ID);
+                    symbols[i].Add(bc.Symbol);
                 }
             }
 
@@ -133,7 +133,7 @@ namespace htn_transformator
                     symbols[i].UnionWith(mandatoryPropSymbols[ordering[i].TaskName]);
             }
 
-            return new List<HashSet<int>>(symbols);
+            return new List<HashSet<PropositionalSymbol>>(symbols);
         }
         private void removeNeighbourBetweens(Method m, List<Task> ordering)
         {
@@ -190,7 +190,7 @@ namespace htn_transformator
 
             return result;
         }
-        private CompoundTask createNewCompoundTask(Task father, HashSet<int> symbols)
+        private CompoundTask createNewCompoundTask(Task father, HashSet<PropositionalSymbol> symbols)
         {
             CompoundTask newCT = new CompoundTask(father, symbols, nextNewCompoundIndex++);
             mandatoryPropSymbols[newCT.TaskName] = symbols;
@@ -282,7 +282,7 @@ namespace htn_transformator
 
             m.RemoveTask(oldCT);
         }
-        private CompoundTask? existingNewCompoundTaskName(Task t, HashSet<int> neededSymbols)
+        private CompoundTask? existingNewCompoundTaskName(Task t, HashSet<PropositionalSymbol> neededSymbols)
         {
             // Task t could be new TaskName but also original
             if (!derivedFrom.ContainsKey(t.TaskName) && !derivesTo.ContainsKey(t.TaskName)) return null;
@@ -304,7 +304,7 @@ namespace htn_transformator
 
             return null;
         }
-        private void appendBeforesToPrimitiveTask(Method m, PrimitiveTask pt, HashSet<int> symbols)
+        private void appendBeforesToPrimitiveTask(Method m, PrimitiveTask pt, HashSet<PropositionalSymbol> symbols)
         {
             if (symbols == null) return;
 
@@ -314,9 +314,9 @@ namespace htn_transformator
                 throw new Exception("Appending state constraints to non-existing Primitive task!");
             }
 
-            foreach(int id in symbols)
+            foreach(PropositionalSymbol s in symbols)
             {
-                BeforeConstraint bc = new BeforeConstraint(new PropositionalSymbol(id), m.RightSidePrimitive[index]);
+                BeforeConstraint bc = new BeforeConstraint(s, m.RightSidePrimitive[index]);
                 m.AppendBefore(bc);
             }
         }

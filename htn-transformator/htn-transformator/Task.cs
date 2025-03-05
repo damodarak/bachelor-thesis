@@ -27,7 +27,7 @@ namespace htn_transformator
             TaskName = taskName;
             TaskIndex = taskIndex;
         }
-        public Task(Task father, HashSet<int> symbols, int index)
+        public Task(Task father, HashSet<PropositionalSymbol> symbols, int index)
         {
             TaskIndex = index;
 
@@ -35,9 +35,9 @@ namespace htn_transformator
 
             sb.Append(father.TaskName.Name);
             sb.Append('{');
-            foreach (int s in symbols)
+            foreach (PropositionalSymbol s in symbols)
             {
-                sb.Append($"{PropositionalSymbol.GetName(s)},");
+                sb.Append($"{s},");
             }
 
             sb.Remove(sb.Length - 1, 1);
