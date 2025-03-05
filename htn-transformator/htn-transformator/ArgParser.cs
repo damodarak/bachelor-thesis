@@ -35,6 +35,10 @@ namespace htn_transformator
                 {
                     type = TransformationType.RemoveBetween;
                 }
+                else if (args[i] == "--empty")
+                {
+                    type = TransformationType.RemoveEmptyMethods;
+                }
                 else if (args[i] == "--tocnf")
                 {
                     type = TransformationType.ToCNF;

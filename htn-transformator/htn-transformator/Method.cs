@@ -215,7 +215,7 @@ namespace htn_transformator
             {
                 if (insertedBetween.FromTask == bc.FromTask &&
                     insertedBetween.ToTask == bc.ToTask &&
-                    insertedBetween.Symbol.PropID == bc.Symbol.PropID)
+                    insertedBetween.Symbol.ID == bc.Symbol.ID)
                 {
                     return;
                 }
@@ -231,7 +231,7 @@ namespace htn_transformator
         {
             foreach (AfterConstraint insertedAfter in Afters)
             {
-                if (insertedAfter.Task == ac.Task && insertedAfter.Symbol.PropID == ac.Symbol.PropID) return;
+                if (insertedAfter.Task == ac.Task && insertedAfter.Symbol.ID == ac.Symbol.ID) return;
             }
 
             afters.Add(ac);
@@ -240,7 +240,7 @@ namespace htn_transformator
         {
             foreach (BeforeConstraint insertedBefore in Befores)
             {
-                if (insertedBefore.Task == bc.Task && insertedBefore.Symbol.PropID == bc.Symbol.PropID) return;
+                if (insertedBefore.Task == bc.Task && insertedBefore.Symbol.ID == bc.Symbol.ID) return;
             }
 
             befores.Add(bc);

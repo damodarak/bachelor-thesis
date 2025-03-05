@@ -37,5 +37,14 @@ namespace htn_transformator
 
             return true;
         }
+        public bool ContaintsEmptyMethod()
+        {
+            foreach (Method m in methods)
+            {
+                if (m.IsEmpty()) return true;
+            }
+
+            return false;
+        }
     }
 }

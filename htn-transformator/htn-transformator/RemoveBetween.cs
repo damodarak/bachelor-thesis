@@ -123,7 +123,7 @@ namespace htn_transformator
 
                 for (int i = fromIndex + 1; i < toIndex; i++)
                 {
-                    symbols[i].Add(bc.Symbol.PropID);
+                    symbols[i].Add(bc.Symbol.ID);
                 }
             }
 

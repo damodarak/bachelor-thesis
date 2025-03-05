@@ -9,6 +9,7 @@ namespace htn_transformator
     internal enum TransformationType
     {
         RemoveBetween,
+        RemoveEmptyMethods,
         ToCNF,
         TOGNF
     }

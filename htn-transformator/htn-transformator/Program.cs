@@ -18,6 +18,9 @@
                     case TransformationType.RemoveBetween:
                         trns = new RemoveBetween(pd);
                         break;
+                    case TransformationType.RemoveEmptyMethods:
+                        trns = new RemoveEmptyMethods(pd);
+                        break;
                     case TransformationType.ToCNF:
                         trns = new ToCNF(pd);
                         break;

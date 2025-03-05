@@ -17,7 +17,7 @@ namespace htn_transformator
 
             return "";
         }
-        public int PropID { get; private set; }
+        public int ID { get; private set; }
         public string Name { get; private set; }
         public  PropositionalSymbol(string name)
         {
@@ -25,19 +25,43 @@ namespace htn_transformator
 
             if (nameToInt.ContainsKey(name))
             {
-                PropID = nameToInt[name];
+                ID = nameToInt[name];
             }
             else
             {
-                PropID = nextPropID++;
-                nameToInt.Add(name, PropID);
-                idToName.Add(PropID, name);
+                ID = nextPropID++;
+                nameToInt.Add(name, ID);
+                idToName.Add(ID, name);
             }
         }
         public PropositionalSymbol(int id)
         {
-            PropID = id;
+            ID = id;
             Name = idToName[id];
+        }
+        public bool Equals(PropositionalSymbol other)
+        {
+            return ID == other.ID;
+        }
+        public override bool Equals(object? obj)
+        {
+            return obj is PropositionalSymbol other && Equals(other);
+        }
+        public override int GetHashCode()
+        {
+            return ID.GetHashCode();
+        }
+        public static bool operator ==(PropositionalSymbol left, PropositionalSymbol right)
+        {
+            return left.Equals(right);
+        }
+        public static bool operator !=(PropositionalSymbol left, PropositionalSymbol right)
+        {
+            return !left.Equals(right);
+        }
+        public override string ToString()
+        {
+            return $"{Name}";
         }
     }
 }
