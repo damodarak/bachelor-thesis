@@ -36,6 +36,8 @@ namespace htn_transformator
         }
         private void searchNullifiedTaskName(TaskName tn)
         {
+            if (!containsInSubtasks.ContainsKey(tn)) return;
+
             foreach (Method m in containsInSubtasks[tn])
             {
                 if (m.RightSidePrimitive.Count != 0) continue;
@@ -56,6 +58,8 @@ namespace htn_transformator
 
                 if (index == m.RightSideCompound.Count - 1)
                 {
+                    if (!nullifies.ContainsKey(m.Head.TaskName)) nullifies[m.Head.TaskName] = new();
+
                     if (!containtsSet(nullifies[m.Head.TaskName], symbolsCopy))
                     {
                         nullifies[m.Head.TaskName].Add(symbolsCopy);
