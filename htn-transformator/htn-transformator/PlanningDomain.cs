@@ -21,12 +21,16 @@ namespace htn_transformator
 
             if (m.RightSidePrimitive.Count == 0 &&
                 m.TaskCount() == 1 &&
-                m.Head.TaskName.ID == m.RightSideCompound[0].TaskName.ID)
+                m.Head.TaskName == m.RightSideCompound[0].TaskName)
             {
                 return; // we can discard unit methods even though there are state constraints
             }
 
             methods.Add(m);
+        }
+        public void RemoveMethod(Method m)
+        {
+            if (!methods.Remove(m)) throw new Exception("Deletion of method failed! Method not found!");
         }
         public bool IsTotallyOrdered()
         {

@@ -32,7 +32,71 @@ namespace htn_transformator
                 searchNullifiedTaskName(toSearch);
             }
 
-            return null;
+            int methodCount = d.Methods.Count; // may change after insertin of new nullified methods
+
+            for (int i = 0; i < methodCount; i++)
+            {
+                List<Task> ordering = d.Methods[i].TaskOrdering();
+                List<int> nullifiableIndices = findNullifiableIndices(d.Methods[i], ordering);
+
+                if (nullifiableIndices.Count != 0)
+                {
+                    List<List<int>> powerSet = GetPowerSet(nullifiableIndices, ordering.Count);
+
+                    foreach (var indices in powerSet)
+                    {
+                        nullifieMethodAndAppendToDomain(d.Methods[i], indices, 0, ordering, new List<Tuple<int, PropositionalSymbol>>());
+                    }
+                }
+            }
+
+            for (int i = 0; i < d.Methods.Count; i++)
+            {
+                if (d.Methods[i].IsEmpty())
+                {
+                    d.RemoveMethod(d.Methods[i]);
+                    i--;
+                }
+            }
+
+            return d;
+        }
+        private void nullifieMethodAndAppendToDomain(Method m, List<int> nullTaskIndices, int index, List<Task> ordering, List<Tuple<int, PropositionalSymbol>> insert)
+        {
+            //append consts
+            //shift; RemoveTaskAndShiftConstraints(Task t)
+            //delete tasks; RemoveTaskAndShiftConstraints(Task t)
+
+            for (int i = 0; i < nullifies[ordering[nullTaskIndices[index]].TaskName].Count; i++)
+            {
+                List<Tuple<int, PropositionalSymbol>> copy = new(insert);
+
+                foreach (var symbol in nullifies[ordering[nullTaskIndices[index]].TaskName][i])
+                {
+                    copy.Add(new Tuple<int, PropositionalSymbol>(nullTaskIndices[index], symbol));
+                }
+
+                if (index == nullTaskIndices.Count - 1)
+                {
+                    //create null method
+                    Method nulledMethod = new Method(m.Head, m);
+                    var nulledMethodOrdering = nulledMethod.TaskOrdering();
+
+                    foreach (var newBefore in insert)
+                    {
+                        nulledMethod.AppendBefore(new BeforeConstraint(newBefore.Item2, nulledMethodOrdering[newBefore.Item1]));
+                    }
+
+                    for (int j = nullTaskIndices.Count - 1; j >= 0; j--) // nullTaskIndices are in ascending order
+                    {
+                        nulledMethod.RemoveTaskAndShiftConstraints(nulledMethodOrdering[nullTaskIndices[j]]);
+                    }
+
+                    d.AppendMethod(nulledMethod);
+                }
+                else
+                    nullifieMethodAndAppendToDomain(m, nullTaskIndices, index + 1, ordering, copy);
+            }
         }
         private void searchNullifiedTaskName(TaskName tn)
         {
@@ -109,6 +173,17 @@ namespace htn_transformator
             return m.RightSidePrimitive.Count == 0; // all CompoundTasks are nullifiable, but there cannot be any PrimitiveTasks
         }
         private bool nullifiable(TaskName tn) { return nullifies.ContainsKey(tn); }
+        private List<int> findNullifiableIndices(Method m, List<Task> ordering)
+        {
+            List<int> result = new();
+
+            for (int i = 0; i < ordering.Count; i++)
+            {
+                if (nullifies.ContainsKey(ordering[i].TaskName)) result.Add(i);
+            }
+
+            return result;
+        }
         private void nullifiesBase()
         {
             foreach (Method m in d.Methods)
@@ -141,5 +216,33 @@ namespace htn_transformator
                 }
             }
         }
+        private List<List<int>> GetPowerSet(List<int> indices, int methodTaskCount) // ChatGPT & GitHub
+        {
+            int n = indices.Count;
+            int powerSetCount = 1 << n; // 2^n
+            List<List<int>> powerSet = new List<List<int>>();
+
+            for (int i = 0; i < powerSetCount; i++)
+            {
+                List<int> subset = new List<int>();
+
+                for (int j = 0; j < n; j++)
+                {
+                    if ((i & (1 << j)) != 0)
+                    {
+                        subset.Add(indices[j]);
+                    }
+                }
+
+                powerSet.Add(subset);
+            }
+
+            powerSet.RemoveAt(0); // we do not want empty set
+
+            if (powerSet[powerSet.Count - 1].Count == methodTaskCount) powerSet.RemoveAt(powerSet.Count - 1); // we do not want to remove all tasks
+
+            return powerSet;
+        }
+        //private void shiftNullifiedTasksConstraints(Method)
     }
 }

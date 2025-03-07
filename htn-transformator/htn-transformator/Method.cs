@@ -49,21 +49,21 @@ namespace htn_transformator
                 taskTranslation[ct] = newCT;
                 rightSideCompound.Add(newCT);
             }
-            foreach (OrderConstraint oc in copy.Orderings)
+            foreach (OrderConstraint oc in copy.orderings)
             {
                 AppendOrderingConstraint(new OrderConstraint(taskTranslation[oc.first], taskTranslation[oc.second]));
             }
-            foreach (BeforeConstraint bc in copy.Befores)
+            foreach (BeforeConstraint bc in copy.befores)
             {
                 AppendBefore(new BeforeConstraint(bc.Symbol, taskTranslation[bc.Task]));
             }
-            foreach (AfterConstraint ac in copy.Afters)
+            foreach (AfterConstraint ac in copy.afters)
             {
-                afters.Add(new AfterConstraint(ac.Symbol, taskTranslation[ac.Task]));
+                AppendAfter(new AfterConstraint(ac.Symbol, taskTranslation[ac.Task]));
             }
-            foreach(BetweenConstraint bw in copy.Betweens)
+            foreach(BetweenConstraint bw in copy.betweens)
             {
-                betweens.Add(new BetweenConstraint(bw.Symbol, taskTranslation[bw.FromTask], taskTranslation[bw.ToTask]));
+                AppendBetween(new BetweenConstraint(bw.Symbol, taskTranslation[bw.FromTask], taskTranslation[bw.ToTask]));
             }
         }
         public bool IsTotallyOrdered()
@@ -104,33 +104,33 @@ namespace htn_transformator
             else
                 rightSidePrimitive.Remove((PrimitiveTask)t);
 
-            for (int i = 0; i < Orderings.Count; i++)
+            for (int i = 0; i < orderings.Count; i++)
             {
-                if (Orderings[i].first == t || Orderings[i].second == t)
+                if (orderings[i].first == t || orderings[i].second == t)
                 {
                    orderings.RemoveAt(i);
                     i--;
                 }
             }
-            for (int i = 0; i < Befores.Count; i++)
+            for (int i = 0; i < befores.Count; i++)
             {
-                if (Befores[i].Task == t)
+                if (befores[i].Task == t)
                 {
                     befores.RemoveAt(i);
                     i--;
                 }
             }
-            for (int i = 0; i < Afters.Count; i++)
+            for (int i = 0; i < afters.Count; i++)
             {
-                if (Afters[i].Task == t)
+                if (afters[i].Task == t)
                 {
                     afters.RemoveAt(i);
                     i--;
                 }
             }
-            for (int i = 0; i < Betweens.Count; i++)
+            for (int i = 0; i < betweens.Count; i++)
             {
-                if (Betweens[i].FromTask == t || Betweens[i].ToTask == t)
+                if (betweens[i].FromTask == t || betweens[i].ToTask == t)
                 {
                     betweens.RemoveAt(i);
                     i--;
@@ -163,7 +163,35 @@ namespace htn_transformator
                 throw new Exception("Identical ordering constraint is inserted for the second time!");
             }
 
-            orderings.Add(con);
+            bool fromFound = false;
+            bool toFound = false;
+
+            foreach (var task in rightSideCompound)
+            {
+                if (con.first == task)
+                {
+                    fromFound = true;
+                }
+                if (con.second == task)
+                {
+                    toFound = true;
+                }
+            }
+
+            foreach (var task in rightSidePrimitive)
+            {
+                if (con.first == task)
+                {
+                    fromFound = true;
+                }
+                if (con.second == task)
+                {
+                    toFound = true;
+                }
+            }
+
+            if (fromFound && toFound) orderings.Add(con);
+            else throw new Exception("Ordering insertion failed! Target tasks not found!");
 
             if (!proceedingTasks.ContainsKey(con.first))
             {
@@ -221,7 +249,36 @@ namespace htn_transformator
                 }
             }
 
-            betweens.Add(bc);
+            bool fromFound = false;
+            bool toFound = false;
+
+            foreach (var task in rightSideCompound)
+            {
+                if (bc.FromTask == task)
+                {
+                    fromFound = true;
+                }
+                if (bc.ToTask == task)
+                {
+                    toFound = true;
+                }
+            }
+
+            foreach (var task in rightSidePrimitive)
+            {
+                if (bc.FromTask == task)
+                {
+                    fromFound = true;
+                }
+                if (bc.ToTask == task)
+                {
+                    toFound = true;
+                }
+            }
+
+            if (fromFound && toFound) betweens.Add(bc);
+            else throw new Exception("Between insertion failed! Target tasks not found!");
+
         }
         public void ClearBetweens()
         {
@@ -234,7 +291,76 @@ namespace htn_transformator
                 if (insertedAfter.Task == ac.Task && insertedAfter.Symbol == ac.Symbol) return;
             }
 
-            afters.Add(ac);
+            foreach (var task in rightSideCompound)
+            {
+                if (ac.Task == task)
+                {
+                    afters.Add(ac);
+                    return;
+                }
+            }
+
+            foreach (var task in rightSidePrimitive)
+            {
+                if (ac.Task == task)
+                {
+                    afters.Add(ac);
+                    return;
+                }
+            }
+
+            throw new Exception("After insertion failed! Target task not found!");
+        }
+        public void RemoveTaskAndShiftConstraints(Task t)
+        {
+            List<Task> ordering = TaskOrdering();
+
+            int index = ordering.IndexOf(t);
+
+            if (index == -1) throw new Exception("Task to remove was not found in a method!");
+            if (ordering.Count < 2) throw new Exception("Cannot shift constraints because there is only one task left!");
+
+            List<BeforeConstraint> toDeleteBefore = new();
+            List<AfterConstraint> toDeleteAfter = new();
+
+            foreach (var before in befores)
+            {
+                if (before.Task == t) toDeleteBefore.Add(before);
+            }
+            foreach (var after in afters)
+            {
+                if (after.Task == t) toDeleteAfter.Add(after);
+            }
+
+            int toShiftIndex;
+            if (index == 0)
+            {
+                toShiftIndex = 1;
+
+                foreach (var before in toDeleteBefore)
+                {
+                    AppendBefore(new BeforeConstraint(before.Symbol, ordering[toShiftIndex]));
+                }
+                foreach (var after in toDeleteAfter)
+                {
+                    AppendBefore(new BeforeConstraint(after.Symbol, ordering[toShiftIndex])); // after becomes before because we shift forwards
+                }
+            }
+            else
+            {
+                toShiftIndex = index - 1;
+
+                foreach (var before in toDeleteBefore)
+                {
+                    AppendAfter(new AfterConstraint(before.Symbol, ordering[toShiftIndex]));
+                }
+                foreach (var after in toDeleteAfter)
+                {
+                    AppendAfter(new AfterConstraint(after.Symbol, ordering[toShiftIndex])); // before becomes after because we shift backwards
+                }
+            }
+
+            RemoveTask(t);
         }
         public void AppendBefore(BeforeConstraint bc)
         {
@@ -243,7 +369,25 @@ namespace htn_transformator
                 if (insertedBefore.Task == bc.Task && insertedBefore.Symbol == bc.Symbol) return;
             }
 
-            befores.Add(bc);
+            foreach (var task in rightSideCompound)
+            {
+                if (bc.Task == task)
+                {
+                    befores.Add(bc);
+                    return;
+                }
+            }
+
+            foreach (var task in rightSidePrimitive)
+            {
+                if (bc.Task == task)
+                {
+                    befores.Add(bc);
+                    return;
+                }
+            }
+
+            throw new Exception("Before insertion failed! Target task not found!");
         }
         /// <summary>
         /// Comparison between tasks with respect to ordering
