@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace htn_transformator
-{
+{ // probably will not do this :(
     internal class ToGNF : ITransformable
     {
         private PlanningDomain domain;

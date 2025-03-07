@@ -82,7 +82,7 @@ namespace htn_transformator
                     Method nulledMethod = new Method(m.Head, m);
                     var nulledMethodOrdering = nulledMethod.TaskOrdering();
 
-                    foreach (var newBefore in insert)
+                    foreach (var newBefore in copy)
                     {
                         nulledMethod.AppendBefore(new BeforeConstraint(newBefore.Item2, nulledMethodOrdering[newBefore.Item1]));
                     }
