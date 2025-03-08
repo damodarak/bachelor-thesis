@@ -10,7 +10,7 @@ namespace htn_transformator
     internal class PlanningDomain
     {
         private List<Method> methods = new List<Method>();
-        public List<Method> Methods { get { return methods; } }
+        public ReadOnlyCollection<Method> Methods => methods.AsReadOnly();
         public PlanningDomain() { }
         public void AppendMethod(Method m)
         {

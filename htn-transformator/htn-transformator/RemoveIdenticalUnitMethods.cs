@@ -21,7 +21,7 @@ namespace htn_transformator
                 if (pd.Methods[i].TaskCount() == 1 && pd.Methods[i].RightSideCompound.Count == 1 &&
                     pd.Methods[i].Head.TaskName == pd.Methods[i].RightSideCompound[0].TaskName)
                 {
-                    pd.Methods.RemoveAt(i);
+                    pd.RemoveMethod(pd.Methods[i]);
                     i--;
                 }
             }
