@@ -19,7 +19,7 @@ namespace htn_transformator
             for (int i = 0; i < pd.Methods.Count; i++)
             {
                 if (pd.Methods[i].TaskCount() == 1 && pd.Methods[i].RightSideCompound.Count == 1 &&
-                    pd.Methods[i].Head.TaskName.ID == pd.Methods[i].RightSideCompound[0].TaskName.ID)
+                    pd.Methods[i].Head.TaskName == pd.Methods[i].RightSideCompound[0].TaskName)
                 {
                     pd.Methods.RemoveAt(i);
                     i--;
