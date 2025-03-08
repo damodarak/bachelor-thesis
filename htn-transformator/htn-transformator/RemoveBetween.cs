@@ -57,7 +57,7 @@ namespace htn_transformator
         }
         private void searchCompoundTask(TaskName tn)
         {
-            List<Method> searchMethods = methodsWithHead(tn);
+            List<Method> searchMethods = Common.MethodsWithHead(d.Methods, tn);
 
             foreach (Method m in searchMethods)
             {
@@ -170,25 +170,13 @@ namespace htn_transformator
         private void copyMethods(TaskName newCompoundTask)
         {
             TaskName oldCompoundTaskName = derivedFrom[newCompoundTask]; // problem because we look at originial task, not actual father
-            List<Method> toCopy = methodsWithHead(oldCompoundTaskName);
+            List<Method> toCopy = Common.MethodsWithHead(d.Methods, oldCompoundTaskName);
 
             foreach (Method old in toCopy)
             {
                 Method copied = new Method(new CompoundTask(newCompoundTask, -1), old);
                 d.AppendMethod(copied);
             }
-        }
-        private List<Method> methodsWithHead(TaskName searchedHead)
-        {
-            List<Method> result = new();
-
-            foreach (Method m in d.Methods)
-            {
-                if (m.Head.TaskName == searchedHead)
-                    result.Add(m);
-            }
-
-            return result;
         }
         private CompoundTask createNewCompoundTask(Task father, HashSet<PropositionalSymbol> symbols)
         {

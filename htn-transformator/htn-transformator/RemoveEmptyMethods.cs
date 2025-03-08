@@ -41,7 +41,7 @@ namespace htn_transformator
 
                 if (nullifiableIndices.Count != 0)
                 {
-                    List<List<int>> powerSet = GetPowerSet(nullifiableIndices);
+                    List<List<int>> powerSet = Common.GetPowerSet(nullifiableIndices);
 
                     powerSet.RemoveAt(0); // we do not want empty set
 
@@ -128,7 +128,7 @@ namespace htn_transformator
                 {
                     if (!nullifies.ContainsKey(m.Head.TaskName)) nullifies[m.Head.TaskName] = new();
 
-                    if (!containtsSet(nullifies[m.Head.TaskName], symbolsCopy))
+                    if (!Common.ContaintsSet(nullifies[m.Head.TaskName], symbolsCopy))
                     {
                         nullifies[m.Head.TaskName].Add(symbolsCopy);
                         toBeSearched.Add(m.Head.TaskName);
@@ -157,15 +157,6 @@ namespace htn_transformator
             }
 
             return symbols;
-        }
-        private bool containtsSet<T>(IEnumerable<HashSet<T>> where, HashSet<T> lookingFor)
-        {
-            foreach (var set in where)
-            {
-                if (set.SetEquals(lookingFor)) return true;
-            }
-
-            return false;
         }
         private bool nullifiable(Method m)
         {
@@ -219,29 +210,6 @@ namespace htn_transformator
                     containsInSubtasks[t.TaskName].Add(m);
                 }
             }
-        }
-        private List<List<int>> GetPowerSet(List<int> set) // ChatGPT & GitHub
-        {
-            int n = set.Count;
-            int powerSetCount = 1 << n; // 2^n
-            List<List<int>> powerSet = new List<List<int>>();
-
-            for (int i = 0; i < powerSetCount; i++)
-            {
-                List<int> subset = new List<int>();
-
-                for (int j = 0; j < n; j++)
-                {
-                    if ((i & (1 << j)) != 0)
-                    {
-                        subset.Add(set[j]);
-                    }
-                }
-
-                powerSet.Add(subset);
-            }
-
-            return powerSet;
         }
     }
 }
