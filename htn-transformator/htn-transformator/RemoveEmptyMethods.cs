@@ -41,7 +41,11 @@ namespace htn_transformator
 
                 if (nullifiableIndices.Count != 0)
                 {
-                    List<List<int>> powerSet = GetPowerSet(nullifiableIndices, ordering.Count);
+                    List<List<int>> powerSet = GetPowerSet(nullifiableIndices);
+
+                    powerSet.RemoveAt(0); // we do not want empty set
+
+                    if (powerSet[powerSet.Count - 1].Count == ordering.Count) powerSet.RemoveAt(powerSet.Count - 1); // we do not want to remove all tasks
 
                     foreach (var indices in powerSet)
                     {
@@ -216,9 +220,9 @@ namespace htn_transformator
                 }
             }
         }
-        private List<List<int>> GetPowerSet(List<int> indices, int methodTaskCount) // ChatGPT & GitHub
+        private List<List<int>> GetPowerSet(List<int> set) // ChatGPT & GitHub
         {
-            int n = indices.Count;
+            int n = set.Count;
             int powerSetCount = 1 << n; // 2^n
             List<List<int>> powerSet = new List<List<int>>();
 
@@ -230,19 +234,14 @@ namespace htn_transformator
                 {
                     if ((i & (1 << j)) != 0)
                     {
-                        subset.Add(indices[j]);
+                        subset.Add(set[j]);
                     }
                 }
 
                 powerSet.Add(subset);
             }
 
-            powerSet.RemoveAt(0); // we do not want empty set
-
-            if (powerSet[powerSet.Count - 1].Count == methodTaskCount) powerSet.RemoveAt(powerSet.Count - 1); // we do not want to remove all tasks
-
             return powerSet;
         }
-        //private void shiftNullifiedTasksConstraints(Method)
     }
 }
