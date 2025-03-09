@@ -19,8 +19,7 @@ namespace htn_transformator
                 throw new Exception("Empty methods cannot have any constraints!");
             }
 
-            if (m.RightSidePrimitive.Count == 0 &&
-                m.TaskCount() == 1 &&
+            if (m.isUnit() &&
                 m.Head.TaskName == m.RightSideCompound[0].TaskName)
             {
                 return; // we can discard unit methods even though there are state constraints

@@ -475,5 +475,9 @@ namespace htn_transformator
 
             return sb.ToString();
         }
+        public bool isUnit()
+        {
+            return rightSidePrimitive.Count == 0 && rightSideCompound.Count == 1;
+        }
     }
 }

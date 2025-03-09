@@ -18,11 +18,13 @@ namespace htn_transformator
         private PlanningDomain d;
         private Dictionary<TaskName, Dictionary<TaskName, List<HashSet<ConstraintHelper>>>> unitsConstraints; // nullifies(Compound1,Compound2) = {{constr, ...  }, ... }
         private HashSet<ValueTuple<TaskName, TaskName>> toBeSearched;
+        private HashSet<ValueTuple<TaskName, TaskName>> searched;
         public RemoveUnitMethods(PlanningDomain d)
         {
             this.d = d;
             unitsConstraints = new();
             toBeSearched = new();
+            searched = new();
         }
         public PlanningDomain Transform()
         {
@@ -37,36 +39,61 @@ namespace htn_transformator
                 enumerator.MoveNext();
                 var toSearch = enumerator.Current;
                 toBeSearched.Remove(toSearch);
+                searched.Add(toSearch);
                 searchNullifiedUnitPair(toSearch);
             }
 
             // create new methods and remove unit methods
 
-            todoLaterRemove();
-            Console.ReadKey();
-            return null;
-        }
-        private void todoLaterRemove()
-        {
-            foreach (var item1 in unitsConstraints)
+            foreach (var pair in searched)
             {
-                foreach (var item2 in item1.Value)
+                List<Method> appendMethods = Common.MethodsWithHead(d.Methods, pair.Item2);
+
+                for (int i = 0; i < appendMethods.Count; i++)
                 {
-                    Console.WriteLine($"({item1.Key}, {item2.Key}): ");
-
-                    foreach (var item3 in item2.Value)
+                    if (appendMethods[i].isUnit())
                     {
-                        if (item3.Count == 0) Console.Write($"(empty), ");
-                        foreach (var item4 in item3)
-                        {
-                            string text = "after";
-                            if (item4.type == typeof(BeforeConstraint)) text = "before";
-
-                            Console.Write($"({item4.ps}, {text}), ");
-                        }
-                        Console.WriteLine();
+                        appendMethods.RemoveAt(i);
+                        i--;
                     }
-                    Console.WriteLine();
+                }
+
+                constructNewNonUnitMethods(appendMethods, pair);
+            }
+
+            for (int i = 0; i < d.Methods.Count; i++)
+            {
+                if (d.Methods[i].isUnit())
+                {
+                    d.RemoveMethod(d.Methods[i]);
+                    i--;
+                }
+            }
+
+            return d;
+        }
+        private void constructNewNonUnitMethods(List<Method> appendMethods, ValueTuple<TaskName, TaskName> pair)
+        {
+            foreach (var m in appendMethods)
+            {
+                foreach (var constraintsSet in unitsConstraints[pair.Item1][m.Head.TaskName])
+                {
+                    Method connected = new Method(new CompoundTask(pair.Item1, -1), m);
+                    var ordering = connected.TaskOrdering();
+                    foreach (var constr in constraintsSet)
+                    {
+                        if (constr.type == typeof(BeforeConstraint))
+                        {
+                            var bc = new BeforeConstraint(constr.ps, ordering[0]);
+                            connected.AppendBefore(bc);
+                        }
+                        else
+                        {
+                            var ac = new AfterConstraint(constr.ps, ordering[connected.TaskCount() - 1]);
+                            connected.AppendAfter(ac);
+                        }
+                    }
+                    d.AppendMethod(connected);
                 }
             }
         }
@@ -76,8 +103,7 @@ namespace htn_transformator
 
             for (int i = 0; i < searchMethods.Count; i++)
             {
-                if (searchMethods[i].TaskCount() != 1 || 
-                    searchMethods[i].RightSideCompound.Count != 1 ||
+                if (!searchMethods[i].isUnit() ||
                     pair.Item1 == searchMethods[i].RightSideCompound[0].TaskName)
                 {
                     searchMethods.RemoveAt(i);
@@ -121,7 +147,7 @@ namespace htn_transformator
         }
         private void unitMethodBase(Method m)
         {
-            if (!(m.TaskCount() == 1 && m.RightSideCompound.Count == 1)) return;
+            if (!m.isUnit()) return;
 
             if (!unitsConstraints.ContainsKey(m.Head.TaskName))
             {
