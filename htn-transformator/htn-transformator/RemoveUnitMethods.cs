@@ -79,7 +79,7 @@ namespace htn_transformator
                 foreach (var constraintsSet in unitsConstraints[pair.Item1][m.Head.TaskName])
                 {
                     Method connected = new Method(new CompoundTask(pair.Item1, -1), m);
-                    var ordering = connected.TaskOrdering();
+                    var ordering = connected.TaskTotalOrdering();
                     foreach (var constr in constraintsSet)
                     {
                         if (constr.type == typeof(BeforeConstraint))

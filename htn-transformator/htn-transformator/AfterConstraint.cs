@@ -6,14 +6,9 @@ using System.Threading.Tasks;
 
 namespace htn_transformator
 {
-    internal class AfterConstraint : StateConstraint
+    internal class AfterConstraint : SingleTaskStateConstraint
     {
-        public Task Task { get; private set; }
-        public AfterConstraint(PropositionalSymbol symbol, Task task)
-        {
-            Symbol = symbol;
-            Task = task;
-        }
+        public AfterConstraint(PropositionalSymbol symbol, Task task) : base(symbol, task) { }
         public override string ToString()
         {
             return $"after({Task}:{Symbol.Name})";

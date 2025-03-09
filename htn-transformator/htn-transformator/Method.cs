@@ -201,11 +201,13 @@ namespace htn_transformator
             proceedingTasks[con.first].Add(con.second);
         }
         /// <summary>
-        /// In case of totally ordered domains, returns linear ordering of tasks, otherwise the ordering is undefined.
+        /// Calculates linear ordering of tasks in this method
         /// </summary>
         /// <returns></returns>
-        public List<Task> TaskOrdering()
+        public List<Task> TaskTotalOrdering()
         {
+            if (!IsTotallyOrdered()) throw new Exception("Calling TaskTotalOrdering() on partially ordered domain!");
+
             List<Task> ordered = new List<Task>(TaskCount());
 
             for (int i = 0; i < RightSideCompound.Count; i++)
@@ -313,24 +315,15 @@ namespace htn_transformator
         }
         public void RemoveTaskAndShiftConstraints(Task t)
         {
-            List<Task> ordering = TaskOrdering();
+            List<Task> ordering = TaskTotalOrdering();
 
             int index = ordering.IndexOf(t);
 
             if (index == -1) throw new Exception("Task to remove was not found in a method!");
             if (ordering.Count < 2) throw new Exception("Cannot shift constraints because there is only one task left!");
 
-            List<BeforeConstraint> toDeleteBefore = new();
-            List<AfterConstraint> toDeleteAfter = new();
-
-            foreach (var before in befores)
-            {
-                if (before.Task == t) toDeleteBefore.Add(before);
-            }
-            foreach (var after in afters)
-            {
-                if (after.Task == t) toDeleteAfter.Add(after);
-            }
+            List<BeforeConstraint> toDeleteBefore = Common.TargetedStateConstraint(befores, t);
+            List<AfterConstraint> toDeleteAfter = Common.TargetedStateConstraint(afters, t);
 
             int toShiftIndex;
             if (index == 0)
@@ -404,7 +397,7 @@ namespace htn_transformator
             StringBuilder sb = new StringBuilder();
             sb.Append($"{Head}-->(");
 
-            List<Task> taskOrder = TaskOrdering();
+            List<Task> taskOrder = TaskTotalOrdering();
 
             if (IsTotallyOrdered())
             {

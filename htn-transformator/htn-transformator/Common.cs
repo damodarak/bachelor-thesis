@@ -52,5 +52,16 @@ namespace htn_transformator
 
             return result;
         }
+        public static List<T> TargetedStateConstraint<T>(IEnumerable<T> collection, Task t) where T : SingleTaskStateConstraint
+        {
+            List<T> result = new();
+
+            foreach (var constr in collection)
+            {
+                if (constr.Task == t) result.Add(constr);
+            }
+
+            return result;
+        }
     }
 }

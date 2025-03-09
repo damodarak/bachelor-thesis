@@ -36,7 +36,7 @@ namespace htn_transformator
 
             for (int i = 0; i < methodCount; i++)
             {
-                List<Task> ordering = d.Methods[i].TaskOrdering();
+                List<Task> ordering = d.Methods[i].TaskTotalOrdering();
                 List<int> nullifiableIndices = findNullifiableIndices(d.Methods[i], ordering);
 
                 if (nullifiableIndices.Count != 0)
@@ -84,7 +84,7 @@ namespace htn_transformator
                 {
                     //create null method
                     Method nulledMethod = new Method(m.Head, m);
-                    var nulledMethodOrdering = nulledMethod.TaskOrdering();
+                    var nulledMethodOrdering = nulledMethod.TaskTotalOrdering();
 
                     foreach (var newBefore in copy)
                     {

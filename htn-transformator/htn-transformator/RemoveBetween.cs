@@ -25,7 +25,7 @@ namespace htn_transformator
 
             foreach (Method m in d.Methods)
             {
-                List<Task> linearOrdering = m.TaskOrdering();
+                List<Task> linearOrdering = m.TaskTotalOrdering();
                 removeNeighbourBetweens(m, linearOrdering);
                 if (containtsIrrationalBetweens(m, linearOrdering))
                 {
@@ -48,7 +48,7 @@ namespace htn_transformator
 
             betweensToBefores(m);
 
-            List<Task> ordering = m.TaskOrdering();
+            List<Task> ordering = m.TaskTotalOrdering();
             List<HashSet<PropositionalSymbol>> symbols = symbolsFromBetweensAndNewTaskNames(m, ordering);
             m.ClearBetweens();
 
@@ -63,7 +63,7 @@ namespace htn_transformator
             {
                 betweensToBefores(m);
 
-                List<Task> ordering = m.TaskOrdering();
+                List<Task> ordering = m.TaskTotalOrdering();
                 List<HashSet<PropositionalSymbol>> neededSymbols = symbolsFromBetweensAndNewTaskNames(m, ordering);
                 m.ClearBetweens();
 
