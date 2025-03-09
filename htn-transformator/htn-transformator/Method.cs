@@ -479,5 +479,83 @@ namespace htn_transformator
         {
             return rightSidePrimitive.Count == 0 && rightSideCompound.Count == 1;
         }
+        public void SwapTask(Task from, Task to)
+        {
+            AppendTask(to);
+
+            List<OrderConstraint> insertOrders = new();
+            for (int i = 0; i < orderings.Count; i++)
+            {
+                OrderConstraint oc = orderings[i];
+                if (oc.first == from)
+                {
+                    insertOrders.Add(new OrderConstraint(to, oc.second));
+                }
+                else if (oc.second == from)
+                {
+                    insertOrders.Add(new OrderConstraint(oc.first, to));
+                }
+            }
+            foreach (OrderConstraint oc in insertOrders)
+            {
+                AppendOrderingConstraint(oc);
+            }
+
+            List<BeforeConstraint> insertBefores = new();
+            for (int i = 0; i < befores.Count; i++)
+            {
+                BeforeConstraint bc = befores[i];
+                if (bc.Task == from)
+                {
+                    insertBefores.Add(new BeforeConstraint(bc.Symbol, to));
+                    RemoveBeforeAt(i);
+                    i--;
+                }
+            }
+            foreach (BeforeConstraint bc in insertBefores)
+            {
+                AppendBefore(bc);
+            }
+
+            List<AfterConstraint> insertAfters = new();
+            for (int i = 0; i < afters.Count; i++)
+            {
+                AfterConstraint ac = afters[i];
+                if (ac.Task == from)
+                {
+                    insertAfters.Add(new AfterConstraint(ac.Symbol, to));
+                    RemoveAfterAt(i);
+                    i--;
+                }
+            }
+            foreach (AfterConstraint ac in insertAfters)
+            {
+                AppendAfter(ac);
+            }
+
+            List<BetweenConstraint> insertBetweens = new();
+            for (int i = 0; i < betweens.Count; i++)
+            {
+                BetweenConstraint bw = betweens[i];
+                if (bw.FromTask == from)
+                {
+                    insertBetweens.Add(new BetweenConstraint(bw.Symbol, to, bw.ToTask));
+                    RemoveBetweenAt(i);
+                    i--;
+                }
+                else if (bw.ToTask == from)
+                {
+                    insertBetweens.Add(new BetweenConstraint(bw.Symbol, bw.FromTask, to));
+                    RemoveBetweenAt(i);
+                    i--;
+                }
+            }
+            foreach (BetweenConstraint bw in insertBetweens)
+            {
+                AppendBetween(bw);
+            }
+
+            RemoveTask(from);
+        }
     }
 }

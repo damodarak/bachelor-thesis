@@ -95,11 +95,11 @@ namespace htn_transformator
                     {
                         CompoundTask newCT = createNewCompoundTask(ordering[i], symbols[i]);
                         toBeSearched.Add(newCT.TaskName);
-                        swapCompoundTask(m, (CompoundTask)ordering[i], newCT);
+                        m.SwapTask(ordering[i], newCT);
                     }
                     else
                     {
-                        swapCompoundTask(m, (CompoundTask)ordering[i], existingCT);
+                        m.SwapTask(ordering[i], existingCT);
                     }
                 }
             }
@@ -191,84 +191,6 @@ namespace htn_transformator
             derivesTo[father.TaskName].Add(newCT.TaskName);
 
             return newCT;
-        }
-        private void swapCompoundTask(Method m, CompoundTask oldCT, CompoundTask newCT)
-        {
-            m.AppendTask(newCT);
-
-            List<OrderConstraint> insertOrders = new();
-            for (int i = 0; i < m.Orderings.Count; i++)
-            {
-                OrderConstraint oc = m.Orderings[i];
-                if (oc.first == oldCT)
-                {
-                    insertOrders.Add(new OrderConstraint(newCT, oc.second));
-                }
-                else if (oc.second == oldCT)
-                {
-                    insertOrders.Add(new OrderConstraint(oc.first, newCT));
-                }
-            }
-            foreach (OrderConstraint oc in insertOrders)
-            {
-                m.AppendOrderingConstraint(oc);
-            }
-
-            List<BeforeConstraint> insertBefores = new();
-            for (int i = 0; i < m.Befores.Count; i++)
-            {
-                BeforeConstraint bc = m.Befores[i];
-                if (bc.Task == oldCT)
-                {
-                    insertBefores.Add(new BeforeConstraint(bc.Symbol, newCT));
-                    m.RemoveBeforeAt(i);
-                    i--;
-                }
-            }
-            foreach (BeforeConstraint bc in insertBefores)
-            {
-                m.AppendBefore(bc);
-            }
-
-            List<AfterConstraint> insertAfters = new();
-            for (int i = 0; i < m.Afters.Count; i++)
-            {
-                AfterConstraint ac = m.Afters[i];
-                if (ac.Task == oldCT)
-                {
-                    insertAfters.Add(new AfterConstraint(ac.Symbol, newCT));
-                    m.RemoveAfterAt(i);
-                    i--;
-                }
-            }
-            foreach (AfterConstraint ac in insertAfters)
-            {
-                m.AppendAfter(ac);
-            }
-
-            List<BetweenConstraint> insertBetweens = new();
-            for (int i = 0; i < m.Betweens.Count; i++)
-            {
-                BetweenConstraint bw = m.Betweens[i];
-                if (bw.FromTask == oldCT)
-                {
-                    insertBetweens.Add(new BetweenConstraint(bw.Symbol, newCT, bw.ToTask));
-                    m.RemoveBetweenAt(i);
-                    i--;
-                }
-                else if (bw.ToTask == oldCT)
-                {
-                    insertBetweens.Add(new BetweenConstraint(bw.Symbol, bw.FromTask, newCT));
-                    m.RemoveBetweenAt(i);
-                    i--;
-                }
-            }
-            foreach (BetweenConstraint bw in insertBetweens)
-            {
-                m.AppendBetween(bw);
-            }
-
-            m.RemoveTask(oldCT);
         }
         private CompoundTask? existingNewCompoundTaskName(Task t, HashSet<PropositionalSymbol> neededSymbols)
         {
