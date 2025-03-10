@@ -7,16 +7,26 @@ using System.Text.RegularExpressions;
 
 namespace htn_transformator
 {
+    /// <summary>
+    /// Class for parsing the input domain, and for storing the result.
+    /// </summary>
     internal class InputOutputDomain
     {
         private string inputFile { get; set; }
         private string outputFile { get; set; }
+        /// <summary>
+        /// Whether the following lines of the file should be ignored.
+        /// </summary>
         private bool insideComment = false;
         public InputOutputDomain(string inputFile, string outputFile)
         {
             this.inputFile = inputFile;
             this.outputFile = outputFile;
         }
+        /// <summary>
+        /// Parses the PlanningDomain from the input file.
+        /// </summary>
+        /// <returns>Parsed PlanningDomain.</returns>
         public PlanningDomain LoadDomain()
         {
             PlanningDomain domain = new PlanningDomain();
@@ -33,6 +43,12 @@ namespace htn_transformator
 
             return domain;
         }
+        /// <summary>
+        /// Defines the grammar of the method. Parses a single line of input domain.
+        /// </summary>
+        /// <param name="d"></param>
+        /// <param name="line"></param>
+        /// <exception cref="Exception"></exception>
         private void parseAndAppendMethod(PlanningDomain d, string line)
         {
             if (line.StartsWith("*/"))
@@ -88,20 +104,34 @@ namespace htn_transformator
 
             d.AppendMethod(method);
         }
+        /// <summary>
+        /// Remove duplicate strings from the input parameter.
+        /// </summary>
+        /// <param name="strings"></param>
+        /// <returns></returns>
         private List<string> removeDuplicates(string[] strings)
         {
             return new HashSet<string>(strings).ToList();
         }
+        /// <summary>
+        /// Creates a new concrete task (Primitive/Compound) and appends to the Method.
+        /// </summary>
+        /// <param name="m"></param>
+        /// <param name="task"></param>
+        /// <param name="concreteTasks"></param>
+        /// <exception cref="Exception"></exception>
         private void parseAndAppendTask(Method m, string task, Dictionary<string, Task> concreteTasks)
         {
             string[] taskAndIndex = task.Split('#');
 
+            // A CompoundTask starts with a capital letter.
             if (char.IsUpper(task[0]))
             {
                 CompoundTask ct = new CompoundTask(taskAndIndex[0], int.Parse(taskAndIndex[1]));
                 concreteTasks[task] = ct;
                 m.AppendTask(ct);
             }
+            // A PrimitiveTask starts with a lower letter.
             else if (char.IsLower(task[0]))
             {
                 PrimitiveTask pt = new PrimitiveTask(taskAndIndex[0], int.Parse(taskAndIndex[1]));
@@ -113,6 +143,13 @@ namespace htn_transformator
                 throw new Exception("Task names must begin with a letter character!");
             }
         }
+        /// <summary>
+        /// Creates a new Constraint and appends to the Method.
+        /// </summary>
+        /// <param name="m"></param>
+        /// <param name="con"></param>
+        /// <param name="concreteTasks"></param>
+        /// <exception cref="Exception"></exception>
         private void parseAndAppendConstraint(Method m, string con, Dictionary<string, Task> concreteTasks)
         {
             if (con.Contains("<"))
@@ -148,9 +185,15 @@ namespace htn_transformator
                 throw new Exception("Unknown constraint!");
             }
         }
+        /// <summary>
+        /// Creates new OrderingConstraint objects and appends to the Method.
+        /// </summary>
+        /// <param name="m"></param>
+        /// <param name="con"></param>
+        /// <param name="concreteTasks"></param>
         private void appendOrderings(Method m, string con, Dictionary<string, Task> concreteTasks)
         {
-            string[] orderConstr = con.Split('<');
+            string[] orderConstr = con.Split('<'); // Maybe be multiple tasks
 
             for (int i = 0; i < orderConstr.Length; i++)
             {
@@ -161,6 +204,10 @@ namespace htn_transformator
                 }
             }
         }
+        /// <summary>
+        /// Stores the PlanningDomain to the outputFile, or standard output.
+        /// </summary>
+        /// <param name="d"></param>
         public void StoreDomain(PlanningDomain d)
         {
             if (outputFile == "")

@@ -7,15 +7,30 @@ using System.Collections.ObjectModel;
 
 namespace htn_transformator
 {
+    /// <summary>
+    /// Represents a concrete Method in a PlanningDomain.
+    /// </summary>
     internal class Method
     {
+        /// <summary>
+        /// proceedingTasks[Task t] gets a collection of tasks that must be placed after this Task.
+        /// </summary>
         private Dictionary<Task, List<Task>> proceedingTasks = new();
         private List<OrderConstraint> orderings { get; set; } = new();
+        /// <summary>
+        /// CompoundTasks of this method's subtasks.
+        /// </summary>
         private List<CompoundTask> rightSideCompound { get; set; } = new();
+        /// <summary>
+        /// PrimitiveTasks of this method's subtasks.
+        /// </summary>
         private List<PrimitiveTask> rightSidePrimitive { get; set; } = new();
         private List<BeforeConstraint> befores { get; set; } = new();
         private List<AfterConstraint> afters { get; set; } = new();
         private List<BetweenConstraint> betweens { get; set; } = new();
+        /// <summary>
+        /// CompoundTask which can be decomposed with this method.
+        /// </summary>
         public CompoundTask Head { get; private set; }
         public ReadOnlyCollection<CompoundTask> RightSideCompound => rightSideCompound.AsReadOnly();
         public ReadOnlyCollection<PrimitiveTask> RightSidePrimitive => rightSidePrimitive.AsReadOnly();
@@ -29,6 +44,12 @@ namespace htn_transformator
 
             Head = head;
         }
+        /// <summary>
+        /// Construct a Method with the given Head and the subtasks, constraints of the given method.
+        /// </summary>
+        /// <param name="head"></param>
+        /// <param name="copy"></param>
+        /// <exception cref="Exception"></exception>
         public Method(CompoundTask head, Method copy)
         {
             if (head.TaskIndex != -1) throw new Exception("Head of the method must have index == -1!");
@@ -66,23 +87,53 @@ namespace htn_transformator
                 AppendBetween(new BetweenConstraint(bw.Symbol, taskTranslation[bw.FromTask], taskTranslation[bw.ToTask]));
             }
         }
+        /// <summary>
+        /// Comparison between tasks with respect to ordering
+        /// </summary>
+        /// <param name="left">expected smaller</param>
+        /// <param name="righ">expected bigged</param>
+        /// <returns>true if the left task comes before the right task; false otherwise</returns>
+        private bool isSmaller(Task left, Task righ)
+        {
+            return proceedingTasks.ContainsKey(left) && proceedingTasks[left].Contains(righ);
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns>true if each pair of tasks from subtasks can be totally ordered, otherwise false.</returns>
         public bool IsTotallyOrdered()
         {
             int count = TaskCount();
-            return Orderings.Count == ((count - 1) * count) / 2;
+            return Orderings.Count == ((count - 1) * count) / 2; // each pair has an ordering
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns>true if this Method has no subtasks, otherwise false.</returns>
         public bool IsEmpty()
         {
             return TaskCount() == 0;
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns>Number of subtasks.</returns>
         public int TaskCount()
         {
             return RightSideCompound.Count + RightSidePrimitive.Count;
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns>Number of all constraints.</returns>
         public int ConstraintsCount()
         {
-            return Befores.Count + Afters.Count + Betweens.Count + Betweens.Count + Orderings.Count;
+            return befores.Count + afters.Count + betweens.Count + orderings.Count;
         }
+        /// <summary>
+        /// Appends the Task to the Method's subtasks.
+        /// </summary>
+        /// <param name="t"></param>
         public void AppendTask(Task t)
         {
             if (t is PrimitiveTask pt)
@@ -90,6 +141,10 @@ namespace htn_transformator
             else
                 rightSideCompound.Add((CompoundTask)t);
         }
+        /// <summary>
+        /// Removes the task from the Method, also removes all constraints targeting input Task.
+        /// </summary>
+        /// <param name="t"></param>
         public void RemoveTask(Task t)
         {
             proceedingTasks.Remove(t);
@@ -149,6 +204,11 @@ namespace htn_transformator
         {
             betweens.RemoveAt(index);
         }
+        /// <summary>
+        /// Appends an OrderingConstraint to the Method. Both Tasks must exist in subtasks.
+        /// </summary>
+        /// <param name="con"></param>
+        /// <exception cref="Exception"></exception>
         public void AppendOrderingConstraint(OrderConstraint con)
         {
             if (con.first == con.second) return;
@@ -201,7 +261,7 @@ namespace htn_transformator
             proceedingTasks[con.first].Add(con.second);
         }
         /// <summary>
-        /// Calculates linear ordering of tasks in this method
+        /// Calculates linear ordering of subtasks in this method. Both Primitive/CompoundTask.
         /// </summary>
         /// <returns></returns>
         public List<Task> TaskTotalOrdering()
@@ -237,6 +297,11 @@ namespace htn_transformator
 
             return ordered;
         }
+        /// <summary>
+        /// Append between constraint to the this Method. Both Tasks must be present in subtasks.
+        /// </summary>
+        /// <param name="bc"></param>
+        /// <exception cref="Exception"></exception>
         public void AppendBetween(BetweenConstraint bc)
         {
             if (bc.FromTask == bc.ToTask) return;
@@ -280,13 +345,13 @@ namespace htn_transformator
 
             if (fromFound && toFound) betweens.Add(bc);
             else throw new Exception("Between insertion failed! Target tasks not found!");
-
         }
-        public void ClearBetweens()
-        {
-            betweens.Clear();
-        }
-        public void AppendAfter(AfterConstraint ac) // todo check also befores and vica verse
+        /// <summary>
+        /// Append after constraint to the this Method. Task must be present in subtasks.
+        /// </summary>
+        /// <param name="ac"></param>
+        /// <exception cref="Exception"></exception>
+        public void AppendAfter(AfterConstraint ac)
         {
             foreach (AfterConstraint insertedAfter in Afters)
             {
@@ -313,48 +378,11 @@ namespace htn_transformator
 
             throw new Exception("After insertion failed! Target task not found!");
         }
-        public void RemoveTaskAndShiftConstraints(Task t)
-        {
-            List<Task> ordering = TaskTotalOrdering();
-
-            int index = ordering.IndexOf(t);
-
-            if (index == -1) throw new Exception("Task to remove was not found in a method!");
-            if (ordering.Count < 2) throw new Exception("Cannot shift constraints because there is only one task left!");
-
-            List<BeforeConstraint> toDeleteBefore = Common.TargetedStateConstraint(befores, t);
-            List<AfterConstraint> toDeleteAfter = Common.TargetedStateConstraint(afters, t);
-
-            int toShiftIndex;
-            if (index == 0)
-            {
-                toShiftIndex = 1;
-
-                foreach (var before in toDeleteBefore)
-                {
-                    AppendBefore(new BeforeConstraint(before.Symbol, ordering[toShiftIndex]));
-                }
-                foreach (var after in toDeleteAfter)
-                {
-                    AppendBefore(new BeforeConstraint(after.Symbol, ordering[toShiftIndex])); // after becomes before because we shift forwards
-                }
-            }
-            else
-            {
-                toShiftIndex = index - 1;
-
-                foreach (var before in toDeleteBefore)
-                {
-                    AppendAfter(new AfterConstraint(before.Symbol, ordering[toShiftIndex]));
-                }
-                foreach (var after in toDeleteAfter)
-                {
-                    AppendAfter(new AfterConstraint(after.Symbol, ordering[toShiftIndex])); // before becomes after because we shift backwards
-                }
-            }
-
-            RemoveTask(t);
-        }
+        /// <summary>
+        /// Append before constraint to the this Method. Task must be present in subtasks.
+        /// </summary>
+        /// <param name="bc"></param>
+        /// <exception cref="Exception"></exception>
         public void AppendBefore(BeforeConstraint bc)
         {
             foreach (BeforeConstraint insertedBefore in Befores)
@@ -383,14 +411,61 @@ namespace htn_transformator
             throw new Exception("Before insertion failed! Target task not found!");
         }
         /// <summary>
-        /// Comparison between tasks with respect to ordering
+        /// Remove all between constraints.
         /// </summary>
-        /// <param name="left">expected smaller</param>
-        /// <param name="righ">expected bigged</param>
-        /// <returns>true if the left task comes before the right task; false otherwise</returns>
-        private bool isSmaller(Task left, Task righ)
+        public void ClearBetweens()
         {
-            return proceedingTasks.ContainsKey(left) && proceedingTasks[left].Contains(righ);
+            betweens.Clear();
+        }
+        /// <summary>
+        /// Remove the task from the subtasks, and shift all before/after constraints to the previous/next task w.r.t. the total ordering.
+        /// </summary>
+        /// <param name="t"></param>
+        /// <exception cref="Exception"></exception>
+        public void RemoveTaskAndShiftConstraints(Task t)
+        {
+            if (!IsTotallyOrdered()) throw new Exception("Cannot shift constraints if the method is not totally ordered");
+
+            List<Task> ordering = TaskTotalOrdering();
+
+            int index = ordering.IndexOf(t);
+
+            if (index == -1) throw new Exception("Task to remove was not found in a method!");
+            if (ordering.Count < 2) throw new Exception("Cannot shift constraints because there is only one task left!");
+            if (betweens.Count > 0) throw new Exception("Cannot remove and shift constraints if there are betweens!");
+
+            List<BeforeConstraint> toDeleteBefore = Common.TargetedStateConstraint(befores, t);
+            List<AfterConstraint> toDeleteAfter = Common.TargetedStateConstraint(afters, t);
+
+            int toShiftIndex; // shift constraints to the previous/next task
+            if (index == 0)
+            {
+                toShiftIndex = 1;
+
+                foreach (var before in toDeleteBefore)
+                {
+                    AppendBefore(new BeforeConstraint(before.Symbol, ordering[toShiftIndex]));
+                }
+                foreach (var after in toDeleteAfter)
+                {
+                    AppendBefore(new BeforeConstraint(after.Symbol, ordering[toShiftIndex])); // after becomes before because we shift forwards
+                }
+            }
+            else
+            {
+                toShiftIndex = index - 1;
+
+                foreach (var before in toDeleteBefore)
+                {
+                    AppendAfter(new AfterConstraint(before.Symbol, ordering[toShiftIndex]));
+                }
+                foreach (var after in toDeleteAfter)
+                {
+                    AppendAfter(new AfterConstraint(after.Symbol, ordering[toShiftIndex])); // before becomes after because we shift backwards
+                }
+            }
+
+            RemoveTask(t);
         }
         public override string ToString()
         {
@@ -468,10 +543,20 @@ namespace htn_transformator
 
             return sb.ToString();
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns>true if there is only one subtask which is CompoundTask, false otherwise.</returns>
         public bool isUnit()
         {
             return rightSidePrimitive.Count == 0 && rightSideCompound.Count == 1;
         }
+        /// <summary>
+        /// Removes the Task from and appends Task to. All constraints targeting Task from are appended with the target Task to.
+        /// Old Tasks and Constraints are removed.
+        /// </summary>
+        /// <param name="from"></param>
+        /// <param name="to"></param>
         public void SwapTask(Task from, Task to)
         {
             AppendTask(to);

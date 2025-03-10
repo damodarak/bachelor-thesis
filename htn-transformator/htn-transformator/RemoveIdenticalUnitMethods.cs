@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace htn_transformator
 {
-    // This transformation is implicitly used in domain parsing
+    // This transformation is implicitly used in the domain parsing
     internal class RemoveIdenticalUnitMethods : ITransformable
     {
         private PlanningDomain pd;

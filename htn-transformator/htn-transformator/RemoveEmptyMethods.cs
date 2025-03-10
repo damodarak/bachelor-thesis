@@ -9,16 +9,22 @@ namespace htn_transformator
     class RemoveEmptyMethods : ITransformable
     {
         private PlanningDomain d;
-        private Dictionary<TaskName, List<HashSet<PropositionalSymbol>>> nullifies = new(); // TaskName -> set of sets of symbols that can be nullified using empty methods
+        /// <summary>
+        /// TaskName -> set of sets of symbols that can be nullified using empty methods.
+        /// </summary>
+        private Dictionary<TaskName, List<HashSet<PropositionalSymbol>>> nullifies = new();
         private HashSet<TaskName> toBeSearched = new();
+        /// <summary>
+        /// TaskName -> set of Methods which contain TaskName in subtasks.
+        /// </summary>
         private Dictionary<TaskName, HashSet<Method>> containsInSubtasks = new();
         public RemoveEmptyMethods(PlanningDomain d) { this.d = d; }
         public PlanningDomain Transform()
         {
-            if (!d.ContaintsEmptyMethod()) return d;
+            if (!d.ContaintsEmptyMethod()) return d; // nothing to do
 
             d = (new RemoveBetween(d)).Transform();
-            // now we know that this is totally ordered domain and does not contain any betweens
+            // now we know that this is totally ordered domain and does not contain any BetweenConstraints
 
             containsInInit();
             nullifiesBase();
@@ -32,7 +38,7 @@ namespace htn_transformator
                 searchNullifiedTaskName(toSearch);
             }
 
-            int methodCount = d.Methods.Count; // may change after insertin of new nullified methods
+            int methodCount = d.Methods.Count; // may change after insertion of new nullified methods
 
             for (int i = 0; i < methodCount; i++)
             {
@@ -43,9 +49,10 @@ namespace htn_transformator
                 {
                     List<List<int>> powerSet = Common.GetPowerSet(nullifiableIndices);
 
-                    powerSet.RemoveAt(0); // we do not want empty set
-
-                    if (powerSet[powerSet.Count - 1].Count == ordering.Count) powerSet.RemoveAt(powerSet.Count - 1); // we do not want to remove all tasks
+                    // we do not want empty set
+                    powerSet.RemoveAt(0);
+                    // we do not want to remove all tasks
+                    if (powerSet[powerSet.Count - 1].Count == ordering.Count) powerSet.RemoveAt(powerSet.Count - 1);
 
                     foreach (var indices in powerSet)
                     {
@@ -54,6 +61,7 @@ namespace htn_transformator
                 }
             }
 
+            // remove all empty Methods
             for (int i = 0; i < d.Methods.Count; i++)
             {
                 if (d.Methods[i].IsEmpty())
@@ -65,9 +73,17 @@ namespace htn_transformator
 
             return d;
         }
+        /// <summary>
+        /// Create new Methods without some Nullable Tasks with some combinations of PropositionalSymbols in new StateConstraints.
+        /// </summary>
+        /// <param name="m"></param>
+        /// <param name="nullTaskIndices"></param>
+        /// <param name="index"></param>
+        /// <param name="ordering"></param>
+        /// <param name="insert"></param>
         private void nullifieMethodAndAppendToDomain(Method m, List<int> nullTaskIndices, int index, List<Task> ordering, List<Tuple<int, PropositionalSymbol>> insert)
         {
-            //append consts
+            //append Constraints
             //shift; RemoveTaskAndShiftConstraints(Task t)
             //delete tasks; RemoveTaskAndShiftConstraints(Task t)
 
@@ -102,6 +118,11 @@ namespace htn_transformator
                     nullifieMethodAndAppendToDomain(m, nullTaskIndices, index + 1, ordering, copy);
             }
         }
+        /// <summary>
+        /// For the given TaskName tries to find new combination of PropositionalTasks that can be nullified using some sequence of nullifiable
+        /// Methods.
+        /// </summary>
+        /// <param name="tn"></param>
         private void searchNullifiedTaskName(TaskName tn)
         {
             if (!containsInSubtasks.ContainsKey(tn)) return;
@@ -115,6 +136,12 @@ namespace htn_transformator
                 createNewNullifiedSymbols(m, 0, symbols);
             }
         }
+        /// <summary>
+        /// Recursive function over nullifiable Method m. Tries to find new combination of PropositionalSymbols that can be nullified.
+        /// </summary>
+        /// <param name="m"></param>
+        /// <param name="index"></param>
+        /// <param name="symbols"></param>
         private void createNewNullifiedSymbols(Method m, int index, HashSet<PropositionalSymbol> symbols)
         {
             HashSet<PropositionalSymbol> symbolsCopy;
@@ -143,6 +170,11 @@ namespace htn_transformator
                 }
             }
         }
+        /// <summary>
+        /// Find all PropositionalSymbols that are contained in After/BeforeConstraints.
+        /// </summary>
+        /// <param name="m"></param>
+        /// <returns></returns>
         private HashSet<PropositionalSymbol> symbolsFromConstraints(Method m)
         {
             HashSet<PropositionalSymbol> symbols = new();
@@ -158,6 +190,11 @@ namespace htn_transformator
 
             return symbols;
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="tn"></param>
+        /// <returns>true if the all subtasks from the given Method can be nullified with a sequence of Methods, false otherwise.</returns>
         private bool nullifiable(Method m)
         {
             foreach (CompoundTask ct in m.RightSideCompound)
@@ -167,18 +204,32 @@ namespace htn_transformator
 
             return m.RightSidePrimitive.Count == 0; // all CompoundTasks are nullifiable, but there cannot be any PrimitiveTasks
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="tn"></param>
+        /// <returns>true if the given TaskName can be nullified with a sequence of Methods, false otherwise.</returns>
         private bool nullifiable(TaskName tn) { return nullifies.ContainsKey(tn); }
+        /// <summary>
+        /// Finds indices of nullifiable TaskNames in the given Method.
+        /// </summary>
+        /// <param name="m"></param>
+        /// <param name="ordering"></param>
+        /// <returns></returns>
         private List<int> findNullifiableIndices(Method m, List<Task> ordering)
         {
             List<int> result = new();
 
             for (int i = 0; i < ordering.Count; i++)
             {
-                if (nullifies.ContainsKey(ordering[i].TaskName)) result.Add(i);
+                if (nullifiable(ordering[i].TaskName)) result.Add(i);
             }
 
             return result;
         }
+        /// <summary>
+        /// init toBeSearched, nullifies based on empty Methods.
+        /// </summary>
         private void nullifiesBase()
         {
             foreach (Method m in d.Methods)
@@ -192,10 +243,13 @@ namespace htn_transformator
                     if (!nullifies.ContainsKey(headName))
                         nullifies[headName] = new();
 
-                    nullifies[headName].Add(new HashSet<PropositionalSymbol>()); // empty set
+                    nullifies[headName].Add(new HashSet<PropositionalSymbol>()); // empty set = nullifies to nothing
                 }
             }
         }
+        /// <summary>
+        /// Fill containsInSubtasks (subtask -> Method) with data.
+        /// </summary>
         private void containsInInit()
         {
             foreach (Method m in d.Methods)

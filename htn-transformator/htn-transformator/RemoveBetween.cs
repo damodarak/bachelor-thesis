@@ -10,10 +10,21 @@ namespace htn_transformator
     {
         private int nextNewCompoundIndex = 1;
         private PlanningDomain d;
-        // translation between TaskName and the set of mandatory IDs of propositional symbols
-        private Dictionary<TaskName, HashSet<PropositionalSymbol>> mandatoryPropSymbols = new(); // IDs of mandatory Propositional Symbols of a TaskName
-        private Dictionary<TaskName, TaskName> derivedFrom = new(); // child TaskName -> father TaskName
-        private Dictionary<TaskName, HashSet<TaskName>> derivesTo = new(); // father TaskName -> children TaskNames
+        /// <summary>
+        /// Translation between TaskName and the set of mandatory PropositionalSymbols.
+        /// </summary>
+        private Dictionary<TaskName, HashSet<PropositionalSymbol>> mandatoryPropSymbols = new();
+        /// <summary>
+        /// Child TaskName -> father TaskName.
+        /// </summary>
+        private Dictionary<TaskName, TaskName> derivedFrom = new();
+        /// <summary>
+        ///  Father TaskName -> set of children TaskNames.
+        /// </summary>
+        private Dictionary<TaskName, HashSet<TaskName>> derivesTo = new();
+        /// <summary>
+        /// TaskNames that were searched and do not need to be searched again.
+        /// </summary>
         private HashSet<TaskName> searched = new();
         public RemoveBetween(PlanningDomain pd) 
         {
@@ -23,6 +34,7 @@ namespace htn_transformator
         {
             if (!d.IsTotallyOrdered()) throw new Exception("This transformation operates only with totally ordered domains!");
 
+            // betweens that should not be here or easy to remove
             foreach (Method m in d.Methods)
             {
                 List<Task> linearOrdering = m.TaskTotalOrdering();
@@ -42,15 +54,19 @@ namespace htn_transformator
 
             return d;
         }
+        /// <summary>
+        /// Remove all between constraints from a Method and create new Methods with guaranteed PropositionalSymbols.
+        /// </summary>
+        /// <param name="m"></param>
         private void removeBetweens(Method m)
         {
-            if (m.Betweens.Count == 0) return;
+            if (m.Betweens.Count == 0) return; // nothing to do
 
             betweensToBefores(m);
 
             List<Task> ordering = m.TaskTotalOrdering();
             List<HashSet<PropositionalSymbol>> symbols = symbolsFromBetweensAndNewTaskNames(m, ordering);
-            m.ClearBetweens();
+            m.ClearBetweens(); // now we can remove all betweens
 
             HashSet<TaskName> toBeSearched = appendBeforesAndSwapTasks(m, ordering, symbols);
             copyMethodsAndSearchTask(toBeSearched);
@@ -76,6 +92,14 @@ namespace htn_transformator
                 copyMethodsAndSearchTask(toBeSearched);
             }
         }
+        /// <summary>
+        /// Append BeforeConstraints with the PropositionalSymbols symbols to the PrimitiveTasks. And swap CompoundTask with the new
+        /// ones that guarantee PropositionalSymbols.
+        /// </summary>
+        /// <param name="m"></param>
+        /// <param name="ordering"></param>
+        /// <param name="symbols"></param>
+        /// <returns>List of new TaskNames which were created.</returns>
         private HashSet<TaskName> appendBeforesAndSwapTasks(Method m, List<Task> ordering, List<HashSet<PropositionalSymbol>> symbols)
         {
             HashSet<TaskName> toBeSearched = new();
@@ -91,7 +115,7 @@ namespace htn_transformator
                 else
                 {
                     CompoundTask? existingCT = existingNewCompoundTaskName(ordering[i], symbols[i]);
-                    if (existingCT == null)
+                    if (existingCT == null) // New TaskName which has not been searched yet
                     {
                         CompoundTask newCT = createNewCompoundTask(ordering[i], symbols[i]);
                         toBeSearched.Add(newCT.TaskName);
@@ -106,9 +130,14 @@ namespace htn_transformator
 
             return toBeSearched;
         }
+        /// <summary>
+        /// For each Task it finds HashSet of PropositionalSymbols that are mentioned in BetweenConstraints.
+        /// </summary>
+        /// <param name="m"></param>
+        /// <param name="ordering"></param>
+        /// <returns></returns>
         private List<HashSet<PropositionalSymbol>> symbolsFromBetweensAndNewTaskNames(Method m, List<Task> ordering)
         {
-            // ints are reffering to Propositional symbol IDs
             HashSet<PropositionalSymbol>[] symbols = new HashSet<PropositionalSymbol>[ordering.Count];
 
             for (int i = 0; i < symbols.Length; i++)
@@ -135,12 +164,18 @@ namespace htn_transformator
 
             return new List<HashSet<PropositionalSymbol>>(symbols);
         }
+        /// <summary>
+        /// Remove BetweenConstraints that target Tasks which are next to each other w.r.t. the totall ordering.
+        /// These can be easily interchange with a single BeforeConstraint.
+        /// </summary>
+        /// <param name="m"></param>
+        /// <param name="ordering"></param>
         private void removeNeighbourBetweens(Method m, List<Task> ordering)
         {
             for (int i = 0; i < m.Betweens.Count; i++)
             {
                 int index = ordering.IndexOf(m.Betweens[i].FromTask);
-                if (index != -1 && index != ordering.Count - 1 && m.Betweens[i].ToTask == ordering[index + 1])
+                if (index != ordering.Count - 1 && m.Betweens[i].ToTask == ordering[index + 1])
                 {
                     PropositionalSymbol ps = m.Betweens[i].Symbol;
                     Task t = m.Betweens[i].ToTask;
@@ -151,6 +186,11 @@ namespace htn_transformator
                 }
             }
         }
+        /// <summary>
+        /// Create new Methods with the toBeSearched TaskNames as a Method.Head.
+        /// Search TaskNames (they interact with newly created Methods) which have not been searched yet.
+        /// </summary>
+        /// <param name="toBeSearched"></param>
         private void copyMethodsAndSearchTask(HashSet<TaskName> toBeSearched)
         {
             foreach (TaskName newCompoundTaskName in toBeSearched)
@@ -167,17 +207,27 @@ namespace htn_transformator
                 }
             }
         }
-        private void copyMethods(TaskName newCompoundTask)
+        /// <summary>
+        /// Create new Methods with new TaskNames. New Methods have identical subtasks and constraints as the father TaskName.
+        /// </summary>
+        /// <param name="newTaskName"></param>
+        private void copyMethods(TaskName newTaskName)
         {
-            TaskName oldCompoundTaskName = derivedFrom[newCompoundTask]; // problem because we look at originial task, not actual father
+            TaskName oldCompoundTaskName = derivedFrom[newTaskName];
             List<Method> toCopy = Common.MethodsWithHead(d.Methods, oldCompoundTaskName);
 
             foreach (Method old in toCopy)
             {
-                Method copied = new Method(new CompoundTask(newCompoundTask, -1), old);
+                Method copied = new Method(new CompoundTask(newTaskName, -1), old);
                 d.AppendMethod(copied);
             }
         }
+        /// <summary>
+        /// Creates new CompounTask with the mandatory symbols.
+        /// </summary>
+        /// <param name="father"></param>
+        /// <param name="symbols"></param>
+        /// <returns></returns>
         private CompoundTask createNewCompoundTask(Task father, HashSet<PropositionalSymbol> symbols)
         {
             CompoundTask newCT = new CompoundTask(father, symbols, nextNewCompoundIndex++);
@@ -192,6 +242,12 @@ namespace htn_transformator
 
             return newCT;
         }
+        /// <summary>
+        /// Tries to find TaskName with the given mandatory symbols.
+        /// </summary>
+        /// <param name="t"></param>
+        /// <param name="neededSymbols"></param>
+        /// <returns>CompoundTask with existing TaskName which guaranteees PropositionalSymbols, null otherwise.</returns>
         private CompoundTask? existingNewCompoundTaskName(Task t, HashSet<PropositionalSymbol> neededSymbols)
         {
             // Task t could be new TaskName but also original
@@ -206,6 +262,7 @@ namespace htn_transformator
 
                 foreach (TaskName child in derivesTo[search])
                 {
+                    // if there is a new TaskName with the given mandatory symbols then we recycle this TaskName
                     if (mandatoryPropSymbols.ContainsKey(child) && mandatoryPropSymbols[child].SetEquals(neededSymbols))
                     {
                         return new CompoundTask(child, nextNewCompoundIndex++);
@@ -214,10 +271,15 @@ namespace htn_transformator
 
             return null;
         }
+        /// <summary>
+        /// Append BeforeConstraints to the Method with the given HashSet of PropositionalSymbols.
+        /// </summary>
+        /// <param name="m"></param>
+        /// <param name="pt"></param>
+        /// <param name="symbols"></param>
+        /// <exception cref="Exception"></exception>
         private void appendBeforesToPrimitiveTask(Method m, PrimitiveTask pt, HashSet<PropositionalSymbol> symbols)
         {
-            if (symbols == null) return;
-
             int index = m.RightSidePrimitive.IndexOf(pt);
             if (index == -1)
             {
@@ -230,6 +292,12 @@ namespace htn_transformator
                 m.AppendBefore(bc);
             }
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="m"></param>
+        /// <param name="linearOrdering"></param>
+        /// <returns>true if a Method contains a BetweenConstraint in which targeted Tasks are in reverse order, false otherwise.</returns>
         private bool containtsIrrationalBetweens(Method m, List<Task> linearOrdering)
         {
             foreach (BetweenConstraint bw in m.Betweens)
@@ -240,6 +308,11 @@ namespace htn_transformator
 
             return false;
         }
+        /// <summary>
+        /// For each BetweenConstraint we append a BeforeConstraint that targets the second Task in a BetweenConstraint.
+        /// This is a prevention if all Tasks targeted by the BetweenConstraint are decomposed with an empty Method.
+        /// </summary>
+        /// <param name="m"></param>
         private void betweensToBefores(Method m)
         {
             foreach (BetweenConstraint bw in m.Betweens) // in case that all intermedieate tasks are empty in the final plan

@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace htn_transformator
 {
+    /// <summary>
+    /// Representing the concrete CompoundTask of the concrete Method in a PlanningDomain.
+    /// </summary>
     internal class CompoundTask : Task
     {
         public CompoundTask(string name, int index) : base(name, index) { }

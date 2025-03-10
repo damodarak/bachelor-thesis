@@ -6,17 +6,11 @@ using System.Threading.Tasks;
 
 namespace htn_transformator
 {
-    internal struct PropositionalSymbol
+    internal struct PropositionalSymbol : IEquatable<PropositionalSymbol>
     {
         private static int nextPropID = 0;
         private static Dictionary<string, int> nameToInt = new Dictionary<string, int>();
         private static Dictionary<int, string> idToName = new Dictionary<int, string>();
-        public static string GetName(int id) //maybe later remove
-        {
-            if (idToName.ContainsKey(id)) return idToName[id];
-
-            return "";
-        }
         public int ID { get; private set; }
         public string Name { get; private set; }
         public  PropositionalSymbol(string name)
@@ -61,7 +55,7 @@ namespace htn_transformator
         }
         public override string ToString()
         {
-            return $"{Name}";
+            return Name;
         }
     }
 }

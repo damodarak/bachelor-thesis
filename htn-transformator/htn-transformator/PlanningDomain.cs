@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace htn_transformator
 {
+    /// <summary>
+    /// Represents PlanningDomain with the set of methods
+    /// </summary>
     internal class PlanningDomain
     {
         private List<Method> methods = new List<Method>();
@@ -22,7 +25,7 @@ namespace htn_transformator
             if (m.isUnit() &&
                 m.Head.TaskName == m.RightSideCompound[0].TaskName)
             {
-                return; // we can discard unit methods even though there are state constraints
+                return; // we can discard these unit methods despite possible state constraints
             }
 
             methods.Add(m);
@@ -31,6 +34,10 @@ namespace htn_transformator
         {
             if (!methods.Remove(m)) throw new Exception("Deletion of method failed! Method not found!");
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns>true if all methods are totally ordered, false otherwise</returns>
         public bool IsTotallyOrdered()
         {
             foreach (Method m in methods)
@@ -40,6 +47,10 @@ namespace htn_transformator
 
             return true;
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns>true if a method with no subtasks exists, false otherwise</returns>
         public bool ContaintsEmptyMethod()
         {
             foreach (Method m in methods)

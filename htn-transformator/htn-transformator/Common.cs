@@ -8,6 +8,11 @@ namespace htn_transformator
 {
     static class Common
     {
+        /// <summary>
+        /// Calculate all subsets of the given set.
+        /// </summary>
+        /// <param name="set"></param>
+        /// <returns>Power set.</returns>
         public static List<List<int>> GetPowerSet(List<int> set) // ChatGPT & GitHub
         {
             int n = set.Count;
@@ -31,6 +36,13 @@ namespace htn_transformator
 
             return powerSet;
         }
+        /// <summary>
+        /// Enumerates over the given collection and looks for the given HashSet.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="where"></param>
+        /// <param name="lookingFor"></param>
+        /// <returns>Returns true if the set was found, false otherwise.</returns>
         public static bool ContaintsSet<T>(IEnumerable<HashSet<T>> where, HashSet<T> lookingFor)
         {
             foreach (var set in where)
@@ -40,6 +52,12 @@ namespace htn_transformator
 
             return false;
         }
+        /// <summary>
+        /// Find all methods in collectin with the given TaskName in the Head.
+        /// </summary>
+        /// <param name="methods"></param>
+        /// <param name="searchedHead"></param>
+        /// <returns></returns>
         public static List<Method> MethodsWithHead(IEnumerable<Method> methods, TaskName searchedHead)
         {
             List<Method> result = new();
@@ -52,6 +70,13 @@ namespace htn_transformator
 
             return result;
         }
+        /// <summary>
+        /// Find all SingleTaskStateConstraint targetins the Task t in the given collection.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="collection"></param>
+        /// <param name="t"></param>
+        /// <returns></returns>
         public static List<T> TargetedStateConstraint<T>(IEnumerable<T> collection, Task t) where T : SingleTaskStateConstraint
         {
             List<T> result = new();

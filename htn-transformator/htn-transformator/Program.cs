@@ -3,43 +3,72 @@
     internal class Program
     {
         static void Main(string[] args)
-        { // TODO: state constraints always target only one task, cannot be extended for PO domains
-   //         try
-			//{
-				ArgParser ap = new ArgParser(args);
+        {
+            ArgParser ap = new ArgParser(args);
 
-                InputOutputDomain iod = new InputOutputDomain(ap.inputFile, ap.outputFile);
-                PlanningDomain pd = iod.LoadDomain();
+            InputOutputDomain iod = new InputOutputDomain(ap.InputFile, ap.OutputFile);
+            PlanningDomain pd = iod.LoadDomain();
 
-                ITransformable trns;
+            ITransformable trns;
 
-                switch (ap.type)
-                {
-                    case TransformationType.RemoveBetween:
-                        trns = new RemoveBetween(pd);
-                        break;
-                    case TransformationType.RemoveEmptyMethods:
-                        trns = new RemoveEmptyMethods(pd);
-                        break;
-                    case TransformationType.ToCNF:
-                        trns = new ToCNF(pd);
-                        break;
-                    case TransformationType.TOGNF:
-                        trns = new ToGNF(pd);
-                        break;
-                    default:
-                        throw new Exception();
-                }
+            switch (ap.Type)
+            {
+                case TransformationType.RemoveBetween:
+                    trns = new RemoveBetween(pd);
+                    break;
+                case TransformationType.RemoveEmptyMethods:
+                    trns = new RemoveEmptyMethods(pd);
+                    break;
+                case TransformationType.ToCNF:
+                    trns = new ToCNF(pd);
+                    break;
+                case TransformationType.TOGNF:
+                    trns = new ToGNF(pd);
+                    break;
+                default:
+                    throw new Exception();
+            }
 
-                PlanningDomain result = trns.Transform();
+            PlanningDomain result = trns.Transform();
 
-                iod.StoreDomain(result);
-   //         }
-			//catch (Exception e)
-			//{
-   //             Console.WriteLine(e.Message);
-			//	return;
-			//}
+            iod.StoreDomain(result);
+
+            //try
+            //{
+            //    ArgParser ap = new ArgParser(args);
+
+            //    InputOutputDomain iod = new InputOutputDomain(ap.InputFile, ap.OutputFile);
+            //    PlanningDomain pd = iod.LoadDomain();
+
+            //    ITransformable trns;
+
+            //    switch (ap.Type)
+            //    {
+            //        case TransformationType.RemoveBetween:
+            //            trns = new RemoveBetween(pd);
+            //            break;
+            //        case TransformationType.RemoveEmptyMethods:
+            //            trns = new RemoveEmptyMethods(pd);
+            //            break;
+            //        case TransformationType.ToCNF:
+            //            trns = new ToCNF(pd);
+            //            break;
+            //        case TransformationType.TOGNF:
+            //            trns = new ToGNF(pd);
+            //            break;
+            //        default:
+            //            throw new Exception();
+            //    }
+
+            //    PlanningDomain result = trns.Transform();
+
+            //    iod.StoreDomain(result);
+            //}
+            //catch (Exception e)
+            //{
+            //    Console.WriteLine(e.Message);
+            //    return;
+            //}
         }
     }
 }

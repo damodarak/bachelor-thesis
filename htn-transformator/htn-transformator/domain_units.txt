@@ -15,3 +15,10 @@ E-->(act#1);[]
 A-->(B#1);[]
 A-->(a#1);[]
 */
+
+/*
+B-->(act2#1,act1#1);[act2#1<act1#1,between(act2#1:p:act1#1)]
+A-->(B#1,act1#1,B#2);[B#1<act1#1,B#1<B#2,act1#1<B#2,before(p:B#1)]
+B-->(act2#1,act1#1);[act2#1<act1#1]
+B-->();[]
+*/
