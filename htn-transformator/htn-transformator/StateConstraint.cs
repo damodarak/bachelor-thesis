@@ -11,6 +11,9 @@ namespace htn_transformator
     /// </summary>
     internal abstract class StateConstraint : Constraint
     {
+        /// <summary>
+        /// Is set in the child Constructors.
+        /// </summary>
         public PropositionalSymbol Symbol { get; protected set; }
     }
 }

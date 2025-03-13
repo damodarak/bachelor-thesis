@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace htn_transformator
 {
+    /// <summary>
+    /// Struct representing a name of a Task. There is a one-to-one mapping of IDs and Names.
+    /// </summary>
     internal struct TaskName : IEquatable<TaskName>
     {
         private static int nextTaskNameID = 0;

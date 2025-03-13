@@ -7,6 +7,10 @@ using System.Xml.Linq;
 
 namespace htn_transformator
 {
+    /// <summary>
+    /// Class representing abstract Task. Each task is defined with TaskName and int TaskIndex (this way we can have multiple
+    /// tasks with the same TaskName in a single method).
+    /// </summary>
     internal abstract class Task
     {
         public static readonly int HeadIndex = -1;
@@ -27,6 +31,12 @@ namespace htn_transformator
             TaskName = taskName;
             TaskIndex = taskIndex;
         }
+        /// <summary>
+        /// New constructor is used in RemoveBetween transformation. To display which Symbols are guaranteed with this CompoundTask.
+        /// </summary>
+        /// <param name="father"></param>
+        /// <param name="symbols"></param>
+        /// <param name="index"></param>
         public Task(Task father, HashSet<PropositionalSymbol> symbols, int index)
         {
             TaskIndex = index;

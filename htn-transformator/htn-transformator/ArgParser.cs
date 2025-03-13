@@ -28,7 +28,7 @@ namespace htn_transformator
         /// <exception cref="Exception"></exception>
         public ArgParser(string[] args) 
         {
-            // the input file must be always given
+            // the input file must be always given + type of transformation
             if (args.Length != 5 && args.Length != 3)
             {
                 throw new Exception("Incorrect argument length!");

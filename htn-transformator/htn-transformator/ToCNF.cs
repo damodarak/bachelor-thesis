@@ -16,21 +16,23 @@
             d = (new RemoveBetween(d)).Transform();
             d = (new RemoveEmptyMethods(d)).Transform();
             d = (new RemoveUnitMethods(d)).Transform();
+            // now all methods have >= 2 subtasks
 
             // now we need to interchange Primitives with new Unit Compounds
             int methodCount = d.Methods.Count;
             for (int i = 0; i < methodCount; i++)
             {
-                swapPrimitivesWithNewCompounds(d.Methods[i]);
+                swapPrimitivesWithCompoundsAndMethods(d.Methods[i]);
             }
 
-            // then split large methods with 2 > Compounds and
-            methodCount = d.Methods.Count;
+            // and lastly we need to split large methods with 2 > Compounds
+            methodCount = d.Methods.Count; // new methods might be added
             for (int i = 0; i < methodCount; i++)
             {
                 splitLargeMethods(d.Methods[i]);
             }
 
+            // remove large methods with 2 > Compounds
             for (int i = 0; i < d.Methods.Count; i++)
             {
                 if (d.Methods[i].TaskCount() > 2)
@@ -42,7 +44,12 @@
 
             return d;
         }
-        private void swapPrimitivesWithNewCompounds(Method m)
+        /// <summary>
+        /// For each Method with >= 2 subtasks we interchange PrimitiveTasks with CompoundTask and creat a single method that 
+        /// decomposes this new CompoundTask to the interchanged PrimitiveTask.
+        /// </summary>
+        /// <param name="m"></param>
+        private void swapPrimitivesWithCompoundsAndMethods(Method m)
         {
             int taskCount = m.TaskCount();
             var ordering = m.TaskTotalOrdering();
@@ -53,18 +60,24 @@
                 if (ordering[i] is CompoundTask) continue;
                 // ordering[i] is PrimitiveTask here
 
+                // same PrimitiveTask might be handled in some previous Method
                 if (!primitiveToNewCompound.ContainsKey(ordering[i].TaskName))
                 {
                     primitiveToNewCompound[ordering[i].TaskName] = new TaskName($"{newCompoundToPrimitivePrefix}{ordering[i].TaskName.Name}");
-                    Method unitToPrimitive = new Method(new CompoundTask(primitiveToNewCompound[ordering[i].TaskName], -1));
-                    unitToPrimitive.AppendTask(new PrimitiveTask(ordering[i].TaskName, 1));
-                    d.AppendMethod(unitToPrimitive);
+                    Method primitiveUnitMethod = new Method(new CompoundTask(primitiveToNewCompound[ordering[i].TaskName], -1));
+                    primitiveUnitMethod.AppendTask(new PrimitiveTask(ordering[i].TaskName, 1)); // append removed Primitive to a new Method
+                    d.AppendMethod(primitiveUnitMethod);
                 }
 
                 CompoundTask exchange = new CompoundTask(primitiveToNewCompound[ordering[i].TaskName], ordering[i].TaskIndex);
                 m.SwapTask(ordering[i], exchange);
             }
         }
+        /// <summary>
+        /// For each Method with >=3 subtasks (in this case all must be CompoundTask) create new Methods (with 2 subtask) that gradually simulate
+        /// the old Method.
+        /// </summary>
+        /// <param name="m"></param>
         private void splitLargeMethods(Method m)
         {
             if (m.TaskCount() < 3) return;
