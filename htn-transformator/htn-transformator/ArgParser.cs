@@ -58,10 +58,6 @@ namespace htn_transformator
                 {
                     Type = TransformationType.ToCNF;
                 }
-                else if (args[i] == "--tognf")
-                {
-                    Type = TransformationType.TOGNF;
-                }
                 else
                 {
                     throw new Exception("Incorrect arguments!");

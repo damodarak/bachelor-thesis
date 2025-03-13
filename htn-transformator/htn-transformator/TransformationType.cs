@@ -10,7 +10,6 @@ namespace htn_transformator
     {
         RemoveBetween,
         RemoveEmptyMethods,
-        ToCNF,
-        TOGNF
+        ToCNF
     }
 }

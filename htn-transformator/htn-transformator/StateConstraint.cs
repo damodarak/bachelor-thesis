@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace htn_transformator
 {
+    /// <summary>
+    /// Represents abstract class that holds a PropositionalSymbol that needs to hold for a valid plan.
+    /// </summary>
     internal abstract class StateConstraint : Constraint
     {
         public PropositionalSymbol Symbol { get; protected set; }

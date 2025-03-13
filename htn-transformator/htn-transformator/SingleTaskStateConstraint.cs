@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace htn_transformator
 {
+    /// <summary>
+    /// Represents StateConstraints that targets only one task.
+    /// </summary>
     abstract class SingleTaskStateConstraint : StateConstraint
     {
         public Task Task { get; protected set; }
