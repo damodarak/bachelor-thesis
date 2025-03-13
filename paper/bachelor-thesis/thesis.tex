@@ -177,8 +177,36 @@ TO – Totally-ordered
 %%% should be uploaded to SIS. Allowed file formats are specified in provision
 %%% of the rector no. 72/2017. Exceptions can be approved by faculty's coordinator.
 \appendix
-%\chapter{Attachments}
+\chapter{Attachments}
 
-%section{First Attachment}
+\section{First Attachment}
+
+\subsection*{NAME}
+\textbf{htn-transformator} - a command-line program that demonstrates some of the transformations mentioned in this text.
+
+\subsection*{SYNOPSIS}
+\texttt{htn-transformator -i INPUTFILE [--between|--empty|--tocnf]} \\
+\texttt{[-o OUTPUTFILE]}
+
+\subsection*{DESCRIPTION}
+\texttt{htn-transformator} is a utility designed to apply specific transformations to HTN planning domains.
+
+\subsection*{OPTIONS}
+\begin{description}
+\item[-i INPUTFILE]
+Specifies the input file containing the HTN data. This option is mandatory.
+
+\item[--between]
+Removes all between constraints from the input planning domain.
+
+\item[--empty]
+Removes all between constraints and empty methods from the input planning domain.
+
+\item[--tocnf]
+Transforms the input planning domain into the HTN-ChNF.
+
+\item[-o OUTPUTFILE]
+Specifies an optional output file to save the result. If this option is omitted, the output is displayed to stdout.
+\end{description}
 
 \end{document}
