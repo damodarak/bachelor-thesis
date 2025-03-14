@@ -1,0 +1,9 @@
+COMPOUND_TASK-->(COMPOUND_TASK#1,pRIMITIVE_TASK#1,COMPOUND_TASK#2,COMPOUND_TASK1#1,...);[constr1,constr2,...]
+
+constraints:
+	TASK1#1<TASK2#1
+	before(p:TASK#1)
+	after(TASK#1:p)
+	between(TASK#1:p:TASK#1)
+
+Each planning domain is defined as a list of methods. Each method is placed on a separate line and consists of three parts: Head compound task, subtasks, constraints. HEAD-->(subtask1,subtask2,...);[constr1,constr2,...]. No white spaces are allowed. To allow multiple identical subtasks, each subtask is indexed (SUBTASK#index). Compound tasks start with a capital letter while primitive tasks start with lower letter. Multiple subtasks with identical name and index are omited. Names of tasks must start with a letter and may continue with both letters and digits.  
