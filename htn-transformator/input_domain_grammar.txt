@@ -1,9 +1,23 @@
 COMPOUND_TASK-->(COMPOUND_TASK#1,pRIMITIVE_TASK#1,COMPOUND_TASK#2,COMPOUND_TASK1#1,...);[constr1,constr2,...]
 
 constraints:
-	TASK1#1<TASK2#1
+	TASK1#1<TASK2#1<TASK3#1<TASK1#2
 	before(p:TASK#1)
 	after(TASK#1:p)
 	between(TASK#1:p:TASK#1)
 
-Each planning domain is defined as a list of methods. Each method is placed on a separate line and consists of three parts: Head compound task, subtasks, constraints. HEAD-->(subtask1,subtask2,...);[constr1,constr2,...]. No white spaces are allowed. To allow multiple identical subtasks, each subtask is indexed (SUBTASK#index). Compound tasks start with a capital letter while primitive tasks start with lower letter. Multiple subtasks with identical name and index are omited. Names of tasks must start with a letter and may continue with both letters and digits.  
+Each planning domain is defined as a list of methods. Each method is placed on a separate line and consists of three parts: Head compound task, subtasks, constraints. HEAD-->(subtask1,subtask2,...);[constr1,constr2,...]. No white spaces are allowed. To allow multiple identical subtasks, each subtask is indexed (SUBTASK#index). Compound tasks start with a capital letter while primitive tasks start with lower letter. Multiple subtasks with identical name and index are omited. Names of tasks must start with a letter and may continue with both letters and digits. All constraints must target subtasks that are mentioned in the subtasks section. There are four types of constraints: ordering constraint (between two or more tasks), before/after/between constraints. Each of the state constraints contain a single propositional symbol that is checked during the planning phase of a planning problem.
+
+Lines enclosed in /* and */ are ignored. These symbols must be at the beginning of a line.
+Line that start with # is also ignored.
+Empty lines are also skipped by the parser.
+
+/*
+insideComment
+insideComment
+
+insideComment
+
+*/
+
+#    ignored
