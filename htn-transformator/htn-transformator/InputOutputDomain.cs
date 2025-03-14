@@ -83,8 +83,8 @@ namespace htn_transformator
             CompoundTask head = new CompoundTask(headAndRest[0], Task.HeadIndex);
 
             string[] subtasksAndConstr = headAndRest[1].Split(';');
-            string[] tasks = subtasksAndConstr[0].Split(['(', ')', ','], StringSplitOptions.RemoveEmptyEntries);
-            string[] constrs = subtasksAndConstr[1].Split(['[', ']', ','], StringSplitOptions.RemoveEmptyEntries);
+            string[] tasks = subtasksAndConstr[0].Split(new char[] { '(', ')', ',' }, StringSplitOptions.RemoveEmptyEntries);
+            string[] constrs = subtasksAndConstr[1].Split(new char[] { '[', ']', ',' }, StringSplitOptions.RemoveEmptyEntries);
 
             List<string> uniqueTasks = removeDuplicates(tasks);
             List<string> uniqueConstrs = removeDuplicates(constrs);
@@ -158,7 +158,7 @@ namespace htn_transformator
             }
             else if (con.Contains("before"))
             {
-                string[] before = con.Split(['(', ')', ':'], StringSplitOptions.RemoveEmptyEntries);
+                string[] before = con.Split(new char[] { '(', ')', ':' }, StringSplitOptions.RemoveEmptyEntries);
 
                 PropositionalSymbol ps = new PropositionalSymbol(before[1]);
                 BeforeConstraint bc = new BeforeConstraint(ps, concreteTasks[before[2]]);
@@ -166,7 +166,7 @@ namespace htn_transformator
             }
             else if (con.Contains("after"))
             {
-                string[] after = con.Split(['(', ')', ':'], StringSplitOptions.RemoveEmptyEntries);
+                string[] after = con.Split(new char[] { '(', ')', ':' }, StringSplitOptions.RemoveEmptyEntries);
 
                 PropositionalSymbol ps = new PropositionalSymbol(after[2]);
                 AfterConstraint ac = new AfterConstraint(ps, concreteTasks[after[1]]);
@@ -174,7 +174,7 @@ namespace htn_transformator
             }
             else if (con.Contains("between"))
             {
-                string[] between = con.Split(['(', ')', ':'], StringSplitOptions.RemoveEmptyEntries);
+                string[] between = con.Split(new char[] { '(', ')', ':' }, StringSplitOptions.RemoveEmptyEntries);
 
                 PropositionalSymbol ps = new PropositionalSymbol(between[2]);
                 BetweenConstraint betc = new BetweenConstraint(ps, concreteTasks[between[1]], concreteTasks[between[3]]);
