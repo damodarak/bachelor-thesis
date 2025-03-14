@@ -1,0 +1,4 @@
+A-->(ac1#1,A#1,ac1#2);[ac1#1<A#1<ac1#2,between(ac1#1:p:ac1#2)]
+A-->(ac2#1,A#1,ac2#2);[ac2#1<A#1<ac2#2,between(ac2#1:q:ac2#2)]
+A-->(ac3#1,A#1,ac3#2);[ac3#1<A#1<ac3#2,between(ac3#1:r:ac3#2)]
+A-->();[]

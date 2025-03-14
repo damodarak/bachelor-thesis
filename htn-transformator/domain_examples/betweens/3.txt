@@ -1,0 +1,2 @@
+# neighbours
+D-->(ac#1,ac#2);[ac#1<ac#2,between(ac#1:p:ac#2)]

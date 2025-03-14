@@ -1,0 +1,2 @@
+# irrational
+D-->(ac#1,ac#2);[ac#1<ac#2,between(ac#2:p:ac#1)]

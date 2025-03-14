@@ -1,0 +1,5 @@
+A-->(B#1,C#1,A#2,B#2);[B#1<C#1<A#2<B#2,between(B#1:p:B#2)]
+A-->(a#1,C#1,a#2);[a#1<C#1<a#2,between(a#1:q:a#2)]
+B-->(bact#1);[]
+C-->();[]
+C-->(cact#1,cact#2);[cact#1<cact#2,after(cact#2:p)]
