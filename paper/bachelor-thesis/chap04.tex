@@ -268,8 +268,24 @@ In the following Algorithm~\ref{alg04:1}, we will create new \emph{compound task
     The same procedure will be carried out to the new \emph{methods}, where \\ $compound(M) = Z_Q^{R}$.
 \end{proof}
 
+\medskip\noindent
+So far, we have only discussed \emph{methods} with \emph{constraints} that can target subtasks. This restriction is placed in Definition~\ref{def02:10}. Besides that, there are HTN formalisms that allow \emph{state-constraints} targeting a \emph{compound task} that is being decomposed. For example $T \rightarrow T_1, T_2 \; [T_1 \prec T_2, be\text{f}ore(p, T)]$ or $T \rightarrow \varepsilon \; [a\text{f}ter(T, q)]$. The following transformation will try to convert these \emph{methods} into \emph{methods} that satisfy our definitions.
 
+\begin{thm}\label{thm04:14}
+    For each \emph{HTN} \emph{method} (including \emph{empty methods}) containing \emph{after-, before-constraints} targeting a decomposed \emph{task}, there is an equivalent transformation that removes these \emph{constraints}. 
+\end{thm}
+\begin{proof}
+    Suppose we have \emph{a method} $T \rightarrow T_1, T_2, \dots, T_k \; [C], \; k \geq 0$ with (for example) $be\text{f}ore(p, T) \in C$. Until there are such \emph{constraints}, choose any of them, remove it from the set of \emph{constraints}, create a new unique \emph{compound task} $X$ and a new \emph{empty method} $X \rightarrow \varepsilon \; [\{\}]$. If the removed \emph{constraint} was a \emph{before-constraint} then append $X$ to the beginning of \emph{a method} ($X$ proceeds all current \emph{tasks}) and append a new \emph{before-constraint} $be\text{f}ore(p,X)$ to the set of \emph{constraints}. Analogously for the \emph{after-constraints}. Repeat until there are such \emph{constraints}. This procedure works fine for \emph{empty methods}.
+\end{proof}
 
+\medskip\noindent
+Example of the transformation above:
+
+\begin{enumerate}
+    \item $T \rightarrow T_1 \; [be\text{f}ore(p,T), a\text{f}ter(T,q)]$
+    \item $T \rightarrow X_1, T_1 \; [X_1 \prec T_1, be\text{f}ore(p,X_1), a\text{f}ter(T,q)]$
+    \item $T \rightarrow X_1, T_1, X_2 \; [X_1 \prec T_1 \prec X_2, be\text{f}ore(p,X_1), a\text{f}ter(X_2,q)]$
+\end{enumerate}
 
 % \section{many different formalisms and languages}
 % look for features that can be transformed or deleted \\

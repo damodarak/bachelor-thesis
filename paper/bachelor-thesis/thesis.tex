@@ -179,7 +179,7 @@ TO – Totally-ordered
 \appendix
 \chapter{Attachments}
 
-\section{First Attachment}
+\section{Program Manual}
 
 \subsection*{NAME}
 \textbf{htn-transformator} - a command-line program that demonstrates some of the transformations mentioned in this text.
@@ -208,5 +208,59 @@ Transforms the input planning domain into the HTN-ChNF.
 \item[-o OUTPUTFILE]
 Specifies an optional output file to save the result. If this option is omitted, the output is displayed to stdout.
 \end{description}
+
+\section{Input Domain Format}
+
+Each planning domain is defined as a list of \textbf{methods}. Each method is placed on a separate line and consists of three parts:
+
+\begin{enumerate}
+  \item \textbf{Head compound task}
+  \item \textbf{Subtasks}
+  \item \textbf{Constraints}
+\end{enumerate}
+
+\textbf{Syntax:}
+\begin{equation*}
+\texttt{HEAD}-->(\texttt{subtask1}, \texttt{subtask2}, \ldots);[\texttt{constr1}, \texttt{constr2}, \ldots]
+\end{equation*}
+
+\subsection*{Rules}
+
+\begin{itemize}
+  \item No white spaces are allowed.
+  \item To allow multiple identical tasks, each subtask is indexed: \texttt{SUBTASK\#index}.
+  \item Compound tasks start with a capital letter.
+  \item Primitive tasks start with a lowercase letter.
+  \item Multiple subtasks with identical name and index are omitted.
+  \item Task names must start with a letter and may include letters and digits.
+  \item All constraints must target subtasks mentioned in the subtasks section.
+  \item There are four types of constraints:
+    \begin{itemize}
+      \item Ordering constraint (between two or more tasks)
+      \item \texttt{before}
+      \item \texttt{after}
+      \item \texttt{between}
+    \end{itemize}
+  \item Each state constraint contains a single propositional symbol checked during planning.
+\end{itemize}
+
+\subsection*{Comment Syntax}
+
+\begin{itemize}
+  \item Lines enclosed in \texttt{/*} and \texttt{*/} are ignored. These symbols must be at the beginning of a line.
+  \item Lines starting with \texttt{\#} are ignored.
+  \item Empty lines are skipped by the parser.
+\end{itemize}
+
+\begin{lstlisting}[language=,frame=single]
+/*
+insideComment
+insideComment
+
+insideComment
+*/
+
+# ignored
+\end{lstlisting}
 
 \end{document}
