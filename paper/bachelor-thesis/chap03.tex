@@ -58,7 +58,7 @@ As it happens in life, forbidding something might help in some cases but, on the
 \medskip\noindent
 Succeeding models will allow different kinds of \emph{empty methods}, usually by handling some workaround.
 
-\subsection{No-op Based Model (version 1)}
+\subsection{No-op Based Model}
 
 \medskip\noindent
 Another possible way to resolve the issue with \emph{empty methods} is the No-op model~\cite{ondrckova2023semantics}~\cite{ondrckova2024empty}. The no-op model introduces a new symbol $no\text{-}op()$ which is not presented in the \emph{hierarchical planning domain}. Formally, the $no\text{-}op()$ symbol is just another \emph{primitive task} with no preconditions and effects, i.e. $no\text{-}op() = (\{\}, \{\}, \{\})$. The semantics behind this symbol is hidden right in the name, "no operation", meaning that this action has no impact on the world that we model. It serves as a regular symbol during the planning phase concerning all of the \emph{ordering-constraints} and \emph{before-, after-, between-constraint}. After the checking of all available constraints, the $no\text{-}op()$ symbol is deleted from the final \emph{plan} as it was not part of the former \emph{planning problem}.
